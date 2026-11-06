@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>حاسبة REQ</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2048%2048%22%3E%3Cdefs%3E%3ClinearGradient%20id=%22g%22%20x1=%220%22%20y1=%220%22%20x2=%221%22%20y2=%221%22%3E%3Cstop%20offset=%220%22%20stop-color=%22%234f6bff%22/%3E%3Cstop%20offset=%221%22%20stop-color=%22%237c5cff%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width=%2248%22%20height=%2248%22%20rx=%2211%22%20fill=%22url%28%23g%29%22/%3E%3Cg%20transform=%22translate%288%208%29%20scale%281.333%29%22%20fill=%22none%22%20stroke=%22%23fff%22%20stroke-width=%221.8%22%20stroke-linecap=%22round%22%20stroke-linejoin=%22round%22%3E%3Cpath%20d=%22M7%203h10a2%202%200%200%201%202%202v14a2%202%200%200%201-2%202H7a2%202%200%200%201-2-2V5a2%202%200%200%201%202-2z%22/%3E%3Cpath%20d=%22M8%207.5h8%22/%3E%3Cpath%20d=%22M8.5%2012h.01%22/%3E%3Cpath%20d=%22M12%2012h.01%22/%3E%3Cpath%20d=%22M15.5%2012h.01%22/%3E%3Cpath%20d=%22M8.5%2016h.01%22/%3E%3Cpath%20d=%22M12%2016h.01%22/%3E%3Cpath%20d=%22M15.5%2016h.01%22/%3E%3C/g%3E%3C/svg%3E">
+<meta name="theme-color" content="#4f6bff">
+<style>
+:root{--bg:#f4f5f8;--card:#fff;--tx:#12151c;--mu:#6a7282;--bd:#e5e8ee;--in:#f1f3f8;--pr:#4f6bff;--pr2:#7c5cff;--ok:#15803d;--er:#dc2626;--sh:0 1px 2px rgba(18,21,28,.04),0 6px 20px rgba(18,21,28,.05);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0b0d12;--card:#141821;--tx:#eceef3;--mu:#9aa3b5;--bd:#262c3a;--in:#1b2030;--pr:#6580ff;--pr2:#8e74ff;--ok:#34d399;--er:#f87171;--sh:none;color-scheme:dark}}
+:root[data-theme=dark]{--bg:#0b0d12;--card:#141821;--tx:#eceef3;--mu:#9aa3b5;--bd:#262c3a;--in:#1b2030;--pr:#6580ff;--pr2:#8e74ff;--ok:#34d399;--er:#f87171;--sh:none;color-scheme:dark}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.65 system-ui,-apple-system,"Segoe UI",Tahoma,Roboto,"Noto Sans Arabic",Arial,sans-serif;direction:ltr;-webkit-font-smoothing:antialiased}
+button,input{font:inherit;color:inherit}
+.t{unicode-bidi:plaintext;text-align:start}.ltr{direction:ltr;unicode-bidi:isolate}
+.wrap{max-width:1160px;margin:0 auto;padding:0 16px 40px}
+header{display:flex;align-items:center;gap:14px;padding:20px 0}
+.logo{width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,var(--pr),var(--pr2));display:grid;place-items:center;color:#fff;flex:none}
+.logo svg{width:26px;height:26px}
+.grow{flex:1;min-width:0}
+h1{margin:0;font-size:18.4px;line-height:1.4;word-break:break-word}
+.mu{color:var(--mu)}.sm{font-size:13.6px}.xs{font-size:12px}
+svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:20px;padding:18px;box-shadow:var(--sh)}
+.row{display:flex;align-items:center;gap:14px}
+.tile{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;flex:none;background:color-mix(in srgb,var(--c,var(--pr)) 13%,transparent);color:var(--c,var(--pr))}
+.card h2{margin:0;font-size:16.8px;line-height:1.4}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 18px;border-radius:16px;border:1px solid var(--bd);background:var(--card);cursor:pointer;font-weight:700;width:100%;transition:filter .15s,transform .1s}
+.btn:active{transform:scale(.98)}.btn:hover{filter:brightness(.97)}
+.btn.p{background:linear-gradient(135deg,var(--pr),var(--pr2));color:#fff;border:0}.btn.p:hover{filter:brightness(1.08)}
+.btn.d{background:var(--er);color:#fff;border:0}
+.btn:disabled{opacity:.55;cursor:default}
+.ib{width:40px;height:40px;border-radius:12px;border:0;background:transparent;display:grid;place-items:center;cursor:pointer;color:var(--mu);flex:none}
+.ib:hover{background:var(--in);color:var(--tx)}
+.chip{min-height:36px;padding:0 16px;border-radius:50px;border:1px solid var(--bd);background:var(--card);cursor:pointer;font-size:13.6px}
+.chip.on{background:color-mix(in srgb,var(--pr) 13%,transparent);border-color:var(--pr);color:var(--pr);font-weight:700}
+.chips{display:flex;gap:10px;flex-wrap:wrap}
+.field{display:flex;align-items:center;gap:10px;background:var(--in);border:1px solid var(--bd);border-radius:13px;padding:0 14px;min-height:48px}
+.field:focus-within{border-color:var(--pr);box-shadow:0 0 0 3px color-mix(in srgb,var(--pr) 20%,transparent)}
+.field input{flex:1;min-width:0;border:0;background:transparent;outline:0;min-height:44px;unicode-bidi:plaintext}
+.ban{display:flex;gap:14px;align-items:flex-start;border-radius:16px;padding:14px 16px;border:1px solid color-mix(in srgb,var(--c) 35%,transparent);background:color-mix(in srgb,var(--c) 9%,transparent)}
+.ban>svg{color:var(--c);margin-top:2px}.ban b{display:block;line-height:1.5}.ban .btn{margin-top:10px;width:auto;min-height:40px}
+.spin{width:20px;height:20px;border:2.5px solid color-mix(in srgb,var(--pr) 25%,transparent);border-top-color:var(--pr);border-radius:50%;animation:sp .8s linear infinite;flex:none;margin-top:2px}
+.btn .spin{border-color:rgba(255,255,255,.35);border-top-color:#fff;margin:0}
+@keyframes sp{to{transform:rotate(360deg)}}
+.stack{display:flex;flex-direction:column;gap:14px}
+.home{display:grid;gap:16px;max-width:900px;margin:0 auto}
+.drop{margin-top:18px;border:2px dashed var(--bd);border-radius:16px;padding:22px 16px;text-align:center;color:var(--mu);transition:.15s}
+.drop.over{border-color:var(--pr);background:color-mix(in srgb,var(--pr) 8%,transparent);color:var(--pr)}
+.drop .btn{margin-top:12px}
+.dc{cursor:pointer}.dc:hover{border-color:var(--pr)}
+.dn{font-weight:700;word-break:break-word;unicode-bidi:plaintext;text-align:start;line-height:1.5}
+.big{font-size:34px;line-height:1.2;font-weight:700;font-variant-numeric:tabular-nums}
+hr{border:0;height:1px;background:var(--bd);margin:16px 0;width:100%}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center}
+.stats b{display:block;font-size:16.8px}
+.res{display:grid;gap:16px;align-items:start}
+.side{display:flex;flex-direction:column;gap:14px}
+.list{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(340px,1fr))}
+.ent .eq{font-weight:700;font-variant-numeric:tabular-nums}
+.badge{font-size:12px;font-weight:700;padding:2px 10px;border-radius:50px;color:var(--c);background:color-mix(in srgb,var(--c) 13%,transparent);white-space:nowrap}
+.ov{position:fixed;inset:0;background:rgba(10,12,18,.5);display:flex;align-items:flex-end;justify-content:center;z-index:20;animation:fi .15s}
+.sheet{background:var(--card);width:100%;max-width:520px;border-radius:24px 24px 0 0;padding:22px 20px calc(22px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px;max-height:92vh;overflow:auto;animation:su .2s}
+@keyframes fi{from{opacity:0}}@keyframes su{from{transform:translateY(30px);opacity:0}}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.raw{max-height:120px;overflow:auto;background:var(--in);border:1px solid var(--bd);border-radius:13px;padding:10px;font:12px/18px ui-monospace,Consolas,monospace;color:var(--mu);white-space:pre-wrap;margin:0}
+.lang{display:flex;align-items:center;justify-content:space-between;min-height:48px;padding:8px 14px;border-radius:13px;border:1px solid var(--bd);background:transparent;cursor:pointer;width:100%;text-align:start}
+.lang.on{border-color:var(--pr);background:color-mix(in srgb,var(--pr) 12%,transparent);font-weight:700}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:10px 20px;border-radius:50px;z-index:30;font-weight:700;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.empty{text-align:center;grid-column:1/-1}
+@media (min-width:720px){
+ .wrap{padding:0 32px 56px}header{padding:28px 0}h1{font-size:22px}
+ .ov{align-items:center}.sheet{border-radius:24px;padding:26px}
+ .card{padding:22px}.big{font-size:40px}
+}
+@media (min-width:980px){
+ .res{grid-template-columns:360px 1fr;gap:24px}
+ .side{position:sticky;top:calc(20px + env(safe-area-inset-top,0px))}
+ .tools{display:flex;gap:12px;align-items:center}.tools .field{flex:1}
+}
+@media (max-width:979px){.tools .chips{margin-top:10px}}
+.av{background:linear-gradient(135deg,var(--pr),var(--pr2));color:#fff;font-weight:700;overflow:hidden;padding:0;border-radius:50%}.av img{width:100%;height:100%;object-fit:cover}
+.who{display:flex;align-items:center;gap:14px}.who .av{width:48px;height:48px;cursor:default}
+.fc{cursor:pointer;border-top:4px solid var(--c)}.fc:hover{border-color:var(--c)}
+.sw{display:flex;gap:10px;flex-wrap:wrap}.sw button{width:38px;height:38px;border-radius:50%;border:3px solid transparent;background:var(--c);cursor:pointer;padding:0}.sw button.on{border-color:var(--tx);box-shadow:inset 0 0 0 3px var(--card)}
+.chk{width:26px;height:26px;border-radius:50%;border:2px solid var(--bd);display:grid;place-items:center;flex:none;color:#fff}.chk.on{background:var(--pr);border-color:var(--pr)}.chk svg{width:16px;height:16px;stroke-width:2.6}
+.dc.sel{border-color:var(--pr);background:color-mix(in srgb,var(--pr) 8%,var(--card))}
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:15;background:var(--card);border-top:1px solid var(--bd);padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;box-shadow:0 -6px 20px rgba(0,0,0,.1)}
+.bar .btn{width:auto;min-height:44px;padding:0 14px}
+.home.selm{padding-bottom:110px}
+.dot{width:14px;height:14px;border-radius:50%;background:var(--c);flex:none;display:inline-block}
+.ov.full{align-items:center;padding:12px}.sheet.wide{max-width:1100px;height:92vh;max-height:92vh;border-radius:20px;overflow:auto;padding:18px}
+.tw{flex:1;min-height:170px;overflow:auto;border:1px solid var(--bd);border-radius:13px;direction:ltr}
+.tb{border-collapse:separate;border-spacing:0;width:100%;font-size:14px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tb th,.tb td{padding:8px 12px;border-bottom:1px solid var(--bd);border-inline-end:1px solid var(--bd);text-align:center}
+.tb th{position:sticky;top:0;background:var(--in);z-index:2;font-weight:700}
+.tb td:last-child,.tb th:last-child{text-align:start}
+.tb tr.b td{background:color-mix(in srgb,var(--ok) 14%,transparent)}.tb tr.b td:nth-child(11){color:var(--ok);font-weight:700}.tb tr.n td{color:var(--mu)}.tb tr.v td{background:color-mix(in srgb,var(--er) 9%,transparent)}
+.tf{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}.tf label{display:flex;flex-direction:column;gap:2px}.tf .field{min-height:42px;padding:0 10px}
+.tb tfoot td{position:sticky;bottom:0;background:var(--in);font-weight:700;border-bottom:0}
+.dc{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.tb tr.m td{background:color-mix(in srgb,var(--er) 12%,transparent)}
+.tw.sm0{min-height:0;flex:none}
+#prt{display:none}
+@media print{body>*:not(#prt){display:none!important}body{background:#fff}:root{padding:0}#prt{display:block;color:#000;font:12px/1.5 system-ui,Arial,sans-serif}#prt h1{font-size:20px;margin:0 0 4px}#prt .pm{color:#555}#prt .tw{overflow:visible;border:0;direction:inherit}#prt .tb{font-size:11px;white-space:normal}#prt .tb th,#prt .tb td{position:static;color:#000;background:#fff;border:1px solid #999;padding:3px 6px}#prt .tb th{background:#eee}#prt .tb tfoot td{position:static;font-weight:700}}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<div id="layer"></div>
+<div id="toast"></div>
+<input type="file" id="file" multiple hidden>
+<input type="file" id="bfile" accept=".json,application/json" hidden>
+<div id="prt"></div>
+<script>
+// ── i18n ──
+const D={
+en:{name:"REQ Calculator",drop:"or drag and drop your files here",csv_lang:"Notes language in Excel",lang_en:"English",lang_fr:"Français",open_excel:"View as table",err_excel:"Excel couldn't open the file",err_excel_desc:"Install Excel, or use Export and open the file from your files.",tagline:"Add up the notes from your ATM log.",language:"Language",back:"Back",import_title:"Import documents",import_desc:"Choose one or more text files that hold your REQ logs.",choose_file:"Choose files",last_desc:"{n} entries · total {t}",reading:"Reading your files…",reading_desc:"This only takes a few seconds.",err_open:"We couldn't open that file",err_open_desc:"Check that the file still exists, then choose it again.",err_none:"No REQ found",err_none_desc:"This file has no REQ lines. Choose the right log file and try again.",try_again:"Try again",results:"Results",grand:"Grand total",grand_desc:"Counts valid entries only.",detected:"REQ found",valid:"Valid",verify:"To check",no_dispense:"No cash",verify_banner:"{n} to check",verify_banner_desc:"They stay out of the total until you fix them.",all_ok:"Everything adds up",all_ok_desc:"No entry needs a check.",search:"Search by number or time",f_all:"All",f_verify:"To check",empty_filter:"Nothing matches your search.",clear_filters:"Clear filters",export_csv:"Export to Excel (CSV)",exporting:"Saving…",saved:"File saved",updated:"Entry updated",err_save:"We couldn't save the file",err_save_desc:"Choose another location and try again.",copy_total:"Copy total",edit:"Edit",edit_title:"Edit the numbers",edit_desc:"Type the four note counts for this REQ.",note_n:"Note {n}",save:"Save",cancel:"Cancel",err_edit:"Enter four whole numbers.",original:"Original text",st_VALID:"Valid",st_VERIFY:"To check",st_NO_DISPENSE:"No cash",n_SUM:"The sum differs from NOTES PRESENTED. Check the numbers.",n_BAD:"Expected four numbers but found: {a}",n_DECLINED:"The ATM declined this request (code {a}). Nothing was paid out.",n_NOCASH:"No cash was requested.",n_NOLINE:"Cash was requested but no line of four numbers was found.",n_FROMNP:"No four-number line, so the notes were taken from NOTES PRESENTED.",n_NONCASH:"Operation type {a}: no notes were presented, nothing was paid out.",n_EDITED:"You edited this entry."},
+fr:{name:"Calculateur REQ",drop:"ou glissez vos fichiers ici",csv_lang:"Langue des notes dans Excel",lang_en:"English",lang_fr:"Français",open_excel:"Afficher en tableau",err_excel:"Excel n'a pas pu ouvrir le fichier",err_excel_desc:"Installez Excel, ou utilisez Exporter puis ouvrez le fichier depuis vos fichiers.",tagline:"Additionnez les billets de votre journal DAB.",language:"Langue",back:"Retour",import_title:"Importer des documents",import_desc:"Choisissez un ou plusieurs fichiers texte contenant vos journaux REQ.",choose_file:"Choisir des fichiers",last_desc:"{n} entrées · total {t}",reading:"Lecture des fichiers…",reading_desc:"Cela ne prend que quelques secondes.",err_open:"Impossible d'ouvrir ce fichier",err_open_desc:"Vérifiez que le fichier existe toujours, puis choisissez-le à nouveau.",err_none:"Aucun REQ trouvé",err_none_desc:"Ce fichier ne contient aucune ligne REQ. Choisissez le bon fichier et réessayez.",try_again:"Réessayer",results:"Résultats",grand:"Total général",grand_desc:"Seules les entrées valides sont comptées.",detected:"REQ trouvés",valid:"Valides",verify:"À vérifier",no_dispense:"Sans billets",verify_banner:"{n} à vérifier",verify_banner_desc:"Elles restent hors du total tant que vous ne les corrigez pas.",all_ok:"Tout est cohérent",all_ok_desc:"Aucune entrée à vérifier.",search:"Rechercher un numéro ou une heure",f_all:"Toutes",f_verify:"À vérifier",empty_filter:"Aucun résultat pour cette recherche.",clear_filters:"Effacer les filtres",export_csv:"Exporter vers Excel (CSV)",exporting:"Enregistrement…",saved:"Fichier enregistré",updated:"Entrée mise à jour",err_save:"Impossible d'enregistrer le fichier",err_save_desc:"Choisissez un autre emplacement et réessayez.",copy_total:"Copier le total",edit:"Modifier",edit_title:"Modifier les nombres",edit_desc:"Saisissez les quatre nombres de billets pour ce REQ.",note_n:"Cassette {n}",save:"Enregistrer",cancel:"Annuler",err_edit:"Saisissez quatre nombres entiers.",original:"Texte d'origine",st_VALID:"Valide",st_VERIFY:"À vérifier",st_NO_DISPENSE:"Sans billets",n_SUM:"La somme diffère de NOTES PRESENTED. Vérifiez les nombres.",n_BAD:"Quatre nombres attendus, trouvé : {a}",n_DECLINED:"Le DAB a refusé cette demande (code {a}). Aucun billet distribué.",n_NOCASH:"Aucun retrait demandé.",n_NOLINE:"Un retrait a été demandé mais aucune ligne de quatre nombres n'a été trouvée.",n_FROMNP:"Pas de ligne de quatre nombres : billets pris de NOTES PRESENTED.",n_NONCASH:"Type d'opération {a} : aucun billet présenté, rien n'a été distribué.",n_EDITED:"Vous avez modifié cette entrée."},
+ar:{name:"حاسبة REQ",drop:"أو اسحب الملفات وأفلتها هنا",csv_lang:"لغة الملاحظات في Excel",lang_en:"English",lang_fr:"Français",open_excel:"عرض كجدول",err_excel:"تعذّر فتح الملف في Excel",err_excel_desc:"ثبّت تطبيق Excel، أو استخدم التصدير ثم افتح الملف من ملفاتك.",tagline:"اجمع أوراق النقد من سجل جهاز الصرف.",language:"اللغة",back:"رجوع",import_title:"استيراد مستندات",import_desc:"اختر ملفًا نصيًا واحدًا أو أكثر يحتوي سجلات REQ.",choose_file:"اختيار ملفات",last_desc:"{n} عملية · المجموع {t}",reading:"جارٍ قراءة الملفات…",reading_desc:"يستغرق هذا بضع ثوانٍ فقط.",err_open:"تعذّر فتح هذا الملف",err_open_desc:"تأكد أن الملف ما زال موجودًا ثم اخترْه مرة أخرى.",err_none:"لم نجد أي REQ",err_none_desc:"لا يحتوي هذا الملف على أسطر REQ. اختر ملف السجل الصحيح وحاول مرة أخرى.",try_again:"حاول مرة أخرى",results:"النتائج",grand:"المجموع العام",grand_desc:"يشمل العمليات الصالحة فقط.",detected:"عدد REQ",valid:"صالحة",verify:"للتحقق",no_dispense:"بدون صرف",verify_banner:"{n} تحتاج تحققًا",verify_banner_desc:"تبقى خارج المجموع حتى تصحّحها.",all_ok:"كل شيء متطابق",all_ok_desc:"لا توجد عملية تحتاج تحققًا.",search:"ابحث برقم العملية أو الوقت",f_all:"الكل",f_verify:"للتحقق",empty_filter:"لا توجد نتائج مطابقة لبحثك.",clear_filters:"مسح التصفية",export_csv:"تصدير إلى Excel (CSV)",exporting:"جارٍ الحفظ…",saved:"تم حفظ الملف",updated:"تم تحديث العملية",err_save:"تعذّر حفظ الملف",err_save_desc:"اختر مكانًا آخر وحاول مرة أخرى.",copy_total:"نسخ المجموع",edit:"تعديل",edit_title:"تعديل الأرقام",edit_desc:"اكتب أعداد الأوراق الأربعة لهذه العملية.",note_n:"الفئة {n}",save:"حفظ",cancel:"إلغاء",err_edit:"أدخل أربعة أعداد صحيحة.",original:"النص الأصلي",st_VALID:"صالحة",st_VERIFY:"للتحقق",st_NO_DISPENSE:"بدون صرف",n_SUM:"المجموع يختلف عن NOTES PRESENTED. تحقق من الأرقام.",n_BAD:"كان المتوقع أربعة أرقام لكن وُجد: {a}",n_DECLINED:"رفض الجهاز هذا الطلب (الرمز {a}). لم تُصرف أي أوراق.",n_NOCASH:"لم يُطلب أي مبلغ.",n_EDITED:"قمت بتعديل هذه العملية.",n_NOLINE:"طُلب مبلغ لكن لم نجد سطر الأرقام الأربعة.",n_FROMNP:"لا يوجد سطر الأرقام الأربعة، فأُخذت الأوراق من NOTES PRESENTED.",n_NONCASH:"نوع العملية {a}: لم تُقدَّم أي أوراق ولم يُصرف شيء."}};
+const LANGS=[["ar","العربية"],["en","English"],["fr","Français"]];
+Object.assign(D.en,{signin:"Sign in",account:"Account",signout:"Sign out",acct_desc:"Your documents sync across every device where you sign in with this account. Signing out clears them from this browser (they stay in your account).",synced:"Synced with your account",sync_err:"Couldn't sync. Check your connection.",login_err:"Sign-in failed. Try again."});
+Object.assign(D.fr,{signin:"Connexion",account:"Compte",signout:"Se déconnecter",acct_desc:"Vos documents se synchronisent sur chaque appareil connecté à ce compte. La déconnexion les efface de ce navigateur (ils restent dans votre compte).",synced:"Synchronisé avec votre compte",sync_err:"Synchronisation impossible. Vérifiez votre connexion.",login_err:"Échec de la connexion. Réessayez."});
+Object.assign(D.ar,{signin:"تسجيل الدخول",account:"الحساب",signout:"تسجيل الخروج",acct_desc:"تتزامن مستنداتك على كل جهاز تدخل منه بهذا الحساب. وتسجيل الخروج يمسحها من هذا المتصفح (وتبقى محفوظة في حسابك).",synced:"تمت المزامنة مع حسابك",sync_err:"تعذّرت المزامنة. تحقق من اتصالك.",login_err:"فشل تسجيل الدخول. حاول مرة أخرى."});
+Object.assign(D.en,{docs_title:"Your documents",docs_search:"Search documents by name",docs_none:"No document matches that name.",del:"Delete",del_title:"Delete this document?",del_desc:"“{n}” will be removed from your account on every device.",deleted:"Document deleted",imported:"{n} document(s) imported",skipped:"Skipped (no REQ found): {names}",prev_doc:"Previous session"});
+Object.assign(D.fr,{docs_title:"Vos documents",docs_search:"Rechercher un document par nom",docs_none:"Aucun document ne correspond à ce nom.",del:"Supprimer",del_title:"Supprimer ce document ?",del_desc:"« {n} » sera supprimé de votre compte sur tous les appareils.",deleted:"Document supprimé",imported:"{n} document(s) importé(s)",skipped:"Ignorés (aucun REQ trouvé) : {names}",prev_doc:"Session précédente"});
+Object.assign(D.ar,{docs_title:"مستنداتك",docs_search:"ابحث عن مستند بالاسم",docs_none:"لا يوجد مستند بهذا الاسم.",del:"حذف",del_title:"حذف هذا المستند؟",del_desc:"سيُحذف «{n}» من حسابك على جميع الأجهزة.",deleted:"تم حذف المستند",imported:"تم استيراد {n} مستند",skipped:"تم تخطي (لا يوجد REQ): {names}",prev_doc:"الجلسة السابقة"});
+Object.assign(D.en,{export_csv:"Export to Excel (.xlsx)",csv_alt:"Export as CSV"});
+Object.assign(D.fr,{export_csv:"Exporter vers Excel (.xlsx)",csv_alt:"Exporter en CSV"});
+Object.assign(D.ar,{export_csv:"تصدير إلى Excel (.xlsx)",csv_alt:"تصدير بصيغة CSV"});
+Object.assign(D.en,{new_folder:"New folder",select:"Select",done:"Done",sel_n:"{n} selected",sel_all:"Select all",desel:"Deselect all",move:"Move",move_title:"Move to…",move_desc:"Choose where to put {n} document(s).",no_folder:"Main list (no folder)",moved:"{n} document(s) moved",bdel_title:"Delete {n} document(s)?",bdel_desc:"They will be removed from your account on every device.",deleted_n:"{n} document(s) deleted",fnew_title:"New folder",fedit_title:"Edit folder",fname:"Folder name",fname_ph:"e.g. January logs",fcolor:"Color",fname_err:"Enter a folder name.",f_count:"{n} document(s)",fdel_title:"Delete this folder?",fdel_desc:"Folder “{n}” will be deleted. Its documents are kept and go back to the main list.",fdeleted:"Folder deleted",fsaved:"Folder saved",folder_empty:"This folder is empty. Import files here or move documents into it.",docs_empty:"No documents yet."});
+Object.assign(D.fr,{new_folder:"Nouveau dossier",select:"Sélectionner",done:"Terminé",sel_n:"{n} sélectionné(s)",sel_all:"Tout sélectionner",desel:"Tout désélectionner",move:"Déplacer",move_title:"Déplacer vers…",move_desc:"Choisissez où placer {n} document(s).",no_folder:"Liste principale (sans dossier)",moved:"{n} document(s) déplacé(s)",bdel_title:"Supprimer {n} document(s) ?",bdel_desc:"Ils seront supprimés de votre compte sur tous les appareils.",deleted_n:"{n} document(s) supprimé(s)",fnew_title:"Nouveau dossier",fedit_title:"Modifier le dossier",fname:"Nom du dossier",fname_ph:"ex. Journaux de janvier",fcolor:"Couleur",fname_err:"Saisissez un nom de dossier.",f_count:"{n} document(s)",fdel_title:"Supprimer ce dossier ?",fdel_desc:"Le dossier « {n} » sera supprimé. Ses documents sont conservés et retournent à la liste principale.",fdeleted:"Dossier supprimé",fsaved:"Dossier enregistré",folder_empty:"Ce dossier est vide. Importez des fichiers ici ou déplacez-y des documents.",docs_empty:"Aucun document pour le moment."});
+Object.assign(D.ar,{new_folder:"مجلد جديد",select:"تحديد",done:"تم",sel_n:"تم تحديد {n}",sel_all:"تحديد الكل",desel:"إلغاء تحديد الكل",move:"نقل",move_title:"نقل إلى…",move_desc:"اختر المكان الذي تريد وضع {n} مستند فيه.",no_folder:"القائمة الرئيسية (بدون مجلد)",moved:"تم نقل {n} مستند",bdel_title:"حذف {n} مستند؟",bdel_desc:"سيتم حذفها من حسابك على جميع الأجهزة.",deleted_n:"تم حذف {n} مستند",fnew_title:"مجلد جديد",fedit_title:"تعديل المجلد",fname:"اسم المجلد",fname_ph:"مثال: سجلات يناير",fcolor:"اللون",fname_err:"اكتب اسم المجلد.",f_count:"{n} مستند",fdel_title:"حذف هذا المجلد؟",fdel_desc:"سيتم حذف المجلد «{n}». تبقى مستنداته محفوظة وتعود إلى القائمة الرئيسية.",fdeleted:"تم حذف المجلد",fsaved:"تم حفظ المجلد",folder_empty:"هذا المجلد فارغ. استورد ملفات إليه أو انقل مستندات إليه.",docs_empty:"لا توجد مستندات بعد."});
+Object.assign(D.en,{tbl_title:"Table view",c_ref:"Ref",c_time:"Time",c_total:"Total",c_status:"Status",c_note:"Note",tbl_hint:"Scroll sideways to see all columns."});
+Object.assign(D.fr,{tbl_title:"Vue tableau",c_ref:"Réf",c_time:"Heure",c_total:"Total",c_status:"Statut",c_note:"Note",tbl_hint:"Faites défiler pour voir toutes les colonnes."});
+Object.assign(D.ar,{tbl_title:"عرض الجدول",c_ref:"الرقم",c_time:"الوقت",c_total:"المجموع",c_status:"الحالة",c_note:"ملاحظة",tbl_hint:"مرّر جانبًا لرؤية كل الأعمدة."});
+Object.assign(D.en,{theme_dark:"Dark mode",theme_light:"Light mode"});
+Object.assign(D.fr,{theme_dark:"Mode sombre",theme_light:"Mode clair"});
+Object.assign(D.ar,{theme_dark:"الوضع الليلي",theme_light:"الوضع النهاري"});
+Object.assign(D.en,{c_date:"Date",k_all:"All",k_NORMAL:"Regular",k_BANK:"Bank operations",t_from:"From",t_to:"To",t_day:"Day",t_clear:"Clear",tot:"Total",sort_by:"Sort",s_date:"By date in name",s_alpha:"Alphabetical",s_asc:"Ascending",s_desc:"Descending"});
+Object.assign(D.fr,{c_date:"Date",k_all:"Toutes",k_NORMAL:"Normales",k_BANK:"Opérations bancaires",t_from:"De",t_to:"À",t_day:"Jour",t_clear:"Effacer",tot:"Total",sort_by:"Tri",s_date:"Par date du nom",s_alpha:"Alphabétique",s_asc:"Croissant",s_desc:"Décroissant"});
+Object.assign(D.ar,{c_date:"التاريخ",k_all:"الكل",k_NORMAL:"العادية",k_BANK:"العمليات البنكية",t_from:"من",t_to:"إلى",t_day:"اليوم",t_clear:"مسح",tot:"المجموع",sort_by:"الترتيب",s_date:"حسب التاريخ في الاسم",s_alpha:"أبجديًا",s_asc:"تصاعدي",s_desc:"تنازلي"});
+const COLORS=["#4f6bff","#7c5cff","#e11d8f","#dc2626","#f97316","#eab308","#16a34a","#0d9488","#0ea5e9","#64748b"];
+const col=c=>/^#[0-9a-f]{6}$/i.test(c)?c:COLORS[0];
+// ── Engine (port of Engine.kt) ──
+const SEP='\\s*[-–—,;|]\\s*';
+const R={ESC:/\x1B\[[0-9;]*[A-Za-z]|\x1B[()][0-9A-Za-z]|\x1B[A-Za-z]\d*|[\x00-\x08\x0B\x0C\x0E-\x1F]/g,REQ:/REQ\s*:\s*([\d.,]+)/,
+FOUR:new RegExp('^\\s*(\\d+)'+SEP+'(\\d+)'+SEP+'(\\d+)'+SEP+'(\\d+)\\s*$'),ANY:new RegExp('^\\s*\\d+('+SEP+'\\d+)+\\s*$'),
+HEADER:/^\s*(\d+)\s+(\d\d)\/(\d\d)\/(\d\d)/,TIME:/^\s*(\d\d:\d\d:\d\d)\s*([A-Z ]*?)\s*$/,RC:/\bRC\s+(\d{3})\b/,NP:/NOTES PRESENTED ([\d,]+)/,CARD:/\bCARD\s*(?:NO\.?|NUMBER|#)?\s*[:=]?\s*([\d*xX]{6,})/i,ACCT:/\bACCT(?:\s*(?:NO\.?|NUMBER|#))?\s*[:=]?\s*([\w*\-]*[\d*][\w*\-]*)/i};
+const sum=a=>a.reduce((x,y)=>x+y,0);
+function pdate(a,b,c){a=+a;b=+b;c=+c;let y,m,d;if(a>31){y=a;m=b;d=c}else if(b>12){m=a;d=b;y=c}else{d=a;m=b;y=c}
+ if(m<1||m>12||d<1||d>31)return'';return(2000+y)+'-'+String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0')}
+const fmtDate=iso=>iso?iso.split('-').reverse().join('/'):'';
+function nameDate(n){let m,y,mo,d;
+ if(m=/(20\d\d)[-_. \/]?(\d\d)[-_. \/]?(\d\d)/.exec(n)){y=+m[1];mo=+m[2];d=+m[3]}
+ else if(m=/(\d\d)(\d\d)(20\d\d)/.exec(n)){if(+m[1]>12){d=+m[1];mo=+m[2]}else{mo=+m[1];d=+m[2]}y=+m[3]}
+ else if(m=/(\d\d)[-_. \/](\d\d)[-_. \/](20\d\d)/.exec(n)){d=+m[1];mo=+m[2];y=+m[3]}
+ else if(m=/(?:^|\D)(\d\d)[-_. \/](\d\d)[-_. \/](\d\d)(?!\d)/.exec(n)){d=+m[1];mo=+m[2];y=2000+ +m[3]}
+ else return null;
+ return mo>=1&&mo<=12&&d>=1&&d<=31?y*10000+mo*100+d:null}
+const cardCell=(x,fr)=>x.kind=='BANK'?(fr?'Opération bancaire':'Bank operation'):(x.card||'');
+function clean(t){return t.replace(R.ESC,'').replace(/\r\n/g,'\n').replace(/\r/g,'\n').replace(/[٠-٩]/g,c=>'٠١٢٣٤٥٦٧٨٩'.indexOf(c))}
+function parse(input){
+ const l=clean(input).split('\n'),idx=[];l.forEach((s,i)=>{if(R.REQ.test(s))idx.push(i)});
+ const seen=new Set(),out=[];
+ idx.forEach((i,k)=>{
+  const end=Math.min(k+1<idx.length?idx[k+1]:l.length,i+14);
+  let ref='REQ '+String(k+1).padStart(3,'0'),time='',date='',type='';
+  for(let j=i-1;j>=Math.max(0,i-4);j--){const h=R.HEADER.exec(l[j]);if(h){ref=h[1];date=pdate(h[2],h[3],h[4]);break}const t=R.TIME.exec(l[j]);if(t){time=t[1];type=t[2].trim()}}
+  let lo=Math.max(0,i-8);for(let j=i-1;j>=Math.max(0,i-15);j--){const h=R.HEADER.exec(l[j]);if(h){lo=j;if(!date)date=pdate(h[2],h[3],h[4]);break}}
+  let hi=end;for(let j=i+1;j<end;j++){if(R.HEADER.test(l[j])){hi=j;break}}
+  const seg=l.slice(lo,hi).join('\n'),cm=R.CARD.exec(seg),am=R.ACCT.exec(seg),card=cm&&/\d/.test(cm[1])?cm[1]:'',acct=am?am[1]:'',kind=acct&&!acct.startsWith('00799999')&&!card.startsWith('00799999')?'BANK':'NORMAL';
+  let a=Number(R.REQ.exec(l[i])[1].replace(/,/g,'').replace(/\.+$/,''));if(isNaN(a))a=0;
+  let nums=[],bad='';
+  for(let j=i+1;j<Math.min(end,i+4);j++){if(!l[j].trim())continue;const m=R.FOUR.exec(l[j]);
+   if(m)nums=m.slice(1,5).map(Number);else if(R.ANY.test(l[j]))bad=l[j].trim();break}
+  const raw=l.slice(i,end).join('\n').trim(),rc=(R.RC.exec(raw)||[])[1];
+  const win=l.slice(i,Math.min(k+1<idx.length?idx[k+1]:l.length,i+26)).join('\n'),gm=re=>{const m=re.exec(win);return m?m.slice(1,5).map(Number):null},
+   den=gm(/DENOMINATION\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)/),disp=gm(/DISPENSED\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)/),rejc=gm(/REJECTED\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)/),rem=gm(/REMAINING\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)/),
+   cur=(/REQ\s*:\s*[\d.,]+\s*([A-Z]{3})\b/.exec(l[i])||[])[1]||'',rr=rc?/\bRC\s+\d{3}\b[ \t]*([A-Z][A-Z _\-]*)/.exec(raw):null,why=rr?rr[1].trim().replace(/\s*-\s*\S+$/,''):'';
+  let status,note='',code='',arg='';
+  if(nums.length==4){status='VALID';const np=R.NP.exec(raw);
+   if(np&&sum(np[1].split(',').map(x=>parseInt(x)||0))!=sum(nums)){status='VERIFY';note='Sum differs from NOTES PRESENTED';code='SUM'}}
+  else if(bad){status='VERIFY';note='Expected 4 numbers: '+bad;code='BAD';arg=bad}
+  else if(!bad&&!rc&&a>0&&(()=>{const np=R.NP.exec(raw);if(!np)return 0;const v=np[1].split(',').map(x=>parseInt(x)||0);if(v.length==4&&sum(v)>0){nums=v;return 1}return 0})()){status='VALID';note='Taken from NOTES PRESENTED';code='FROMNP'}
+  else if(a==0||rc){status='NO_DISPENSE';note=rc?'Declined RC '+rc+(why?' '+why:''):'No cash';code=rc?'DECLINED':'NOCASH';arg=rc?rc+(why?' '+why:''):''}
+  else if(type&&!/WITHDRAW|CASH/.test(type)){status='NO_DISPENSE';note='No notes dispensed ('+type+')';code='NONCASH';arg=type}
+  else{status='VERIFY';note='REQ > 0 but no four-number line';code='NOLINE'}
+  const key=[ref,date,time,a,nums.join('-')].join('|');
+  if(!seen.has(key)){seen.add(key);out.push({type,ref,date,time,req:a,numbers:nums,total:sum(nums),status,note,raw,code,arg,card,acct,kind,cur,den,disp,rejc,rem})}
+ });
+ // the machine's cumulative DISPENSED counter must grow by exactly the notes presented
+ let pv=null;out.forEach(x=>{if(!x.disp)return;if(pv&&x.status=='VALID'&&x.numbers.length==4){const d=x.disp.map((v,i)=>v-pv[i]);if(d.every(v=>v>=0)&&d.some((v,i)=>v!=x.numbers[i])){x.cm=true;x.cmd=d}}pv=x.disp});
+ return out}
+const summarize=e=>({detected:e.length,valid:e.filter(x=>x.status=='VALID').length,verify:e.filter(x=>x.status=='VERIFY').length,noDispense:e.filter(x=>x.status=='NO_DISPENSE').length,grand:sum(e.filter(x=>x.status=='VALID').map(x=>x.total))});
+const edit=(e,n)=>({...e,numbers:n,total:sum(n),status:n.length==4?'VALID':'VERIFY',note:'Edited',code:'EDITED',arg:'',cm:false,cmd:null});
+function noteText(x,lang){if(lang=='en')return x.note;return({SUM:'La somme diffère de NOTES PRESENTED',BAD:'Quatre nombres attendus : '+x.arg,DECLINED:'Refusé RC '+x.arg,NOCASH:'Aucun retrait',NOLINE:'REQ > 0 mais aucune ligne de quatre nombres',EDITED:'Modifié',FROMNP:'Nombres pris de NOTES PRESENTED',NONCASH:'Aucun billet distribué ('+x.arg+')'})[x.code]||x.note}
+function toCsv(e,lang){const fr=lang!='en',SP=fr?';':',';
+ let s='﻿'+(fr?'Réf,Date,Heure,REQ,N1,N2,N3,N4,Total,Statut,Carte,Compte,Note,Calcul,Écart':'Ref,Date,Time,REQ,N1,N2,N3,N4,Total,Status,Card,Account,Note,Calc,Diff').split(',').join(SP)+'\n';
+ for(const x of e){const cc=calcOf(x);const st=!fr?x.status:({VALID:'VALIDE',NO_DISPENSE:'SANS DISTRIBUTION',VERIFY:'À VÉRIFIER'})[x.status];
+  const rq=fr?String(x.req).replace('.',','):String(x.req);
+  s+=[x.ref,fmtDate(x.date),x.time,rq,...[0,1,2,3].map(i=>x.numbers[i]??''),x.total,st,cardCell(x,fr),x.acct||''].join(SP)+SP+'"'+noteText(x,lang).replace(/"/g,'""')+'"'+SP+(cc==null?'':cc)+SP+(cc==null?'':cc-x.req)+'\n'}
+ return s+(fr?'TOTAL GÉNÉRAL':'GRAND TOTAL')+SP.repeat(8)+summarize(e).grand+SP.repeat(6)+'\n'}
+
+// ── XLSX export (no libraries): minimal OOXML package inside a store-only ZIP ──
+const CRC=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
+const crc32=b=>{let c=0xFFFFFFFF;for(let i=0;i<b.length;i++)c=CRC[(c^b[i])&255]^(c>>>8);return(c^0xFFFFFFFF)>>>0};
+function zip(files,type){const enc=new TextEncoder(),parts=[],cd=[];let off=0;
+ const u16=v=>[v&255,(v>>>8)&255],u32=v=>[v&255,(v>>>8)&255,(v>>>16)&255,(v>>>24)&255];
+ for(const [n,d] of files){const nb=enc.encode(n),c=crc32(d);
+  const lh=new Uint8Array([0x50,0x4b,3,4,...u16(20),...u16(0x0800),...u16(0),...u16(0),...u16(0x21),...u32(c),...u32(d.length),...u32(d.length),...u16(nb.length),...u16(0)]);
+  parts.push(lh,nb,d);
+  cd.push(new Uint8Array([0x50,0x4b,1,2,...u16(20),...u16(20),...u16(0x0800),...u16(0),...u16(0),...u16(0x21),...u32(c),...u32(d.length),...u32(d.length),...u16(nb.length),...u16(0),...u16(0),...u16(0),...u16(0),...u32(0),...u32(off)]),nb);
+  off+=lh.length+nb.length+d.length}
+ let cs=0;cd.forEach(x=>cs+=x.length);
+ const end=new Uint8Array([0x50,0x4b,5,6,0,0,0,0,...u16(files.length),...u16(files.length),...u32(cs),...u32(off),0,0]);
+ return new Blob([...parts,...cd,end],{type})}
+const XW=[12,12,11,12,8,8,8,8,10,20,22,18,46,12,10];
+function entryRows(e,lang){const fr=lang!='en',
+ H=(fr?'Réf,Date,Heure,REQ,N1,N2,N3,N4,Total,Statut,Carte,Compte,Note,Calcul,Écart':'Ref,Date,Time,REQ,N1,N2,N3,N4,Total,Status,Card,Account,Note,Calc,Diff').split(','),
+ rows=[H.map(v=>({v,s:1}))];
+ e.forEach(x=>{const st=!fr?x.status:({VALID:'VALIDE',NO_DISPENSE:'SANS DISTRIBUTION',VERIFY:'À VÉRIFIER'})[x.status],bk=x.kind=='BANK'?2:0,c=calcOf(x);
+  rows.push([/^\d+$/.test(x.ref)?+x.ref:x.ref,fmtDate(x.date),x.time,x.req,...[0,1,2,3].map(i=>x.numbers[i]??''),x.total,st,cardCell(x,fr),x.acct,noteText(x,lang),c==null?'':c,c==null?'':c-x.req].map(v=>({v,s:bk})))});
+ rows.push([fr?'TOTAL GÉNÉRAL':'GRAND TOTAL','','','','','','','',summarize(e).grand,'','','','','',''].map(v=>({v,s:1})));
+ return rows}
+function xlsxBook(sheets){const enc=new TextEncoder(),NS='http://schemas.openxmlformats.org/spreadsheetml/2006/main',RN='http://schemas.openxmlformats.org/officeDocument/2006/relationships',PK='http://schemas.openxmlformats.org/package/2006/relationships',HD='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>',
+ X=s=>String(s).replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g,'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]),
+ cell=(r,i,v,st)=>{const a=String.fromCharCode(65+i)+r,s=st?' s="'+st+'"':'';if(v===''||v==null)return st==2?'<c r="'+a+'" s="2"/>':'';
+  return typeof v=='number'?'<c r="'+a+'"'+s+'><v>'+v+'</v></c>':'<c r="'+a+'" t="inlineStr"'+s+'><is><t xml:space="preserve">'+X(v)+'</t></is></c>'},
+ used=new Set(),
+ nm=n=>{const b=String(n||'Sheet').replace(/[\[\]:*?\/\\]/g,'_').trim().slice(0,28)||'Sheet';let x=b,k=2;while(used.has(x.toLowerCase()))x=b+' '+k++;used.add(x.toLowerCase());return x},
+ names=sheets.map(s=>nm(s.name)),
+ sx=s=>HD+'<worksheet xmlns="'+NS+'"><sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews><cols>'+s.w.map((w,i)=>'<col min="'+(i+1)+'" max="'+(i+1)+'" width="'+w+'" customWidth="1"/>').join('')+'</cols><sheetData>'+s.rows.map((r,k)=>'<row r="'+(k+1)+'">'+r.map((c,i)=>cell(k+1,i,c.v,c.s)).join('')+'</row>').join('')+'</sheetData></worksheet>';
+ const F=[
+ ['[Content_Types].xml',HD+'<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>'+sheets.map((s,i)=>'<Override PartName="/xl/worksheets/sheet'+(i+1)+'.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>').join('')+'<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>'],
+ ['_rels/.rels',HD+'<Relationships xmlns="'+PK+'"><Relationship Id="rId1" Type="'+RN+'/officeDocument" Target="xl/workbook.xml"/></Relationships>'],
+ ['xl/workbook.xml',HD+'<workbook xmlns="'+NS+'" xmlns:r="'+RN+'"><sheets>'+names.map((n,i)=>'<sheet name="'+X(n)+'" sheetId="'+(i+1)+'" r:id="rId'+(i+1)+'"/>').join('')+'</sheets></workbook>'],
+ ['xl/_rels/workbook.xml.rels',HD+'<Relationships xmlns="'+PK+'">'+sheets.map((s,i)=>'<Relationship Id="rId'+(i+1)+'" Type="'+RN+'/worksheet" Target="worksheets/sheet'+(i+1)+'.xml"/>').join('')+'<Relationship Id="rId'+(sheets.length+1)+'" Type="'+RN+'/styles" Target="styles.xml"/></Relationships>'],
+ ['xl/styles.xml',HD+'<styleSheet xmlns="'+NS+'"><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FFD1FADF"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="3"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/><xf numFmtId="0" fontId="0" fillId="2" borderId="0" xfId="0" applyFill="1"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>'],
+ ...sheets.map((s,i)=>['xl/worksheets/sheet'+(i+1)+'.xml',sx(s)])
+ ].map(([n,s])=>[n,enc.encode(s)]);
+ return zip(F,'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')}
+function toXlsx(e,lang){return xlsxBook([{name:'REQ',rows:entryRows(e,lang),w:XW}])}
+const b64=u=>{let s='';for(let i=0;i<u.length;i+=32768)s+=String.fromCharCode.apply(null,u.subarray(i,i+32768));return btoa(s)};
+// ── helpers / icons ──
+const P={User:["M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8z","M4 21a8 8 0 0 1 16 0"],Upload:["M12 15V3","M7 8l5-5 5 5","M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"],Download:["M12 3v12","M7 10l5 5 5-5","M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"],
+Copy:["M9 9h10a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V10a1 1 0 0 1 1-1z","M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"],Check:["M5 12.5l4.5 4.5L19 7.5"],
+CheckCircle:["M12 3a9 9 0 1 0 0 18a9 9 0 0 0 0-18z","M8 12.5l2.8 2.8L16 9.5"],Search:["M11 4a7 7 0 1 0 0 14a7 7 0 0 0 0-14z","M16 16l4 4"],Back:["M19 12H5","M11 6l-6 6 6 6"],Chevron:["M9 6l6 6-6 6"],
+Globe:["M12 3a9 9 0 1 0 0 18a9 9 0 0 0 0-18z","M3 12h18","M12 3c2.5 2.5 3.5 5.5 3.5 9s-1 6.5-3.5 9c-2.5-2.5-3.5-5.5-3.5-9s1-6.5 3.5-9z"],Edit:["M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4z","M13.5 6.5l4 4"],
+Alert:["M12 3L2.5 20h19L12 3z","M12 10v4","M12 17.2v.01"],Ban:["M12 3a9 9 0 1 0 0 18a9 9 0 0 0 0-18z","M5.6 5.6l12.8 12.8"],File:["M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5z","M14 3v5h5","M9 13h6","M9 17h4"],
+Trash:["M4 7h16","M10 11v6","M14 11v6","M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13","M9 7V4h6v3"],
+Table:["M5 4h14a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z","M4 10h16","M4 15h16","M10 4v16"],
+Calc:["M7 3h10a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z","M8 7.5h8","M8.5 12h.01","M12 12h.01","M15.5 12h.01","M8.5 16h.01","M12 16h.01","M15.5 16h.01"],
+Folder:["M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"],Move:["M5 12h14","M13 6l6 6-6 6"],Sun:["M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z","M12 2v2","M12 20v2","M4.9 4.9l1.4 1.4","M17.7 17.7l1.4 1.4","M2 12h2","M20 12h2","M4.9 19.1l1.4-1.4","M17.7 6.3l1.4-1.4"],Moon:["M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"],Up:["M12 19V5","M6 11l6-6 6 6"],Down:["M12 5v14","M6 13l6 6 6-6"]};
+const ic=n=>'<svg class="i" viewBox="0 0 24 24" aria-hidden="true">'+P[n].map(d=>'<path d="'+d+'"/>').join('')+'</svg>';
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]);
+const num=n=>n.toLocaleString('en-US'),amt=d=>d.toLocaleString('en-US',{maximumFractionDigits:2});
+let LS=null;try{LS=window.localStorage}catch(e){}
+const sget=k=>{try{return LS&&LS.getItem(k)}catch(e){return null}},sset=(k,v)=>{try{LS&&LS.setItem(k,v)}catch(e){}},sdel=k=>{try{LS&&LS.removeItem(k)}catch(e){}};
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+function jget(k,def){try{const v=JSON.parse(sget(k));return v==null?def:v}catch(e){return def}}
+const detect=()=>{const l=(navigator.language||'ar').slice(0,2);return D[l]?l:'ar'};
+// ── theme ──
+const MQ=window.matchMedia?matchMedia('(prefers-color-scheme:dark)'):{matches:false};
+const isDark=()=>{const v=document.documentElement.dataset.theme;return v?v=='dark':MQ.matches};
+function applyTheme(){const v=sget('theme');if(v=='dark'||v=='light')document.documentElement.dataset.theme=v;else delete document.documentElement.dataset.theme;
+ const m=document.querySelector('meta[name=theme-color]');if(m)m.content=isDark()?'#141821':'#4f6bff'}
+applyTheme();
+if(MQ.addEventListener)MQ.addEventListener('change',()=>{applyTheme();if(typeof render=='function')render()});
+// ── state ──
+let TS=+sget('ts')||0,pt;
+const S={docs:[],del:{},cur:null,entries:[],screen:0,q:'',dq:'',onlyV:false,csvLang:'fr',lang:sget('lang')||detect(),busy:false,saving:false,homeErr:null,homeInfo:null,saveErr:false,excelErr:false,sheet:null,idx:0,delId:null,fb:false,user:null,folders:[],fol:null,sel:false,ids:new Set(),fe:null,tf:{kind:'all',from:'',to:'',day:''},sortBy:sget('sortBy')||'date',sortDir:sget('sortDir')||'desc'};
+const t=(k,a)=>{let s=D[S.lang][k]??D.en[k]??k;for(const x in a||{})s=s.replace('{'+x+'}',a[x]);return s};
+const $=s=>document.querySelector(s);
+// load saved documents (and migrate the old single-session storage)
+(function(){let d=jget('docs',null);
+ if(!Array.isArray(d)){d=[];const old=jget('entries',[]);
+  if(Array.isArray(old)&&old.length){d=[{id:'legacy',name:t('prev_doc'),ts:+sget('ts')||Date.now(),entries:old}];sset('docs',JSON.stringify(d))}}
+ S.docs=d.filter(x=>x&&x.id&&Array.isArray(x.entries));
+ const fl=jget('folders',[]);S.folders=Array.isArray(fl)?fl.filter(x=>x&&x.id&&x.name):[];
+ const dl=jget('del',{});S.del=dl&&typeof dl=='object'&&!Array.isArray(dl)?dl:{};
+ const c=sget('cur'),cd=S.docs.find(x=>x.id==c);if(cd){S.cur=cd.id;S.entries=cd.entries}})();
+const curDoc=()=>S.docs.find(x=>x.id==S.cur);
+function saveAll(){TS=Date.now();sset('docs',JSON.stringify(S.docs));sset('folders',JSON.stringify(S.folders));sset('del',JSON.stringify(S.del));sset('ts',String(TS));push()}
+function persist(){const d=curDoc();if(d){d.entries=S.entries;d.ts=Date.now()}saveAll()}
+let tt;function toast(k,a){const el=$('#toast');el.innerHTML='<div class="toast t" role="status">'+esc(t(k,a))+'</div>';clearTimeout(tt);tt=setTimeout(()=>el.innerHTML='',2400)}
+function banner(kind,title,desc,act){const c={RUN:'var(--pr)',INFO:'var(--pr)',ERR:'var(--er)',OK:'var(--ok)'}[kind];
+ return '<div class="ban" style="--c:'+c+'" role="'+(kind=='ERR'?'alert':'status')+'">'+(kind=='RUN'?'<div class="spin"></div>':ic(kind=='OK'?'CheckCircle':'Alert'))+'<div class="grow t"><b>'+esc(title)+'</b>'+(desc?'<span class="mu sm">'+esc(desc)+'</span>':'')+(act||'')+'</div></div>'}
+const btn=(a,label,o={})=>'<button class="btn '+(o.p?'p':'')+(o.d?'d':'')+'" data-a="'+a+'"'+(o.dis?' disabled':'')+'>'+(o.load?'<span class="spin"></span>':o.icon?ic(o.icon):'')+'<span class="t">'+esc(label)+'</span></button>';
+const copyBtn=v=>'<button class="ib" data-a="copy" data-v="'+v+'" title="'+esc(t('copy_total'))+'" aria-label="'+esc(t('copy_total'))+'">'+ic('Copy')+'</button>';
+// ── views ──
+function header(){const back=S.screen==1&&S.entries.length,cd=curDoc();
+ return '<header>'+(back?'<button class="ib" data-a="back" aria-label="'+esc(t('back'))+'" title="'+esc(t('back'))+'">'+ic('Back')+'</button>':'')+'<div class="logo">'+ic('Calc')+'</div><div class="grow"><h1 class="t">'+esc(back&&cd?cd.name:t('name'))+'</h1><div class="mu sm t">'+esc(back?t('results'):t('tagline'))+'</div></div><button class="ib" data-a="theme" aria-label="'+esc(t(isDark()?'theme_light':'theme_dark'))+'" title="'+esc(t(isDark()?'theme_light':'theme_dark'))+'">'+ic(isDark()?'Sun':'Moon')+'</button><button class="ib" data-a="lang" aria-label="'+esc(t('language'))+'" title="'+esc(t('language'))+'">'+ic('Globe')+'</button>'+acctBtn()+'</header>'}
+function acctBtn(){if(!S.fb)return'';if(!S.user)return'<button class="chip on" data-a="login">'+esc(t('signin'))+'</button>';
+ const u=S.user;return'<button class="ib av" data-a="acct" aria-label="'+esc(t('account'))+'" title="'+esc(u.email)+'">'+(u.photo?'<img src="'+esc(u.photo)+'" alt="" referrerpolicy="no-referrer">':esc((u.name||u.email||'?').charAt(0).toUpperCase()))+'</button>'}
+const fid=d=>S.folders.some(f=>f.id===d.folder)?d.folder:null;
+function vis(){const q=S.dq.trim().toLowerCase();return [...S.docs].sort(sorter()).filter(d=>q?d.name.toLowerCase().includes(q):fid(d)===S.fol)}
+function secHead(){const cf=S.fol&&S.folders.find(f=>f.id===S.fol);let h='<div class="row">';
+ if(cf){const id=esc(cf.id),n=S.docs.filter(d=>fid(d)===cf.id).length;
+  h+='<button class="ib" data-a="upf" aria-label="'+esc(t('back'))+'" title="'+esc(t('back'))+'">'+ic('Back')+'</button><div class="tile" style="--c:'+col(cf.color)+'">'+ic('Folder')+'</div><div class="grow t"><h2>'+esc(cf.name)+'</h2><div class="mu sm">'+esc(t('f_count',{n}))+'</div></div>'+
+  '<button class="ib" data-a="editf" data-id="'+id+'" title="'+esc(t('edit'))+'" aria-label="'+esc(t('edit'))+'">'+ic('Edit')+'</button><button class="ib" data-a="delf" data-id="'+id+'" title="'+esc(t('del'))+'" aria-label="'+esc(t('del'))+'">'+ic('Trash')+'</button>'}
+ else h+='<div class="tile">'+ic('File')+'</div><div class="grow t"><h2>'+esc(t('docs_title'))+' ('+S.docs.length+')</h2></div>';
+ return h+'</div><div class="chips" style="margin-top:14px"><button class="chip" data-a="newf">+ '+esc(t('new_folder'))+'</button><button class="chip'+(S.sel?' on':'')+'" data-a="selmode">'+esc(S.sel?t('done'):t('select'))+'</button></div><div class="chips" style="margin-top:10px;align-items:center"><span class="mu sm t">'+esc(t('sort_by'))+'</span><button class="chip'+(S.sortBy=='date'?' on':'')+'" data-a="sortby" data-v="date">'+esc(t('s_date'))+'</button><button class="chip'+(S.sortBy=='alpha'?' on':'')+'" data-a="sortby" data-v="alpha">'+esc(t('s_alpha'))+'</button><button class="ib" data-a="sortdir" title="'+esc(t(S.sortDir=='asc'?'s_asc':'s_desc'))+'" aria-label="'+esc(t(S.sortDir=='asc'?'s_asc':'s_desc'))+'">'+ic(S.sortDir=='asc'?'Up':'Down')+'</button></div>'}
+function selBar(){if(!S.sel)return'';const n=S.ids.size,v=vis();
+ return '<div class="bar t" role="toolbar"><b>'+esc(t('sel_n',{n}))+'</b>'+btn('selall',v.length&&v.every(d=>S.ids.has(d.id))?t('desel'):t('sel_all'),{dis:!v.length})+btn('move',t('move'),{icon:'Move',dis:!n})+btn('bdel',t('del'),{d:1,icon:'Trash',dis:!n})+'</div>'}
+function fcard(f){const n=S.docs.filter(d=>fid(d)===f.id).length,id=esc(f.id),c=col(f.color);
+ return '<article class="card ent fc" style="--c:'+c+'" data-a="openf" data-id="'+id+'" tabindex="0" role="button"><div class="row"><div class="tile">'+ic('Folder')+'</div><div class="grow"><div class="dn">'+esc(f.name)+'</div><div class="mu sm t">'+esc(t('f_count',{n}))+'</div></div><button class="ib" data-a="editf" data-id="'+id+'" title="'+esc(t('edit'))+'" aria-label="'+esc(t('edit'))+'">'+ic('Edit')+'</button></div></article>'}
+function home(){if(S.fol&&!S.folders.some(f=>f.id===S.fol))S.fol=null;const has=true;let h='<div class="home'+(S.sel?' selm':'')+'">';
+ if(S.busy)h+=banner('RUN',t('reading'),t('reading_desc'));
+ else if(S.homeErr)h+=banner('ERR',t('err_'+S.homeErr),t('err_'+S.homeErr+'_desc'),btn('pick',t('try_again')));
+ else if(S.homeInfo)h+=banner('OK',t('imported',{n:S.homeInfo.ok}),S.homeInfo.skipped.length?t('skipped',{names:S.homeInfo.skipped.join(', ')}):'');
+ h+='<div class="card"><div class="row"><div class="tile">'+ic('Upload')+'</div><div class="grow t"><h2>'+esc(t('import_title'))+'</h2><div class="mu sm">'+esc(t('import_desc'))+'</div></div></div>'+
+ '<div class="drop t" id="drop">'+esc(t('drop'))+btn('pick',t('choose_file'),{p:1,icon:'Upload',dis:S.busy,load:S.busy})+'</div></div>';
+ h+=toolsCard();if(has)h+='<section class="card">'+secHead()+
+  '<label class="field" style="margin-top:14px">'+ic('Search')+'<input id="dq" type="search" value="'+esc(S.dq)+'" placeholder="'+esc(t('docs_search'))+'" aria-label="'+esc(t('docs_search'))+'"></label><div class="list" id="dlist" style="margin-top:14px"></div></section>';
+ return h+'</div>'+selBar()}
+function docCard(d){const s=summarize(d.entries),dt=new Date(d.ts).toLocaleString(S.lang=='ar'?'ar-u-nu-latn':S.lang,{dateStyle:'medium',timeStyle:'short'}),id=esc(d.id),on=S.ids.has(d.id),fo=S.folders.find(f=>f.id===fid(d)),tc=fo?col(fo.color):'var(--pr)';
+ return '<article class="card ent dc'+(on?' sel':'')+'" style="--c:'+(s.verify?'var(--er)':'var(--pr)')+'" data-a="'+(S.sel?'tog':'open')+'" data-id="'+id+'" tabindex="0" role="button"'+(S.sel?' aria-pressed="'+on+'"':'')+'><div class="row">'+(S.sel?'<span class="chk'+(on?' on':'')+'">'+(on?ic('Check'):'')+'</span>':'')+'<div class="tile" style="--c:'+tc+'">'+ic('File')+'</div><div class="grow"><div class="dn">'+esc(d.name)+'</div><div class="mu sm t">'+esc(t('last_desc',{n:s.detected,t:num(s.grand)}))+'</div><div class="mu xs">'+esc(dt)+'</div>'+(fo&&S.dq.trim()?'<div class="xs t" style="color:'+col(fo.color)+';font-weight:700">● '+esc(fo.name)+'</div>':'')+'</div>'+
+ (s.verify?'<span class="badge t" style="--c:var(--er)">'+esc(s.verify+' · '+t('verify'))+'</span>':'')+
+ (S.sel?'':'<button class="ib" data-a="deldoc" data-id="'+id+'" title="'+esc(t('del'))+'" aria-label="'+esc(t('del'))+'">'+ic('Trash')+'</button>')+'</div></article>'}
+function dlist(){const el=$('#dlist');if(!el)return;const q=S.dq.trim(),sh=vis();
+ const fs=(!q&&!S.fol)?[...S.folders].sort(sorter()).map(fcard).join(''):'';
+ const msg=q?'docs_none':S.fol?'folder_empty':'docs_empty';
+ el.innerHTML=(fs||sh.length)?fs+sh.map(docCard).join(''):'<div class="card empty t"><p class="mu" style="margin:0">'+esc(t(msg))+'</p></div>'}
+function results(){const s=summarize(S.entries),st=(n,l,c)=>'<div><b style="color:'+c+'">'+n+'</b><span class="xs mu t">'+esc(l)+'</span></div>';
+ return '<div class="res"><aside class="side"><div class="card"><div class="row"><div class="grow t"><div class="mu sm">'+esc(t('grand'))+'</div><div class="big ltr">'+num(s.grand)+'</div><div class="mu sm">'+esc(t('grand_desc'))+'</div>'+valLine(S.entries)+'</div>'+copyBtn(s.grand)+'</div><hr>'+
+ '<div class="stats">'+st(s.detected,t('detected'),'var(--tx)')+st(s.valid,t('valid'),'var(--ok)')+st(s.verify,t('verify'),s.verify?'var(--er)':'var(--mu)')+st(s.noDispense,t('no_dispense'),'var(--mu)')+'</div>'+
+ '<div class="mu sm t" style="margin-top:20px">'+esc(t('csv_lang'))+'</div><div class="chips" style="margin:6px 0 14px">'+['fr','en'].map(c=>'<button class="chip '+(S.csvLang==c?'on':'')+'" data-a="csv" data-v="'+c+'">'+esc(t('lang_'+c))+'</button>').join('')+'</div>'+
+ '<div class="stack" style="gap:10px">'+btn('export',S.saving?t('exporting'):t('export_csv'),{p:1,icon:'Download',dis:S.saving,load:S.saving})+btn('excel',t('open_excel'),{icon:'Table',dis:S.saving})+btn('csvx',t('csv_alt'),{icon:'Download',dis:S.saving})+btn('days',t('days_title'),{icon:'Table'})+btn('printr',t('print_report'),{icon:'Download'})+'</div></div>'+
+ (S.saveErr?banner('ERR',t('err_save'),t('err_save_desc'),btn('export',t('try_again'))):'')+(S.excelErr?banner('ERR',t('err_excel'),t('err_excel_desc')):'')+
+ (s.verify?banner('ERR',t('verify_banner',{n:s.verify}),t('verify_banner_desc')):banner('OK',t('all_ok'),t('all_ok_desc')))+mmBanners()+'<div class="card"><h2 class="t" style="margin:0 0 12px">'+esc(t('cass_title'))+'</h2>'+cassHtml(S.entries)+'</div>'+devCard(S.entries)+declCard(S.entries)+'</aside>'+
+ '<main class="stack"><div class="tools"><label class="field">'+ic('Search')+'<input id="q" type="search" value="'+esc(S.q)+'" placeholder="'+esc(t('search'))+'" aria-label="'+esc(t('search'))+'"></label><div class="chips" id="flt"></div></div><div class="list" id="list"></div></main></div>'}
+function filters(){$('#flt').innerHTML=[[0,'f_all'],[1,'f_verify']].concat([[2,'f_mm']]).map(([v,k])=>'<button class="chip '+((S.onlyM?2:S.onlyV?1:0)==v?'on':'')+'" data-a="flt" data-v="'+v+'">'+esc(t(k))+'</button>').join('')}
+function entry(e,i){const col={VALID:'var(--ok)',VERIFY:'var(--er)',NO_DISPENSE:'var(--mu)'}[e.status],icn={VALID:'CheckCircle',VERIFY:'Alert',NO_DISPENSE:'Ban'}[e.status];
+ const title=/^\d+$/.test(e.ref)?'#'+e.ref:e.ref,sub=[fmtDate(e.date),e.time,'REQ '+amt(e.req)].filter(Boolean).join(' · '),four=e.numbers.length==4;
+ return '<article class="card ent" style="--c:'+col+'"><div class="row"><div class="tile">'+ic(icn)+'</div><div class="grow"><b class="ltr">'+esc(title)+'</b><div class="mu sm ltr">'+esc(sub)+'</div></div><span class="badge t">'+esc(t('st_'+e.status))+'</span>'+(e.kind=='BANK'?'<span class="badge t" style="--c:var(--ok)">'+esc(t('k_BANK'))+'</span>':'')+'</div>'+
+ ((e.kind!='BANK'&&e.card)||e.acct?'<div class="mu xs ltr" style="margin-top:8px;word-break:break-all">'+esc([e.kind!='BANK'&&e.card?'CARD '+e.card:'',e.acct?'ACCT '+e.acct:''].filter(Boolean).join(' · '))+'</div>':'')+
+ (four?'<div class="row" style="margin-top:14px;gap:10px"><div class="grow eq ltr">'+e.numbers.join(' + ')+' = '+num(e.total)+'</div>'+copyBtn(e.total)+'<button class="ib" data-a="edit" data-i="'+i+'" title="'+esc(t('edit'))+'" aria-label="'+esc(t('edit'))+'">'+ic('Edit')+'</button></div>':'')+
+ (e.code?'<div class="sm t" style="margin-top:6px;color:'+(e.status=='VERIFY'?'var(--er)':'var(--mu)')+'">'+esc(t('n_'+e.code,{a:e.arg}))+'</div>':'')+(isMM(e)?'<div class="sm t" style="margin-top:6px;color:var(--er)">'+esc(mmText(e))+'</div>':'')+
+ (!four&&e.status=='VERIFY'?'<div style="margin-top:14px">'+btn('edit',t('edit'),{icon:'Edit'}).replace('data-a="edit"','data-a="edit" data-i="'+i+'"')+'</div>':'')+'</article>'}
+function list(){const q=S.q.trim(),sh=S.entries.map((e,i)=>[e,i]).filter(([e])=>(!q||e.ref.includes(q)||e.time.includes(q)||fmtDate(e.date).includes(q)||(e.card||'').includes(q)||(e.acct||'').includes(q)||String(e.total)==q)&&(!S.onlyV||e.status=='VERIFY')&&(!S.onlyM||isMM(e)));
+ $('#list').innerHTML=sh.length?sh.map(([e,i])=>entry(e,i)).join(''):'<div class="card empty t"><p class="mu" style="margin-top:0">'+esc(t('empty_filter'))+'</p>'+btn('clear',t('clear_filters'))+'</div>'}
+function render(){document.documentElement.lang=S.lang;document.title=t('name');
+ const res=S.screen==1&&S.entries.length;
+ $('#app').innerHTML=header()+(res?results():home());
+ if(res){filters();list()}else dlist();
+ const L=$('#layer');
+ if(S.sheet=='lang')L.innerHTML='<div class="ov" data-a="close"><div class="sheet" role="dialog" aria-modal="true"><h2 class="t" style="margin:0">'+esc(t('language'))+'</h2>'+LANGS.map(([c,n])=>'<button class="lang '+(c==S.lang?'on':'')+'" data-a="setlang" data-v="'+c+'"><span>'+n+'</span>'+(c==S.lang?ic('Check'):'')+'</button>').join('')+'</div></div>';
+ else if(S.sheet=='del'){const d=S.docs.find(x=>x.id==S.delId);
+  L.innerHTML=d?'<div class="ov" data-a="close"><div class="sheet" role="dialog" aria-modal="true"><h2 class="t" style="margin:0">'+esc(t('del_title'))+'</h2><div class="mu sm t">'+esc(t('del_desc',{n:d.name}))+'</div><div class="g2">'+btn('close',t('cancel'))+btn('confirmdel',t('del'),{d:1,icon:'Trash'})+'</div></div></div>':''}
+ else if(S.sheet=='edit'&&S.entries[S.idx]){const e=S.entries[S.idx];
+  L.innerHTML='<div class="ov" data-a="close"><div class="sheet" role="dialog" aria-modal="true"><h2 class="t" style="margin:0">'+esc(t('edit_title'))+'</h2><div class="mu sm t">'+esc(t('edit_desc'))+'</div><div class="g2">'+
+  [0,1,2,3].map(i=>'<label><span class="mu sm t">'+esc(t('note_n',{n:i+1}))+'</span><div class="field"><input class="n" inputmode="numeric" maxlength="7" placeholder="0" value="'+(e.numbers[i]??'')+'"></div></label>').join('')+
+  '</div><div class="sm t" id="err" style="color:var(--er)" hidden>'+esc(t('err_edit'))+'</div><div class="mu sm t">'+esc(t('original'))+'</div><pre class="raw ltr">'+esc(e.raw)+'</pre><div class="g2">'+btn('close',t('cancel'))+btn('save',t('save'),{p:1})+'</div></div></div>';
+  const f=L.querySelector('.n');f&&f.focus()}
+ else if(S.sheet=='acct'&&S.user){const u=S.user;
+  L.innerHTML='<div class="ov" data-a="close"><div class="sheet" role="dialog" aria-modal="true"><h2 class="t" style="margin:0">'+esc(t('account'))+'</h2><div class="who"><div class="av ib">'+(u.photo?'<img src="'+esc(u.photo)+'" alt="" referrerpolicy="no-referrer">':esc((u.name||u.email||'?').charAt(0).toUpperCase()))+'</div><div class="grow"><b class="t">'+esc(u.name)+'</b><div class="mu sm ltr">'+esc(u.email)+'</div></div></div><div class="mu sm t">'+esc(t('acct_desc'))+'</div><div class="g2">'+btn('close',t('cancel'))+btn('logout',t('signout'),{p:1})+'</div></div></div>'}
+ else if(S.sheet=='table'){const f=S.tf,H=['c_ref','c_date','c_time','REQ','N1','N2','N3','N4','c_total','c_status','CARD','ACCT','c_note','c_calc','c_diff'].map(k=>k[0]=='c'?t(k):k),lb=(k,id,ty,v)=>'<label><span class="mu xs t">'+esc(t(k))+'</span><div class="field"><input type="'+ty+'" id="'+id+'" value="'+esc(v)+'"></div></label>';
+  L.innerHTML='<div class="ov full" data-a="close"><div class="sheet wide" role="dialog" aria-modal="true"><div class="row"><div class="grow t"><h2 style="margin:0">'+esc(t('tbl_title'))+'</h2><div class="mu sm">'+esc(t('tbl_hint'))+'</div></div><button class="ib" data-a="close" aria-label="'+esc(t('done'))+'">'+ic('Back')+'</button></div>'+
+  '<div class="chips" id="tchips"></div><div class="tf">'+lb('t_from','tfrom','time',f.from)+lb('t_to','tto','time',f.to)+lb('t_day','tday','date',f.day)+'<button class="chip" data-a="tclr">'+esc(t('t_clear'))+'</button></div><div class="sm t" id="tsum"></div>'+
+  '<div class="tw"><table class="tb"><thead><tr>'+H.map(h=>'<th>'+esc(h)+'</th>').join('')+'</tr></thead><tbody id="tbody"></tbody><tfoot><tr><td colspan="15" id="tfoot" style="text-align:start"></td></tr></tfoot></table></div><div class="g2">'+btn('close',t('done'))+btn('export',S.saving?t('exporting'):t('export_csv'),{p:1,icon:'Download',dis:S.saving,load:S.saving})+'</div></div></div>';
+  tblUpdate()}
+ else if(S.sheet=='fedit'&&S.fe){const fe=S.fe;
+  L.innerHTML='<div class="ov" data-a="close"><div class="sheet" role="dialog" aria-modal="true"><h2 class="t" style="margin:0">'+esc(t(fe.id?'fedit_title':'fnew_title'))+'</h2><label><span class="mu sm t">'+esc(t('fname'))+'</span><div class="field"><input id="fn" maxlength="40" value="'+esc(fe.name)+'" placeholder="'+esc(t('fname_ph'))+'"></div></label><div class="mu sm t">'+esc(t('fcolor'))+'</div><div class="sw">'+
+  COLORS.map(c=>'<button class="'+(c==fe.color?'on':'')+'" style="--c:'+c+'" data-a="fcol" data-v="'+c+'" aria-label="'+c+'"></button>').join('')+'</div><div class="sm t" id="err" style="color:var(--er)" hidden>'+esc(t('fname_err'))+'</div><div class="g2">'+btn('close',t('cancel'))+btn('fsave',t('save'),{p:1})+'</div></div></div>';
+  const f=L.querySelector('#fn');f&&f.focus()}
+ else if(S.sheet=='move'){const n=S.ids.size;
+  L.innerHTML='<div class="ov" data-a="close"><div class="sheet" role="dialog" aria-modal="true"><h2 class="t" style="margin:0">'+esc(t('move_title'))+'</h2><div class="mu sm t">'+esc(t('move_desc',{n}))+'</div><button class="lang" data-a="mv" data-v=""><span class="t">'+esc(t('no_folder'))+'</span></button>'+
+  S.folders.map(f=>'<button class="lang" data-a="mv" data-v="'+esc(f.id)+'"><span class="row" style="gap:10px"><span class="dot" style="--c:'+col(f.color)+'"></span><span class="t">'+esc(f.name)+'</span></span></button>').join('')+btn('newf','+ '+t('new_folder'))+btn('close',t('cancel'))+'</div></div>'}
+ else if(S.sheet=='bdel'){const n=S.ids.size;
+  L.innerHTML='<div class="ov" data-a="close"><div class="sheet" role="dialog" aria-modal="true"><h2 class="t" style="margin:0">'+esc(t('bdel_title',{n}))+'</h2><div class="mu sm t">'+esc(t('bdel_desc'))+'</div><div class="g2">'+btn('close',t('cancel'))+btn('confirmbdel',t('del'),{d:1,icon:'Trash'})+'</div></div></div>'}
+ else if(S.sheet=='fdel'){const f=S.folders.find(x=>x.id==S.delId);
+  L.innerHTML=f?'<div class="ov" data-a="close"><div class="sheet" role="dialog" aria-modal="true"><h2 class="t" style="margin:0">'+esc(t('fdel_title'))+'</h2><div class="mu sm t">'+esc(t('fdel_desc',{n:f.name}))+'</div><div class="g2">'+btn('close',t('cancel'))+btn('confirmfdel',t('del'),{d:1,icon:'Trash'})+'</div></div></div>':''}
+ else if(SH3[S.sheet])L.innerHTML=SH3[S.sheet]();else L.innerHTML='';after3()}
+// ── table view filters ──
+const KIND=x=>x.kind=='BANK'?'BANK':'NORMAL';
+function trow(x){const bank=x.kind=='BANK',mm=isMM(x),c=calcOf(x),cl=[bank?'b':'',x.status=='VERIFY'?'v':x.status=='NO_DISPENSE'?'n':'',mm?'m':''].join(' ').trim();
+ return '<tr'+(cl?' class="'+cl+'"':'')+'><td>'+esc(x.ref)+'</td><td>'+esc(fmtDate(x.date))+'</td><td>'+esc(x.time)+'</td><td>'+amt(x.req)+'</td>'+[0,1,2,3].map(i=>'<td>'+(x.numbers[i]??'')+'</td>').join('')+'<td>'+(x.numbers.length==4?num(x.total):'')+'</td><td>'+esc(t('st_'+x.status))+'</td><td>'+esc(bank?t('k_BANK'):(x.card||''))+'</td><td>'+esc(x.acct||'')+'</td><td>'+esc(noteOf(x))+'</td><td>'+(c==null?'':num(c))+'</td><td>'+(c==null?'':amt(c-x.req))+'</td></tr>'}
+function tblUpdate(){const f=S.tf,base=S.entries.filter(x=>{
+  if(f.day&&x.date!==f.day)return false;
+  if(f.from||f.to){if(!x.time)return false;const m=x.time.slice(0,5),a=f.from||'00:00',b=f.to||'23:59';if(a<=b?(m<a||m>b):(m<a&&m>b))return false}
+  return true}),rows=f.kind=='all'?base:base.filter(x=>KIND(x)==f.kind),sm=summarize(rows);
+ $('#tchips').innerHTML=['all','NORMAL','BANK'].map(k=>{const a=k=='all'?base:base.filter(x=>KIND(x)==k);return '<button class="chip'+(f.kind==k?' on':'')+'" data-a="tk" data-v="'+k+'">'+esc(t('k_'+k))+' · '+a.length+' · '+num(summarize(a).grand)+'</button>'}).join('');
+ $('#tbody').innerHTML=rows.map(trow).join('');
+ $('#tsum').textContent=t('last_desc',{n:rows.length,t:num(sm.grand)});
+ $('#tfoot').textContent=t('tot')+' : '+num(sm.grand)}
+// ── sorting (folders and documents) ──
+function sorter(){const dir=S.sortDir=='asc'?1:-1,al=(a,b)=>a.name.localeCompare(b.name,undefined,{numeric:true,sensitivity:'base'});
+ return (a,b)=>{if(S.sortBy=='alpha')return al(a,b)*dir;
+  const x=nameDate(a.name),y=nameDate(b.name);
+  if(x!=null&&y!=null&&x!=y)return (x-y)*dir;if(x!=null&&y==null)return -1;if(x==null&&y!=null)return 1;return al(a,b)}}
+// ── folders & multi-select ──
+function moveSel(to){const n=S.ids.size,now=Date.now();S.docs.forEach(d=>{if(S.ids.has(d.id)){d.folder=to||null;d.ts=now}});
+ S.ids.clear();S.sel=false;S.sheet=null;S.fe=null;saveAll();render();toast('moved',{n})}
+function delSel(){const ids=[...S.ids],now=Date.now();trashAdd(S.docs.filter(d=>S.ids.has(d.id)));S.docs=S.docs.filter(d=>!S.ids.has(d.id));ids.forEach(i=>S.del[i]=now);
+ if(ids.includes(S.cur)){S.cur=null;S.entries=[];sdel('cur')}
+ S.ids.clear();S.sel=false;S.sheet=null;saveAll();render();toastUndo('deleted_n',{n:ids.length})}
+function fsave(){const i=$('#fn'),name=(i?i.value:'').trim().slice(0,40);if(!name){$('#err').hidden=false;return}
+ const fe=S.fe;let id=fe.id;
+ if(id){const f=S.folders.find(x=>x.id==id);if(f){f.name=name;f.color=fe.color;f.ts=Date.now()}}
+ else{id=uid();S.folders.push({id,name,color:fe.color,ts:Date.now()})}
+ S.sheet=null;S.fe=null;
+ if(fe.after&&S.ids.size){moveSel(id);return}
+ saveAll();render();toast('fsaved')}
+function delFolder(){const id=S.delId,now=Date.now();S.docs.forEach(d=>{if(d.folder===id){d.folder=null;d.ts=now}});
+ S.folders=S.folders.filter(f=>f.id!=id);S.del[id]=now;if(S.fol===id)S.fol=null;S.sheet=null;S.delId=null;saveAll();render();toast('fdeleted')}
+function act2(a,el){const d=el.dataset;
+ if(a=='theme'){sset('theme',isDark()?'light':'dark');applyTheme();render();return 1}
+ if(a=='tk'){S.tf.kind=d.v;tblUpdate();return 1}
+ if(a=='tclr'){S.tf.from=S.tf.to=S.tf.day='';['tfrom','tto','tday'].forEach(i=>{const e=$('#'+i);if(e)e.value=''});tblUpdate();return 1}
+ if(a=='sortby'){S.sortBy=d.v;S.sortDir=d.v=='alpha'?'asc':'desc';sset('sortBy',S.sortBy);sset('sortDir',S.sortDir);render();return 1}
+ if(a=='sortdir'){S.sortDir=S.sortDir=='asc'?'desc':'asc';sset('sortDir',S.sortDir);render();return 1}
+ if(a=='newf'){S.fe={id:null,name:'',color:COLORS[S.folders.length%COLORS.length],after:S.sheet=='move'};S.sheet='fedit';render();return 1}
+ if(a=='editf'){const f=S.folders.find(x=>x.id==d.id);if(f){S.fe={id:f.id,name:f.name,color:col(f.color)};S.sheet='fedit';render()}return 1}
+ if(a=='fcol'){const i=$('#fn');if(i)S.fe.name=i.value;S.fe.color=d.v;render();return 1}
+ if(a=='fsave'){fsave();return 1}
+ if(a=='delf'){S.delId=d.id;S.sheet='fdel';render();return 1}
+ if(a=='confirmfdel'){delFolder();return 1}
+ if(a=='openf'){S.fol=d.id;S.dq='';render();return 1}
+ if(a=='upf'){S.fol=null;S.dq='';render();return 1}
+ if(a=='selmode'){S.sel=!S.sel;S.ids.clear();render();return 1}
+ if(a=='tog'){S.ids.has(d.id)?S.ids.delete(d.id):S.ids.add(d.id);render();return 1}
+ if(a=='selall'){const v=vis();if(v.every(x=>S.ids.has(x.id)))v.forEach(x=>S.ids.delete(x.id));else v.forEach(x=>S.ids.add(x.id));render();return 1}
+ if(a=='move'){S.sheet='move';render();return 1}
+ if(a=='mv'){moveSel(d.v||null);return 1}
+ if(a=='bdel'){S.sheet='bdel';render();return 1}
+ if(a=='confirmbdel'){delSel();return 1}
+ if(act3(a,el))return 1
+ return 0}
+// long-press on a document starts selection
+let lp,lpF=false;
+document.addEventListener('pointerdown',ev=>{const el=ev.target.closest&&ev.target.closest('.dc');if(!el||S.sel||ev.target.closest('.ib'))return;
+ clearTimeout(lp);lp=setTimeout(()=>{lpF=true;S.sel=true;S.ids.add(el.dataset.id);render();try{navigator.vibrate&&navigator.vibrate(15)}catch(e){}},500)});
+['pointerup','pointercancel'].forEach(n=>document.addEventListener(n,()=>{clearTimeout(lp);if(lpF)setTimeout(()=>lpF=false,350)}));
+document.addEventListener('scroll',()=>clearTimeout(lp),true);
+document.addEventListener('contextmenu',e=>{if(e.target.closest&&e.target.closest('.dc'))e.preventDefault()});
+// ── actions ──
+function uniqName(n){const names=new Set(S.docs.map(d=>d.name));if(!names.has(n))return n;
+ const m=/^(.*?)(\.[^.]*)?$/.exec(n),b=m[1],x=m[2]||'';let i=2;while(names.has(b+' ('+i+')'+x))i++;return b+' ('+i+')'+x}
+async function readFiles(files){files=[...files];if(!files.length)return;
+ S.busy=true;S.homeErr=null;S.homeInfo=null;S.screen=0;render();
+ let ok=0,last=null,skipped=[],failed=0;
+ for(const f of files){
+  try{const b=new Uint8Array(await f.arrayBuffer()),s=decodeText(b);
+   const p=parse(s);
+   if(!p.length){skipped.push(f.name);continue}
+   const d={id:uid(),name:uniqName(f.name),ts:Date.now(),entries:p,folder:S.fol||null};S.docs.push(d);ok++;last=d}
+  catch(e){failed++;skipped.push(f.name)}}
+ S.busy=false;
+ if(!ok){S.homeErr=failed==files.length?'open':'none';render();return}
+ saveAll();
+ if(files.length==1){openDoc(last.id);return}
+ S.homeInfo={ok,skipped};render()}
+function openDoc(id){const d=S.docs.find(x=>x.id==id);if(!d)return;
+ S.cur=id;sset('cur',id);S.entries=d.entries;S.q='';S.onlyV=false;S.onlyM=false;S.saveErr=false;S.excelErr=false;S.homeErr=null;S.homeInfo=null;go(1)}
+function delDoc(){const id=S.delId;trashAdd(S.docs.filter(d=>d.id==id));S.docs=S.docs.filter(d=>d.id!=id);S.del[id]=Date.now();S.ids.delete(id);
+ if(S.cur==id){S.cur=null;S.entries=[];sdel('cur')}
+ S.sheet=null;S.delId=null;saveAll();render();toastUndo('deleted')}
+function go(n){S.screen=n;if(n==1){if(location.hash!='#results')location.hash='results'}else if(location.hash)history.replaceState(null,'',location.pathname+location.search);render();window.scrollTo(0,0)}
+async function save(open,fmt){S.saving=true;S.saveErr=false;S.excelErr=false;render();
+ const cd=curDoc(),base=(cd?cd.name.replace(/\.[^.]*$/,''):'REQ_report').replace(/[\\/:*?"<>|]/g,'_')||'REQ_report',xl=fmt!='csv';let ok=false;
+ try{const blob=xl?toXlsx(S.entries,S.csvLang):new Blob([toCsv(S.entries,S.csvLang)],{type:'text/csv;charset=utf-8'}),name=base+(xl?'.xlsx':'.csv');
+  if(window.Android&&Android.saveFile){const r=Android.saveFile(name,blob.type.split(';')[0],b64(new Uint8Array(await blob.arrayBuffer())),!!open);ok=r!='err';if(r=='noapp')S.excelErr=true}
+  else{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();ok=true}}catch(e){}
+ S.saving=false;if(!ok)S.saveErr=true;render();if(ok&&!S.excelErr)toast('saved')}
+async function copy(v,b){let ok=false;try{await navigator.clipboard.writeText(v);ok=true}catch(e){try{const x=document.createElement('textarea');x.value=v;document.body.appendChild(x);x.select();ok=document.execCommand('copy');x.remove()}catch(e2){}}
+ if(ok){const h=b.innerHTML;b.innerHTML=ic('Check');b.style.color='var(--ok)';setTimeout(()=>{b.innerHTML=h;b.style.color=''},1400)}}
+function saveEdit(){const v=[...document.querySelectorAll('#layer .n')].map(i=>i.value.trim());
+ if(v.some(x=>!/^\d+$/.test(x))){$('#err').hidden=false;return}
+ S.entries[S.idx]=edit(S.entries[S.idx],v.map(Number));persist();S.sheet=null;render();toast('updated')}
+document.addEventListener('click',ev=>{const el=ev.target.closest('[data-a]');if(!el)return;const a=el.dataset.a;
+ if(lpF){lpF=false;return}
+ if(a=='close'&&el.classList.contains('ov')&&ev.target!==el)return;
+ if(act2(a,el))return;
+ if(a=='pick')$('#file').click();else if(a=='open')openDoc(el.dataset.id);else if(a=='back')go(0);else if(a=='lang'){S.sheet='lang';render()}
+ else if(a=='deldoc'){S.delId=el.dataset.id;S.sheet='del';render()}else if(a=='confirmdel')delDoc()
+ else if(a=='setlang'){S.lang=el.dataset.v;sset('lang',S.lang);S.sheet=null;render()}
+ else if(a=='close'){S.sheet=null;render()}else if(a=='csv'){S.csvLang=el.dataset.v;render()}
+ else if(a=='flt'){S.onlyV=el.dataset.v=='1';S.onlyM=el.dataset.v=='2';filters();list()}else if(a=='clear'){S.q='';S.onlyV=false;S.onlyM=false;render()}
+ else if(a=='edit'){S.idx=+el.dataset.i;S.sheet='edit';render()}else if(a=='save')saveEdit();
+ else if(a=='excel'){S.tf={kind:'all',from:'',to:'',day:''};S.sheet='table';render()}else if(a=='export')save(false);else if(a=='csvx')save(false,'csv');else if(a=='copy')copy(el.dataset.v,el)
+ else if(a=='login')login();else if(a=='acct'){S.sheet='acct';render()}else if(a=='logout')logout()});
+document.addEventListener('input',ev=>{const el=ev.target;
+ if(DF[el.id]){S.df[DF[el.id]]=el.value;daysUpdate()}else if(el.id=='q'){S.q=el.value;list()}else if(el.id=='dq'){S.dq=el.value;dlist()}
+ else if(el.id=='tfrom'||el.id=='tto'||el.id=='tday'){S.tf[{tfrom:'from',tto:'to',tday:'day'}[el.id]]=el.value;tblUpdate()}
+ else if(el.classList.contains('n')){el.value=el.value.replace(/\D/g,'').slice(0,7);const e=$('#err');e&&(e.hidden=true)}});
+document.addEventListener('keydown',ev=>{if(ev.key=='Escape'&&S.sheet){S.sheet=null;render()}
+ else if(ev.key=='Enter'&&S.sheet=='edit'&&ev.target.classList.contains('n'))saveEdit();
+ else if(ev.key=='Enter'&&S.sheet=='fedit'&&ev.target.id=='fn')fsave();
+ else if((ev.key=='Enter'||ev.key==' ')&&ev.target.dataset&&['open','tog','openf'].includes(ev.target.dataset.a)){ev.preventDefault();ev.target.click()}});
+$('#file').addEventListener('change',e=>{const fs=[...e.target.files];e.target.value='';if(fs.length)readFiles(fs)});
+['dragover','dragenter'].forEach(n=>document.addEventListener(n,e=>{if(S.screen==0&&$('#drop')){e.preventDefault();$('#drop').classList.add('over')}}));
+['dragleave','drop'].forEach(n=>document.addEventListener(n,e=>{const d=$('#drop');d&&d.classList.remove('over')}));
+document.addEventListener('drop',e=>{if(S.screen==0&&$('#drop')){e.preventDefault();const fs=e.dataTransfer.files;if(fs&&fs.length)readFiles(fs)}});
+window.addEventListener('hashchange',()=>{const n=location.hash=='#results'&&S.entries.length?1:0;if(n!=S.screen){S.screen=n;render()}});
+if(location.hash=='#results'&&S.entries.length)S.screen=1;
+// ── v4: reconciliation, cassettes, daily report, folder stats, protection, print ──
+Object.assign(D.ar,{den_title:"قيم الفئات",den_desc:"اكتب قيمة الورقة في كل كاسيت ليحسب التطبيق المبلغ الفعلي ويقارنه بـ REQ.",den_err:"أدخل أربع قيم أكبر من صفر، أو اتركها كلها فارغة.",den_saved:"تم حفظ الفئات",den_unset_t:"قيم الفئات غير محددة",den_unset:"حدّدها مرة واحدة لتفعيل مطابقة المبلغ مع الأوراق.",den_val:"الفئة",value:"القيمة",pieces:"الأوراق",mm:"فروقات",mm_banner:"{n} عملية مبلغها لا يطابق الأوراق",mm_ok:"المبلغ يطابق الأوراق في كل العمليات",f_mm:"فروقات المبلغ",n_MM:"المبلغ المحسوب {c} يختلف عن REQ {r} (الفرق {d}).",cass_title:"جرد الكاسيتات",tools_title:"أدوات",fs_btn:"إحصاءات",fs_all:"كل المستندات",c_doc:"المستند",c_calc:"المحسوب",c_diff:"الفرق",days_title:"التقرير اليومي",h_from:"من الساعة",h_to:"إلى الساعة",print_report:"تقرير للطباعة / PDF",rep_susp:"العمليات المشبوهة",backup_export:"نسخة احتياطية",backup_import:"استعادة نسخة",backup_ok:"تمت استعادة {n} مستند",backup_err:"ملف النسخة غير صالح",trash_title:"سلة المحذوفات",trash_desc:"تبقى المستندات المحذوفة 14 يومًا على هذا الجهاز فقط.",trash_empty:"السلة فارغة.",trash_clear:"إفراغ السلة",restore:"استعادة",restored:"تمت استعادة {n} مستند",undo:"تراجع",dups_title:"العمليات المكررة",dups_none:"لا توجد عمليات مكررة بين الملفات.",dup_n:"{n} عملية موجودة في أكثر من ملف.",dup_in:"موجودة في:",export_all:"تصدير xlsx (ورقة لكل مستند)"});
+Object.assign(D.en,{den_title:"Note values",den_desc:"Enter the value of the note in each cassette so the app can compute the real amount and compare it with REQ.",den_err:"Enter four values above zero, or leave all empty.",den_saved:"Values saved",den_unset_t:"Note values not set",den_unset:"Set them once to turn on amount-vs-notes matching.",den_val:"Note",value:"Value",pieces:"Notes",mm:"Mismatches",mm_banner:"{n} with amount ≠ notes",mm_ok:"Amount matches notes everywhere",f_mm:"Amount mismatch",n_MM:"Computed amount {c} differs from REQ {r} (difference {d}).",cass_title:"Cassette count",tools_title:"Tools",fs_btn:"Statistics",fs_all:"All documents",c_doc:"Document",c_calc:"Computed",c_diff:"Diff",days_title:"Daily report",h_from:"From hour",h_to:"To hour",print_report:"Print / PDF report",rep_susp:"Suspicious operations",backup_export:"Backup",backup_import:"Restore backup",backup_ok:"{n} document(s) restored",backup_err:"Invalid backup file",trash_title:"Trash",trash_desc:"Deleted documents stay for 14 days on this device only.",trash_empty:"Trash is empty.",trash_clear:"Empty trash",restore:"Restore",restored:"{n} document(s) restored",undo:"Undo",dups_title:"Duplicates",dups_none:"No duplicate operations across files.",dup_n:"{n} operation(s) found in several files.",dup_in:"Found in:",export_all:"Export xlsx (one sheet per document)"});
+Object.assign(D.fr,{den_title:"Valeur des coupures",den_desc:"Saisissez la valeur du billet de chaque cassette pour comparer le montant réel à REQ.",den_err:"Saisissez quatre valeurs positives, ou laissez tout vide.",den_saved:"Valeurs enregistrées",den_unset_t:"Valeurs non définies",den_unset:"Définissez-les une fois pour activer le rapprochement montant/billets.",den_val:"Coupure",value:"Valeur",pieces:"Billets",mm:"Écarts",mm_banner:"{n} dont le montant ≠ billets",mm_ok:"Montant cohérent avec les billets partout",f_mm:"Écarts de montant",n_MM:"Montant calculé {c} différent de REQ {r} (écart {d}).",cass_title:"Inventaire des cassettes",tools_title:"Outils",fs_btn:"Statistiques",fs_all:"Tous les documents",c_doc:"Document",c_calc:"Calculé",c_diff:"Écart",days_title:"Rapport quotidien",h_from:"De l'heure",h_to:"À l'heure",print_report:"Rapport à imprimer / PDF",rep_susp:"Opérations suspectes",backup_export:"Sauvegarde",backup_import:"Restaurer",backup_ok:"{n} document(s) restauré(s)",backup_err:"Fichier de sauvegarde invalide",trash_title:"Corbeille",trash_desc:"Les documents supprimés restent 14 jours sur cet appareil uniquement.",trash_empty:"La corbeille est vide.",trash_clear:"Vider la corbeille",restore:"Restaurer",restored:"{n} document(s) restauré(s)",undo:"Annuler",dups_title:"Doublons",dups_none:"Aucun doublon entre les fichiers.",dup_n:"{n} opération(s) présente(s) dans plusieurs fichiers.",dup_in:"Présente dans :",export_all:"Exporter xlsx (une feuille par document)"});
+S.den=(a=>Array.isArray(a)&&a.length==4?a.map(n=>+n||0):[0,0,0,0])(jget('den',null));
+S.trash=(a=>Array.isArray(a)?a.filter(x=>x&&x.d&&x.d.id):[])(jget('trash',[]));
+S.onlyM=false;S.df={from:'',to:'',hf:'',ht:''};S.fs=[];S.fsTitle='';S.lastDel=0;
+const dset=()=>S.den.every(v=>v>0);
+const denOf=x=>x.den&&x.den.length==4&&x.den.every(v=>v>0)?x.den:(dset()?S.den:null);
+const calcOf=x=>{const d=denOf(x);return d&&x.numbers.length==4?x.numbers.reduce((s,n,i)=>s+n*d[i],0):null};
+const hasD=e=>e.some(x=>denOf(x));
+const cassVals=e=>{const v=[0,0,0,0];e.forEach(x=>{const d=denOf(x);if(d&&x.status=='VALID'&&x.numbers.length==4)x.numbers.forEach((n,i)=>v[i]+=n*d[i])});return v};
+const denShow=e=>{for(let i=e.length-1;i>=0;i--){const d=denOf(e[i]);if(d)return d}return null};
+const curOf=e=>(e.find(x=>x.cur)||{}).cur||'';
+const isAM=x=>{if(x.status!='VALID')return false;const c=calcOf(x);return c!=null&&Math.abs(c-x.req)>0.005};
+const isMM=x=>isAM(x)||!!x.cm;
+const sum2=e=>({...summarize(e),mm:e.filter(isMM).length});
+const cassTot=e=>{const c=[0,0,0,0];e.forEach(x=>{if(x.status=='VALID'&&x.numbers.length==4)x.numbers.forEach((n,i)=>c[i]+=n)});return c};
+const mmText=x=>[isAM(x)?(()=>{const c=calcOf(x),d=c-x.req;return t('n_MM',{c:num(c),r:amt(x.req),d:(d>0?'+':'')+amt(d)})})():'',x.cm?t('n_CM',{a:(x.cmd||[]).join(' / ')}):''].filter(Boolean).join(' ');
+const noteOf=x=>[x.code?t('n_'+x.code,{a:x.arg}):'',isMM(x)?mmText(x):''].filter(Boolean).join(' · ');
+const rname=()=>{const c=curDoc();return c?c.name:t('name')};
+const OV=(inner,full)=>'<div class="ov'+(full?' full':'')+'" data-a="close"><div class="sheet'+(full?' wide':'')+'" role="dialog" aria-modal="true">'+inner+'</div></div>';
+const lbl=(k,id,ty,v)=>'<label><span class="mu xs t">'+esc(t(k))+'</span><div class="field"><input type="'+ty+'" id="'+id+'" value="'+esc(v)+'"></div></label>';
+const H2=k=>'<h2 class="t" style="margin:6px 0 0;font-size:15px">'+esc(t(k))+'</h2>';
+// text decoding: UTF-8 → UTF-16 BOM → Windows-1252 fallback (was plain Latin-1)
+function decodeText(b){
+ if(b[0]==0xFF&&b[1]==0xFE)return new TextDecoder('utf-16le').decode(b);
+ if(b[0]==0xFE&&b[1]==0xFF)return new TextDecoder('utf-16be').decode(b);
+ try{return new TextDecoder('utf-8',{fatal:true}).decode(b)}catch(e){}
+ try{return new TextDecoder('windows-1252').decode(b)}catch(e){}
+ let s='';for(let i=0;i<b.length;i+=32768)s+=String.fromCharCode.apply(null,b.subarray(i,i+32768));return s}
+// cassette table
+function cassHtml(e){const c=cassTot(e),v=cassVals(e),d=denShow(e),set=!!d,th=k=>'<th>'+esc(t(k))+'</th>';
+ return '<div class="tw sm0"><table class="tb"><thead><tr><th></th>'+(set?th('den_val'):'')+th('pieces')+(set?th('value'):'')+'</tr></thead><tbody>'+c.map((n,i)=>'<tr><td>'+esc(t('note_n',{n:i+1}))+'</td>'+(set?'<td>'+num(d[i])+'</td>':'')+'<td>'+num(n)+'</td>'+(set?'<td>'+num(v[i])+'</td>':'')+'</tr>').join('')+'</tbody><tfoot><tr><td>'+esc(t('tot'))+'</td>'+(set?'<td></td>':'')+'<td>'+num(sum(c))+'</td>'+(set?'<td>'+num(sum(v))+'</td>':'')+'</tr></tfoot></table></div>'}
+function mmBanners(){if(!hasD(S.entries))return banner('INFO',t('den_unset_t'),t('den_unset'),btn('den',t('den_title')));
+ const n=S.entries.filter(isMM).length;return n?banner('ERR',t('mm_banner',{n}),'',btn('mmf',t('f_mm'))):banner('OK',t('mm_ok'))}
+// daily aggregation
+function dayFilter(e){const f=S.df;return e.filter(x=>{if(f.from&&(!x.date||x.date<f.from))return false;if(f.to&&(!x.date||x.date>f.to))return false;
+ if(f.hf||f.ht){if(!x.time)return false;const m=x.time.slice(0,5),a=f.hf||'00:00',b=f.ht||'23:59';if(a<=b?(m<a||m>b):(m<a&&m>b))return false}return true})}
+function dayAgg(e){const m={};e.forEach(x=>{const k=x.date||'',o=m[k]||(m[k]={d:k,n:0,v:0,vf:0,mm:0,g:0,c:[0,0,0,0],val:0,hv:0});o.n++;
+ if(x.status=='VALID'){o.v++;o.g+=x.total;const q=calcOf(x);if(q!=null){o.val+=q;o.hv=1}if(x.numbers.length==4)x.numbers.forEach((z,i)=>o.c[i]+=z)}else if(x.status=='VERIFY')o.vf++;if(isMM(x))o.mm++});
+ return Object.values(m).sort((a,b)=>a.d<b.d?-1:a.d>b.d?1:0)}
+function dayTbl(rows){const set=rows.some(o=>o.hv),H=[t('c_date'),t('detected'),t('valid'),t('verify'),t('mm'),'N1','N2','N3','N4',t('c_total')].concat(set?[t('value')]:[]),
+ T=rows.reduce((a,o)=>({n:a.n+o.n,v:a.v+o.v,vf:a.vf+o.vf,mm:a.mm+o.mm,g:a.g+o.g,c:a.c.map((x,i)=>x+o.c[i]),val:a.val+o.val}),{n:0,v:0,vf:0,mm:0,g:0,c:[0,0,0,0],val:0}),
+ r=(l,o)=>'<td>'+l+'</td><td>'+o.n+'</td><td>'+o.v+'</td><td>'+o.vf+'</td><td>'+o.mm+'</td>'+o.c.map(n=>'<td>'+num(n)+'</td>').join('')+'<td>'+num(o.g)+'</td>'+(set?'<td>'+num(o.val)+'</td>':'');
+ return '<div class="tw sm0"><table class="tb"><thead><tr>'+H.map(h=>'<th>'+esc(h)+'</th>').join('')+'</tr></thead><tbody>'+rows.map(o=>'<tr>'+r(esc(o.d?fmtDate(o.d):'—'),o)+'</tr>').join('')+'</tbody><tfoot><tr>'+r(esc(t('tot')),T)+'</tr></tfoot></table></div>'}
+function daysSheet(){const f=S.df;
+ return OV('<div class="row"><div class="grow t"><h2 style="margin:0">'+esc(t('days_title'))+'</h2><div class="mu sm" id="dsum"></div></div><button class="ib" data-a="close" aria-label="'+esc(t('done'))+'">'+ic('Back')+'</button></div><div class="tf">'+lbl('t_from','dfrom','date',f.from)+lbl('t_to','dto','date',f.to)+lbl('h_from','dhf','time',f.hf)+lbl('h_to','dht','time',f.ht)+'<button class="chip" data-a="dclr">'+esc(t('t_clear'))+'</button></div><div id="dtbl"></div><div class="g2">'+btn('close',t('done'))+btn('printd',t('print_report'),{p:1,icon:'Download'})+'</div>',1)}
+function daysUpdate(){const e=dayFilter(S.entries);$('#dtbl').innerHTML=dayTbl(dayAgg(e));$('#dsum').textContent=t('last_desc',{n:e.length,t:num(sum2(e).grand)})}
+// folder / multi-document statistics
+const fsDocs=()=>S.fs.map(id=>S.docs.find(d=>d.id==id)).filter(Boolean);
+function fsSheet(){const ds=fsDocs(),e=ds.flatMap(d=>d.entries),s=sum2(e),set=hasD(e),
+ st=(n,l,c)=>'<div><b style="color:'+c+'">'+n+'</b><span class="xs mu t">'+esc(l)+'</span></div>',
+ heads=[t('c_doc'),t('detected'),t('valid'),t('verify'),t('mm'),t('c_total')].concat(set?[t('value')]:[]),
+ rows=ds.map(d=>{const q=sum2(d.entries);return '<tr><td style="text-align:start">'+esc(d.name)+'</td><td>'+q.detected+'</td><td>'+q.valid+'</td><td>'+q.verify+'</td><td>'+q.mm+'</td><td>'+num(q.grand)+'</td>'+(set?'<td>'+num(sum(cassVals(d.entries)))+'</td>':'')+'</tr>'}).join('');
+ return OV('<div class="row"><div class="grow t"><h2 style="margin:0">'+esc(S.fsTitle)+'</h2><div class="mu sm">'+esc(t('f_count',{n:ds.length})+' · '+t('last_desc',{n:s.detected,t:num(s.grand)}))+'</div></div><button class="ib" data-a="close" aria-label="'+esc(t('done'))+'">'+ic('Back')+'</button></div>'+
+ '<div class="stats">'+st(s.detected,t('detected'),'var(--tx)')+st(s.valid,t('valid'),'var(--ok)')+st(s.verify,t('verify'),s.verify?'var(--er)':'var(--mu)')+st(s.mm,t('mm'),s.mm?'var(--er)':'var(--mu)')+'</div>'+
+ H2('cass_title')+cassHtml(e)+H2('days_title')+dayTbl(dayAgg(e))+H2('c_doc')+'<div class="tw sm0"><table class="tb"><thead><tr>'+heads.map(h=>'<th>'+esc(h)+'</th>').join('')+'</tr></thead><tbody>'+rows+'</tbody></table></div>'+
+ '<div class="g2">'+btn('fsx',t('export_all'),{p:1,icon:'Download'})+btn('printf',t('print_report'),{icon:'Download'})+'</div>'+btn('close',t('done')),1)}
+async function deliver(blob,name,open){try{if(window.Android&&Android.saveFile){const r=Android.saveFile(name,blob.type.split(';')[0],b64(new Uint8Array(await blob.arrayBuffer())),!!open);return r!='err'}
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();return true}catch(e){return false}}
+async function saveFs(){const ds=fsDocs();if(!ds.length)return;const lang=S.csvLang,fr=lang!='en',set=ds.some(d=>hasD(d.entries)),
+ H=(fr?['Document','Opérations','Valides','À vérifier','Écarts','Billets','Valeur']:['Document','Operations','Valid','To check','Mismatches','Notes','Value']),
+ rows=[H.map(v=>({v,s:1}))];let T=[0,0,0,0,0,0];
+ ds.forEach(d=>{const q=sum2(d.entries),v=set?sum(cassVals(d.entries)):'';rows.push([d.name,q.detected,q.valid,q.verify,q.mm,q.grand,v].map(v=>({v,s:0})));T=[T[0]+q.detected,T[1]+q.valid,T[2]+q.verify,T[3]+q.mm,T[4]+q.grand,T[5]+(v||0)]});
+ rows.push([fr?'TOTAL GÉNÉRAL':'GRAND TOTAL',...T.slice(0,5),set?T[5]:''].map(v=>({v,s:1})));
+ const sheets=[{name:fr?'Résumé':'Summary',rows,w:[40,12,12,12,12,12,14]},...ds.map(d=>({name:d.name.replace(/\.[^.]*$/,''),rows:entryRows(d.entries,lang),w:XW}))],
+ ok=await deliver(xlsxBook(sheets),(S.fsTitle||'REQ').replace(/[\\/:*?"<>|]/g,'_')+'.xlsx');toast(ok?'saved':'err_save')}
+// print / PDF report
+function printReport(title,e){const s=sum2(e),set=hasD(e),susp=e.filter(x=>x.status=='VERIFY'||isMM(x)),
+ sr=[[t('detected'),s.detected],[t('valid'),s.valid],[t('verify'),s.verify],[t('no_dispense'),s.noDispense],[t('mm'),s.mm],[t('grand'),num(s.grand)]].concat(set?[[t('value'),num(sum(cassVals(e)))]]:[]);
+ const sus=susp.length?'<div class="tw sm0"><table class="tb"><thead><tr>'+[t('c_ref'),t('c_date'),t('c_time'),'REQ','N1','N2','N3','N4',t('c_total'),t('c_calc'),t('c_note')].map(h=>'<th>'+esc(h)+'</th>').join('')+'</tr></thead><tbody>'+susp.map(x=>{const c=calcOf(x);return '<tr><td>'+esc(x.ref)+'</td><td>'+esc(fmtDate(x.date))+'</td><td>'+esc(x.time)+'</td><td>'+amt(x.req)+'</td>'+[0,1,2,3].map(i=>'<td>'+(x.numbers[i]??'')+'</td>').join('')+'<td>'+(x.numbers.length==4?num(x.total):'')+'</td><td>'+(c==null?'':num(c))+'</td><td>'+esc(noteOf(x))+'</td></tr>'}).join('')+'</tbody></table></div>':'<p>'+esc(t('all_ok'))+'</p>';
+ const P=$('#prt');P.dir=S.lang=='ar'?'rtl':'ltr';
+ P.innerHTML='<h1>'+esc(title)+'</h1><div class="pm">'+esc(new Date().toLocaleString(S.lang=='ar'?'ar-u-nu-latn':S.lang))+'</div><div class="tw sm0" style="margin-top:12px"><table class="tb"><tbody>'+sr.map(([k,v])=>'<tr><td style="text-align:start">'+esc(k)+'</td><td>'+esc(v)+'</td></tr>').join('')+'</tbody></table></div>'+H2('cass_title')+cassHtml(e)+H2('days_title')+dayTbl(dayAgg(e))+'<h2 class="t" style="margin:16px 0 6px;font-size:15px">'+esc(t('rep_susp')+' ('+susp.length+')')+'</h2>'+sus;
+ setTimeout(()=>window.print(),80)}
+// trash / undo / backup / duplicates
+function trashAdd(docs){const now=Date.now();docs.forEach(d=>S.trash.unshift({d,at:now}));S.trash=S.trash.filter(x=>now-x.at<14*864e5).slice(0,30);S.lastDel=now;sset('trash',JSON.stringify(S.trash))}
+function restoreTrash(by){const its=S.trash.filter(x=>by.id?x.d.id==by.id:x.at==by.at);let n=0;
+ its.forEach(x=>{if(S.docs.some(d=>d.id==x.d.id))return;const d={...x.d,ts:Date.now()+1};delete S.del[d.id];S.docs.push(d);n++});
+ S.trash=S.trash.filter(x=>!its.includes(x));sset('trash',JSON.stringify(S.trash));S.sheet=S.sheet=='trash'?'trash':null;saveAll();render();toast('restored',{n})}
+function toastUndo(k,a){const el=$('#toast');el.innerHTML='<div class="toast t" role="status">'+esc(t(k,a))+'<button class="chip on" data-a="undo" style="margin-inline-start:12px;min-height:30px">'+esc(t('undo'))+'</button></div>';clearTimeout(tt);tt=setTimeout(()=>el.innerHTML='',7000)}
+function trashSheet(){const dt=at=>new Date(at).toLocaleString(S.lang=='ar'?'ar-u-nu-latn':S.lang,{dateStyle:'medium',timeStyle:'short'});
+ return OV('<h2 class="t" style="margin:0">'+esc(t('trash_title'))+'</h2><div class="mu sm t">'+esc(t('trash_desc'))+'</div>'+(S.trash.length?S.trash.map(x=>'<div class="card ent" style="padding:12px"><div class="row"><div class="grow"><div class="dn">'+esc(x.d.name)+'</div><div class="mu xs">'+esc(dt(x.at))+'</div></div><button class="chip on" data-a="restore" data-id="'+esc(x.d.id)+'">'+esc(t('restore'))+'</button></div></div>').join(''):'<div class="mu t">'+esc(t('trash_empty'))+'</div>')+'<div class="g2">'+btn('close',t('done'))+btn('emptytrash',t('trash_clear'),{d:1,icon:'Trash',dis:!S.trash.length})+'</div>')}
+function backup(){const j=JSON.stringify({app:'req',v:3,docs:S.docs,folders:S.folders,del:S.del,den:S.den});
+ deliver(new Blob([j],{type:'application/json'}),'req-backup-'+new Date().toISOString().slice(0,10)+'.json').then(ok=>toast(ok?'saved':'err_save'))}
+$('#bfile').addEventListener('change',async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;
+ try{const txt=await f.text(),raw=JSON.parse(txt),p=unpack(txt);if(!p.docs.length&&!p.folders.length)throw 0;let n=0;
+  p.docs.forEach(d=>{const c=S.docs.find(x=>x.id==d.id);if(c&&c.ts>=d.ts)return;if(S.del[d.id]){d.ts=Math.max(d.ts,S.del[d.id]+1);delete S.del[d.id]}S.docs=S.docs.filter(x=>x.id!=d.id);S.docs.push(d);n++});
+  p.folders.forEach(x=>{if(!S.folders.some(y=>y.id==x.id)){delete S.del[x.id];S.folders.push(x)}});
+  if(!Array.isArray(raw)&&Array.isArray(raw.den)&&raw.den.length==4&&!dset()){S.den=raw.den.map(v=>+v||0);sset('den',JSON.stringify(S.den))}
+  saveAll();render();toast('backup_ok',{n})}catch(err){toast('backup_err')}});
+function findDups(){const m=new Map();S.docs.forEach(d=>d.entries.forEach(x=>{if(!/^\d+$/.test(x.ref)||!(x.date||x.time))return;const k=[x.ref,x.date,x.time,x.req,x.numbers.join('-')].join('|');let a=m.get(k);if(!a)m.set(k,a=[]);if(!a.some(y=>y.d.id==d.id))a.push({d,x})}));return [...m.values()].filter(a=>a.length>1)}
+function dupsSheet(){const g=findDups();
+ return OV('<h2 class="t" style="margin:0">'+esc(t('dups_title'))+'</h2><div class="mu sm t">'+esc(g.length?t('dup_n',{n:g.length}):t('dups_none'))+'</div>'+g.slice(0,100).map(a=>{const x=a[0].x;return '<div class="card ent t" style="--c:var(--er);padding:12px"><div class="row"><b class="ltr">#'+esc(x.ref)+'</b><span class="mu sm ltr grow">'+esc([fmtDate(x.date),x.time,'REQ '+amt(x.req)].filter(Boolean).join(' · '))+'</span></div><div class="mu sm" style="margin-top:6px">'+esc(t('dup_in')+' '+a.map(y=>y.d.name).join(' · '))+'</div></div>'}).join('')+btn('close',t('done')))}
+function denSheet(){return OV('<h2 class="t" style="margin:0">'+esc(t('den_title'))+'</h2><div class="mu sm t">'+esc(t('den_desc'))+'</div><div class="g2">'+[0,1,2,3].map(i=>'<label><span class="mu sm t">'+esc(t('note_n',{n:i+1}))+'</span><div class="field"><input class="n" inputmode="numeric" maxlength="7" placeholder="0" value="'+(S.den[i]||'')+'"></div></label>').join('')+'</div><div class="sm t" id="err" style="color:var(--er)" hidden>'+esc(t('den_err'))+'</div><div class="g2">'+btn('close',t('cancel'))+btn('densave',t('save'),{p:1})+'</div>')}
+function toolsCard(){return '<section class="card"><div class="row"><div class="tile">'+ic('Calc')+'</div><div class="grow t"><h2>'+esc(t('tools_title'))+'</h2></div></div><div class="chips" style="margin-top:14px">'+[['den','den_title'],['fstats','fs_btn'],['backup','backup_export'],['bimport','backup_import'],['trash','trash_title'],['dups','dups_title']].map(([a,k])=>'<button class="chip" data-a="'+a+'">'+esc(t(k))+(a=='trash'&&S.trash.length?' ('+S.trash.length+')':'')+'</button>').join('')+'</div>'+(S.docs.some(d=>hasD(d.entries))?'':'<div class="mu sm t" style="margin-top:10px">'+esc(t('den_unset'))+'</div>')+'</section>'}
+function valLine(e){return hasD(e)?'<div class="ltr" style="font-weight:700;margin-top:6px">'+esc(t('value'))+': '+num(sum(cassVals(e)))+' '+esc(curOf(e))+'</div>':''}
+function devCard(e){const x=[...e].reverse().find(y=>y.rem);if(!x)return '';const d=denOf(x),th=k=>'<th>'+esc(t(k))+'</th>',rj=x.rejc||[0,0,0,0];
+ return '<div class="card"><h2 class="t" style="margin:0">'+esc(t('dev_title'))+'</h2><div class="mu xs ltr" style="margin:2px 0 12px">'+esc([fmtDate(x.date),x.time].filter(Boolean).join(' · '))+'</div><div class="tw sm0"><table class="tb"><thead><tr><th></th>'+(d?th('den_val'):'')+th('rem_l')+th('rej_l')+(d?th('value'):'')+'</tr></thead><tbody>'+x.rem.map((n,i)=>'<tr><td>'+esc(t('note_n',{n:i+1}))+'</td>'+(d?'<td>'+num(d[i])+'</td>':'')+'<td>'+num(n)+'</td><td>'+num(rj[i]||0)+'</td>'+(d?'<td>'+num(n*d[i])+'</td>':'')+'</tr>').join('')+'</tbody><tfoot><tr><td>'+esc(t('tot'))+'</td>'+(d?'<td></td>':'')+'<td>'+num(sum(x.rem))+'</td><td>'+num(sum(rj))+'</td>'+(d?'<td>'+num(x.rem.reduce((s,n,i)=>s+n*d[i],0))+'</td>':'')+'</tr></tfoot></table></div></div>'}
+function declCard(e){const m={};e.forEach(x=>{if(x.code=='DECLINED'){const k=x.arg||'?';m[k]=(m[k]||0)+1}});const ks=Object.keys(m).sort((a,b)=>m[b]-m[a]);if(!ks.length)return '';
+ return '<div class="card"><h2 class="t" style="margin:0 0 10px">'+esc(t('decl_title'))+'</h2>'+ks.map(k=>'<div class="row sm" style="gap:10px;padding:4px 0"><span class="grow ltr">'+esc(k)+'</span><b>'+m[k]+'</b></div>').join('')+'</div>'}
+Object.assign(D.ar,{n_CM:"عدّاد الجهاز يختلف عن الأوراق (الفرق: {a}). قد تكون هناك عمليات ناقصة في السجل.",dev_title:"حالة الكاسيتات عند آخر عملية",rem_l:"المتبقي",rej_l:"المرفوض",decl_title:"أسباب الرفض",mm_banner:"{n} عملية بها فروقات",mm_ok:"المبلغ وعدّادات الجهاز متطابقة في كل العمليات",f_mm:"فروقات",den_desc:"تُقرأ فئات الكاسيتات تلقائيًا من سجل الجهاز. هذه القيم احتياطية للملفات التي لا تحتويها.",den_unset_t:"لا توجد فئات في هذا الملف"});
+Object.assign(D.en,{n_CM:"Machine counter differs from notes (delta: {a}). The log may be missing operations.",dev_title:"Cassette status at last operation",rem_l:"Remaining",rej_l:"Rejected",decl_title:"Decline reasons",mm_banner:"{n} with differences",mm_ok:"Amount and machine counters match everywhere",f_mm:"Differences",den_desc:"Cassette values are read automatically from the machine log. These are a fallback for files without them.",den_unset_t:"No cassette values in this file"});
+Object.assign(D.fr,{n_CM:"Le compteur du DAB diffère des billets (écart : {a}). Des opérations manquent peut-être au journal.",dev_title:"État des cassettes à la dernière opération",rem_l:"Restant",rej_l:"Rejeté",decl_title:"Motifs de refus",mm_banner:"{n} avec des écarts",mm_ok:"Montant et compteurs du DAB cohérents partout",f_mm:"Écarts",den_desc:"Les valeurs sont lues automatiquement du journal. Celles-ci servent de secours pour les fichiers qui n'en contiennent pas.",den_unset_t:"Aucune valeur de cassette dans ce fichier"});
+const SH3={den:denSheet,days:daysSheet,fstats:fsSheet,trash:trashSheet,dups:dupsSheet};
+function after3(){if(S.sheet=='days')daysUpdate()}
+const DF={dfrom:'from',dto:'to',dhf:'hf',dht:'ht'};
+function act3(a,el){const d=el.dataset;
+ if(a=='den'){S.sheet='den';render();return 1}
+ if(a=='densave'){const v=[...document.querySelectorAll('#layer .n')].map(i=>+i.value||0);if(!(v.every(x=>x>0)||v.every(x=>!x))){$('#err').hidden=false;return 1}
+  S.den=v;sset('den',JSON.stringify(v));S.sheet=null;render();toast('den_saved');return 1}
+ if(a=='days'){S.df={from:'',to:'',hf:'',ht:''};S.sheet='days';render();return 1}
+ if(a=='dclr'){S.df={from:'',to:'',hf:'',ht:''};Object.keys(DF).forEach(i=>{const e=$('#'+i);if(e)e.value=''});daysUpdate();return 1}
+ if(a=='printd'){printReport(rname()+' — '+t('days_title'),dayFilter(S.entries));return 1}
+ if(a=='printr'){printReport(rname(),S.entries);return 1}
+ if(a=='mmf'){S.onlyV=false;S.onlyM=true;filters();list();return 1}
+ if(a=='fstats'){const sel=S.sel&&S.ids.size,ids=sel?[...S.ids]:S.docs.filter(x=>S.fol?fid(x)===S.fol:true).map(x=>x.id);
+  if(!ids.length){toast('docs_empty');return 1}
+  const cf=S.fol&&S.folders.find(f=>f.id==S.fol);S.fs=ids;S.fsTitle=sel?t('sel_n',{n:ids.length}):cf?cf.name:t('fs_all');S.sheet='fstats';render();return 1}
+ if(a=='fsx'){saveFs();return 1}
+ if(a=='printf'){printReport(S.fsTitle,fsDocs().flatMap(x=>x.entries));return 1}
+ if(a=='backup'){backup();return 1}
+ if(a=='bimport'){$('#bfile').click();return 1}
+ if(a=='trash'){S.sheet='trash';render();return 1}
+ if(a=='restore'){restoreTrash({id:d.id});return 1}
+ if(a=='emptytrash'){S.trash=[];sset('trash','[]');render();return 1}
+ if(a=='undo'){restoreTrash({at:S.lastDel});$('#toast').innerHTML='';return 1}
+ if(a=='dups'){S.sheet='dups';render();return 1}
+ return 0}
+// ── Cloud sync (Firebase) — one set of documents per account ──
+function pack(){return JSON.stringify({v:3,docs:S.docs,del:S.del,folders:S.folders})}
+function unpack(json,ts){try{const p=JSON.parse(json);
+ if(Array.isArray(p))return{docs:p.length?[{id:'legacy',name:t('prev_doc'),ts:ts||1,entries:p}]:[],del:{},folders:[]};
+ return{docs:(p.docs||[]).filter(x=>x&&x.id&&Array.isArray(x.entries)),del:p.del||{},folders:(p.folders||[]).filter(x=>x&&x.id&&x.name)}}catch(e){return{docs:[],del:{},folders:[]}}}
+function merge(a,b){const del={...a.del};for(const k in b.del)del[k]=Math.max(del[k]||0,b.del[k]);
+ const mk=(x,y)=>{const m={};[...(x||[]),...(y||[])].forEach(d=>{if(!m[d.id]||d.ts>m[d.id].ts)m[d.id]=d});return Object.values(m).filter(d=>!(del[d.id]>=d.ts))};
+ return{docs:mk(a.docs,b.docs),folders:mk(a.folders,b.folders),del}}
+function push(){if(!S.user||!window.FB)return;clearTimeout(pt);pt=setTimeout(async()=>{try{await FB.save(S.user.uid,TS,pack())}catch(e){toast('sync_err')}},800)}
+async function login(){try{await FB.login()}catch(e){if(!e||(e.code!='auth/popup-closed-by-user'&&e.code!='auth/cancelled-popup-request'))toast('login_err')}}
+async function logout(){clearTimeout(pt);try{await FB.logout()}catch(e){}
+ S.docs=[];S.del={};S.folders=[];S.fol=null;S.sel=false;S.ids.clear();S.cur=null;S.entries=[];TS=0;['docs','del','folders','cur','uid','entries','trash'].forEach(sdel);S.trash=[];sset('ts','0');
+ S.sheet=null;S.q='';S.dq='';S.onlyV=false;go(0)}
+function fbInit(){S.fb=true;FB.onUser(async u=>{S.user=u?{uid:u.uid,name:u.displayName||'',email:u.email||'',photo:u.photo||u.photoURL||''}:null;render();if(!u)return;
+ // documents of another account must never mix into this one
+ const prev=sget('uid');
+ if(prev&&prev!=u.uid){S.docs=[];S.del={};S.folders=[];S.fol=null;S.sel=false;S.ids.clear();S.cur=null;S.entries=[];sdel('cur');S.trash=[];sdel('trash');S.screen=0}
+ sset('uid',u.uid);
+ try{const c=await FB.load(u.uid),remote=c?unpack(c.json,c.ts):{docs:[],del:{}};
+  const m=merge({docs:S.docs,del:S.del,folders:S.folders},remote);
+  S.docs=m.docs;S.del=m.del;S.folders=m.folders;
+  const cd=curDoc();if(cd){S.entries=cd.entries}else{S.cur=null;S.entries=[];S.screen=0}
+  const mr=merge(remote,{docs:[],del:{},folders:[]}),fk=a=>JSON.stringify((a||[]).map(d=>d.id+':'+d.ts).sort()),needPush=fk(mr.folders)!=fk(S.folders)||JSON.stringify(mr.docs.map(d=>d.id+':'+d.ts).sort())!=JSON.stringify(S.docs.map(d=>d.id+':'+d.ts).sort())||JSON.stringify(remote.del)!=JSON.stringify(S.del);
+  TS=Date.now();sset('docs',JSON.stringify(S.docs));sset('del',JSON.stringify(S.del));sset('ts',String(TS));
+  sset('folders',JSON.stringify(S.folders));
+  if(needPush)await FB.save(u.uid,TS,pack());
+  render();toast('synced')}
+ catch(e){toast('sync_err')}})}
+window.addEventListener('fbready',fbInit);if(window.FB)fbInit();
+render();
+</script>
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import {getAuth,GoogleAuthProvider,signInWithPopup,signOut,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import {getFirestore,doc,getDoc,getDocs,collection,writeBatch} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+const app=initializeApp({apiKey:"AIzaSyC3MMC-7dGU3ztshP0mYUWrV_c1Zm8njoc",authDomain:"youyou-f869f.firebaseapp.com",projectId:"youyou-f869f",storageBucket:"youyou-f869f.firebasestorage.app",messagingSenderId:"185167516974",appId:"1:185167516974:web:6d44fc5c98e63b554696bf"});
+const auth=getAuth(app),db=getFirestore(app);
+window.FB={
+ onUser:f=>onAuthStateChanged(auth,f),
+ login:()=>signInWithPopup(auth,new GoogleAuthProvider()),
+ logout:()=>signOut(auth),
+ async load(uid){const m=await getDoc(doc(db,'users',uid));if(!m.exists())return null;const d=m.data(),cs=await getDocs(collection(db,'users',uid,'chunks')),parts=[];
+  cs.forEach(c=>{parts[+c.id]=c.data().d});return{ts:d.ts,json:parts.slice(0,d.n).join('')}},
+ async save(uid,ts,json){const CH=400000,parts=[];for(let i=0;i<json.length;i+=CH)parts.push(json.slice(i,i+CH));
+  const old=await getDocs(collection(db,'users',uid,'chunks')),b=writeBatch(db);
+  parts.forEach((d,i)=>b.set(doc(db,'users',uid,'chunks',String(i)),{d}));
+  old.forEach(c=>{if(+c.id>=parts.length)b.delete(c.ref)});
+  b.set(doc(db,'users',uid),{ts,n:parts.length});await b.commit()}};
+window.dispatchEvent(new Event('fbready'));
+</script>
+</body>
+</html>
