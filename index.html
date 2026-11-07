@@ -47,7 +47,7 @@ svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stro
 .btn .spin{border-color:rgba(255,255,255,.35);border-top-color:#fff;margin:0}
 @keyframes sp{to{transform:rotate(360deg)}}
 .stack{display:flex;flex-direction:column;gap:14px}
-.home{display:grid;gap:16px;max-width:900px;margin:0 auto}
+.home{display:grid;gap:16px;max-width:900px;margin:0 auto;grid-template-columns:minmax(0,1fr)}.home>*{min-width:0}
 .drop{margin-top:18px;border:2px dashed var(--bd);border-radius:16px;padding:22px 16px;text-align:center;color:var(--mu);transition:.15s}
 .drop.over{border-color:var(--pr);background:color-mix(in srgb,var(--pr) 8%,transparent);color:var(--pr)}
 .drop .btn{margin-top:12px}
@@ -57,15 +57,15 @@ svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stro
 hr{border:0;height:1px;background:var(--bd);margin:16px 0;width:100%}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center}
 .stats b{display:block;font-size:16.8px}
-.res{display:grid;gap:16px;align-items:start}
+.res{display:grid;gap:16px;align-items:start;grid-template-columns:minmax(0,1fr)}.res>*{min-width:0}
 .side{display:flex;flex-direction:column;gap:14px}
-.list{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(340px,1fr))}
+.list{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(min(340px,100%),1fr))}
 .ent .eq{font-weight:700;font-variant-numeric:tabular-nums}
 .badge{font-size:12px;font-weight:700;padding:2px 10px;border-radius:50px;color:var(--c);background:color-mix(in srgb,var(--c) 13%,transparent);white-space:nowrap}
 .ov{position:fixed;inset:0;background:rgba(10,12,18,.5);display:flex;align-items:flex-end;justify-content:center;z-index:20;animation:fi .15s}
 .sheet{background:var(--card);width:100%;max-width:520px;border-radius:24px 24px 0 0;padding:22px 20px calc(22px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px;max-height:92vh;overflow:auto;animation:su .2s}
 @keyframes fi{from{opacity:0}}@keyframes su{from{transform:translateY(30px);opacity:0}}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.g2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
 .raw{max-height:120px;overflow:auto;background:var(--in);border:1px solid var(--bd);border-radius:13px;padding:10px;font:12px/18px ui-monospace,Consolas,monospace;color:var(--mu);white-space:pre-wrap;margin:0}
 .lang{display:flex;align-items:center;justify-content:space-between;min-height:48px;padding:8px 14px;border-radius:13px;border:1px solid var(--bd);background:transparent;cursor:pointer;width:100%;text-align:start}
 .lang.on{border-color:var(--pr);background:color-mix(in srgb,var(--pr) 12%,transparent);font-weight:700}
@@ -77,7 +77,7 @@ hr{border:0;height:1px;background:var(--bd);margin:16px 0;width:100%}
  .card{padding:22px}.big{font-size:40px}
 }
 @media (min-width:980px){
- .res{grid-template-columns:360px 1fr;gap:24px}
+ .res{grid-template-columns:360px minmax(0,1fr);gap:24px}
  .side{position:sticky;top:calc(20px + env(safe-area-inset-top,0px))}
  .tools{display:flex;gap:12px;align-items:center}.tools .field{flex:1}
 }
@@ -106,6 +106,16 @@ hr{border:0;height:1px;background:var(--bd);margin:16px 0;width:100%}
 .tw.sm0{min-height:0;flex:none}
 #prt{display:none}
 @media print{body>*:not(#prt){display:none!important}body{background:#fff}:root{padding:0}#prt{display:block;color:#000;font:12px/1.5 system-ui,Arial,sans-serif}#prt h1{font-size:20px;margin:0 0 4px}#prt .pm{color:#555}#prt .tw{overflow:visible;border:0;direction:inherit}#prt .tb{font-size:11px;white-space:normal}#prt .tb th,#prt .tb td{position:static;color:#000;background:#fff;border:1px solid #999;padding:3px 6px}#prt .tb th{background:#eee}#prt .tb tfoot td{position:static;font-weight:700}}
+/* phone header: actions on the first row, title on its own full-width row */
+header{flex-wrap:wrap;row-gap:8px}
+header .chip{white-space:nowrap;flex:none;min-height:40px;padding:0 14px}
+@media (max-width:640px){
+ header{gap:8px;padding:14px 0 6px}
+ header .logo{width:42px;height:42px;border-radius:12px}
+ header .grow{order:3;flex:1 0 100%}
+ header .ib[data-a=theme]{margin-inline-start:auto}
+ h1{font-size:17px;word-break:normal;overflow-wrap:anywhere}
+}
 </style>
 </head>
 <body>
@@ -259,7 +269,14 @@ const ic=n=>'<svg class="i" viewBox="0 0 24 24" aria-hidden="true">'+P[n].map(d=
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]);
 const num=n=>n.toLocaleString('en-US'),amt=d=>d.toLocaleString('en-US',{maximumFractionDigits:2});
 let LS=null;try{LS=window.localStorage}catch(e){}
-const sget=k=>{try{return LS&&LS.getItem(k)}catch(e){return null}},sset=(k,v)=>{try{LS&&LS.setItem(k,v)}catch(e){}},sdel=k=>{try{LS&&LS.removeItem(k)}catch(e){}};
+// data of each account lives under its own prefix; preferences (language, theme, sort) stay shared
+const DK=['docs','del','folders','cur','ts','trash','den','entries'];
+let NS='';
+try{if(LS&&!LS.getItem('ns5')){LS.setItem('ns5','1');const u=LS.getItem('uid');
+  if(u){DK.forEach(k=>{const v=LS.getItem(k);if(v!=null){LS.setItem('u_'+u+'_'+k,v);LS.removeItem(k)}});LS.setItem('active',u)}}
+ const ac=LS&&LS.getItem('active');if(ac&&ac!='guest')NS='u_'+ac+'_'}catch(e){}
+const NSK=k=>DK.includes(k)?NS+k:k;
+const sget=k=>{try{return LS&&LS.getItem(NSK(k))}catch(e){return null}},sset=(k,v)=>{try{LS&&LS.setItem(NSK(k),v)}catch(e){}},sdel=k=>{try{LS&&LS.removeItem(NSK(k))}catch(e){}};
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 function jget(k,def){try{const v=JSON.parse(sget(k));return v==null?def:v}catch(e){return def}}
 const detect=()=>{const l=(navigator.language||'ar').slice(0,2);return D[l]?l:'ar'};
@@ -293,7 +310,7 @@ const btn=(a,label,o={})=>'<button class="btn '+(o.p?'p':'')+(o.d?'d':'')+'" dat
 const copyBtn=v=>'<button class="ib" data-a="copy" data-v="'+v+'" title="'+esc(t('copy_total'))+'" aria-label="'+esc(t('copy_total'))+'">'+ic('Copy')+'</button>';
 // ── views ──
 function header(){const back=S.screen==1&&S.entries.length,cd=curDoc();
- return '<header>'+(back?'<button class="ib" data-a="back" aria-label="'+esc(t('back'))+'" title="'+esc(t('back'))+'">'+ic('Back')+'</button>':'')+'<div class="logo">'+ic('Calc')+'</div><div class="grow"><h1 class="t">'+esc(back&&cd?cd.name:t('name'))+'</h1><div class="mu sm t">'+esc(back?t('results'):t('tagline'))+'</div></div><button class="ib" data-a="theme" aria-label="'+esc(t(isDark()?'theme_light':'theme_dark'))+'" title="'+esc(t(isDark()?'theme_light':'theme_dark'))+'">'+ic(isDark()?'Sun':'Moon')+'</button><button class="ib" data-a="lang" aria-label="'+esc(t('language'))+'" title="'+esc(t('language'))+'">'+ic('Globe')+'</button>'+acctBtn()+'</header>'}
+ return '<header>'+(back?'<button class="ib" data-a="back" aria-label="'+esc(t('back'))+'" title="'+esc(t('back'))+'">'+ic('Back')+'</button>':'')+'<div class="logo">'+ic('Calc')+'</div><div class="grow"><h1 class="t">'+esc(back&&cd?cd.name:t('name'))+'</h1><div class="mu sm t">'+esc(back?t('results'):t('tagline'))+'</div></div><button class="ib" data-a="theme" aria-label="'+esc(t(isDark()?'theme_light':'theme_dark'))+'" title="'+esc(t(isDark()?'theme_light':'theme_dark'))+'">'+ic(isDark()?'Sun':'Moon')+'</button><button class="ib" data-a="lang" aria-label="'+esc(t('language'))+'" title="'+esc(t('language'))+'">'+ic('Globe')+'</button>'+subBar()+acctBtn()+'</header>'}
 function acctBtn(){if(!S.fb)return'';if(!S.user)return'<button class="chip on" data-a="login">'+esc(t('signin'))+'</button>';
  const u=S.user;return'<button class="ib av" data-a="acct" aria-label="'+esc(t('account'))+'" title="'+esc(u.email)+'">'+(u.photo?'<img src="'+esc(u.photo)+'" alt="" referrerpolicy="no-referrer">':esc((u.name||u.email||'?').charAt(0).toUpperCase()))+'</button>'}
 const fid=d=>S.folders.some(f=>f.id===d.folder)?d.folder:null;
@@ -312,7 +329,7 @@ function home(){if(S.fol&&!S.folders.some(f=>f.id===S.fol))S.fol=null;const has=
  if(S.busy)h+=banner('RUN',t('reading'),t('reading_desc'));
  else if(S.homeErr)h+=banner('ERR',t('err_'+S.homeErr),t('err_'+S.homeErr+'_desc'),btn('pick',t('try_again')));
  else if(S.homeInfo)h+=banner('OK',t('imported',{n:S.homeInfo.ok}),S.homeInfo.skipped.length?t('skipped',{names:S.homeInfo.skipped.join(', ')}):'');
- h+='<div class="card"><div class="row"><div class="tile">'+ic('Upload')+'</div><div class="grow t"><h2>'+esc(t('import_title'))+'</h2><div class="mu sm">'+esc(t('import_desc'))+'</div></div></div>'+
+ h+=subBanner();h+='<div class="card"><div class="row"><div class="tile">'+ic('Upload')+'</div><div class="grow t"><h2>'+esc(t('import_title'))+'</h2><div class="mu sm">'+esc(t('import_desc'))+'</div></div></div>'+
  '<div class="drop t" id="drop">'+esc(t('drop'))+btn('pick',t('choose_file'),{p:1,icon:'Upload',dis:S.busy,load:S.busy})+'</div></div>';
  h+=toolsCard();if(has)h+='<section class="card">'+secHead()+
   '<label class="field" style="margin-top:14px">'+ic('Search')+'<input id="dq" type="search" value="'+esc(S.dq)+'" placeholder="'+esc(t('docs_search'))+'" aria-label="'+esc(t('docs_search'))+'"></label><div class="list" id="dlist" style="margin-top:14px"></div></section>';
@@ -356,8 +373,7 @@ function render(){document.documentElement.lang=S.lang;document.title=t('name');
   [0,1,2,3].map(i=>'<label><span class="mu sm t">'+esc(t('note_n',{n:i+1}))+'</span><div class="field"><input class="n" inputmode="numeric" maxlength="7" placeholder="0" value="'+(e.numbers[i]??'')+'"></div></label>').join('')+
   '</div><div class="sm t" id="err" style="color:var(--er)" hidden>'+esc(t('err_edit'))+'</div><div class="mu sm t">'+esc(t('original'))+'</div><pre class="raw ltr">'+esc(e.raw)+'</pre><div class="g2">'+btn('close',t('cancel'))+btn('save',t('save'),{p:1})+'</div></div></div>';
   const f=L.querySelector('.n');f&&f.focus()}
- else if(S.sheet=='acct'&&S.user){const u=S.user;
-  L.innerHTML='<div class="ov" data-a="close"><div class="sheet" role="dialog" aria-modal="true"><h2 class="t" style="margin:0">'+esc(t('account'))+'</h2><div class="who"><div class="av ib">'+(u.photo?'<img src="'+esc(u.photo)+'" alt="" referrerpolicy="no-referrer">':esc((u.name||u.email||'?').charAt(0).toUpperCase()))+'</div><div class="grow"><b class="t">'+esc(u.name)+'</b><div class="mu sm ltr">'+esc(u.email)+'</div></div></div><div class="mu sm t">'+esc(t('acct_desc'))+'</div><div class="g2">'+btn('close',t('cancel'))+btn('logout',t('signout'),{p:1})+'</div></div></div>'}
+ else if(S.sheet=='acct')L.innerHTML=acctSheet();
  else if(S.sheet=='table'){const f=S.tf,H=['c_ref','c_date','c_time','REQ','N1','N2','N3','N4','c_total','c_status','CARD','ACCT','c_note','c_calc','c_diff'].map(k=>k[0]=='c'?t(k):k),lb=(k,id,ty,v)=>'<label><span class="mu xs t">'+esc(t(k))+'</span><div class="field"><input type="'+ty+'" id="'+id+'" value="'+esc(v)+'"></div></label>';
   L.innerHTML='<div class="ov full" data-a="close"><div class="sheet wide" role="dialog" aria-modal="true"><div class="row"><div class="grow t"><h2 style="margin:0">'+esc(t('tbl_title'))+'</h2><div class="mu sm">'+esc(t('tbl_hint'))+'</div></div><button class="ib" data-a="close" aria-label="'+esc(t('done'))+'">'+ic('Back')+'</button></div>'+
   '<div class="chips" id="tchips"></div><div class="tf">'+lb('t_from','tfrom','time',f.from)+lb('t_to','tto','time',f.to)+lb('t_day','tday','date',f.day)+'<button class="chip" data-a="tclr">'+esc(t('t_clear'))+'</button></div><div class="sm t" id="tsum"></div>'+
@@ -428,7 +444,7 @@ function act2(a,el){const d=el.dataset;
  if(a=='mv'){moveSel(d.v||null);return 1}
  if(a=='bdel'){S.sheet='bdel';render();return 1}
  if(a=='confirmbdel'){delSel();return 1}
- if(act3(a,el))return 1
+ if(act3(a,el)||actSub(a,el))return 1
  return 0}
 // long-press on a document starts selection
 let lp,lpF=false;
@@ -440,7 +456,7 @@ document.addEventListener('contextmenu',e=>{if(e.target.closest&&e.target.closes
 // ── actions ──
 function uniqName(n){const names=new Set(S.docs.map(d=>d.name));if(!names.has(n))return n;
  const m=/^(.*?)(\.[^.]*)?$/.exec(n),b=m[1],x=m[2]||'';let i=2;while(names.has(b+' ('+i+')'+x))i++;return b+' ('+i+')'+x}
-async function readFiles(files){files=[...files];if(!files.length)return;
+async function readFiles(files){files=[...files];if(!files.length)return;if(!limitOk(files.length))return;
  S.busy=true;S.homeErr=null;S.homeInfo=null;S.screen=0;render();
  let ok=0,last=null,skipped=[],failed=0;
  for(const f of files){
@@ -474,7 +490,7 @@ function saveEdit(){const v=[...document.querySelectorAll('#layer .n')].map(i=>i
 document.addEventListener('click',ev=>{const el=ev.target.closest('[data-a]');if(!el)return;const a=el.dataset.a;
  if(lpF){lpF=false;return}
  if(a=='close'&&el.classList.contains('ov')&&ev.target!==el)return;
- if(act2(a,el))return;
+ if(gate(a)||act2(a,el))return;
  if(a=='pick')$('#file').click();else if(a=='open')openDoc(el.dataset.id);else if(a=='back')go(0);else if(a=='lang'){S.sheet='lang';render()}
  else if(a=='deldoc'){S.delId=el.dataset.id;S.sheet='del';render()}else if(a=='confirmdel')delDoc()
  else if(a=='setlang'){S.lang=el.dataset.v;sset('lang',S.lang);S.sheet=null;render()}
@@ -593,7 +609,7 @@ function dupsSheet(){const g=findDups();
  return OV('<h2 class="t" style="margin:0">'+esc(t('dups_title'))+'</h2><div class="mu sm t">'+esc(g.length?t('dup_n',{n:g.length}):t('dups_none'))+'</div>'+g.slice(0,100).map(a=>{const x=a[0].x;return '<div class="card ent t" style="--c:var(--er);padding:12px"><div class="row"><b class="ltr">#'+esc(x.ref)+'</b><span class="mu sm ltr grow">'+esc([fmtDate(x.date),x.time,'REQ '+amt(x.req)].filter(Boolean).join(' · '))+'</span></div><div class="mu sm" style="margin-top:6px">'+esc(t('dup_in')+' '+a.map(y=>y.d.name).join(' · '))+'</div></div>'}).join('')+btn('close',t('done')))}
 function denSheet(){return OV('<h2 class="t" style="margin:0">'+esc(t('den_title'))+'</h2><div class="mu sm t">'+esc(t('den_desc'))+'</div><div class="g2">'+[0,1,2,3].map(i=>'<label><span class="mu sm t">'+esc(t('note_n',{n:i+1}))+'</span><div class="field"><input class="n" inputmode="numeric" maxlength="7" placeholder="0" value="'+(S.den[i]||'')+'"></div></label>').join('')+'</div><div class="sm t" id="err" style="color:var(--er)" hidden>'+esc(t('den_err'))+'</div><div class="g2">'+btn('close',t('cancel'))+btn('densave',t('save'),{p:1})+'</div>')}
 function toolsCard(){return '<section class="card"><div class="row"><div class="tile">'+ic('Calc')+'</div><div class="grow t"><h2>'+esc(t('tools_title'))+'</h2></div></div><div class="chips" style="margin-top:14px">'+[['den','den_title'],['fstats','fs_btn'],['backup','backup_export'],['bimport','backup_import'],['trash','trash_title'],['dups','dups_title']].map(([a,k])=>'<button class="chip" data-a="'+a+'">'+esc(t(k))+(a=='trash'&&S.trash.length?' ('+S.trash.length+')':'')+'</button>').join('')+'</div>'+(S.docs.some(d=>hasD(d.entries))?'':'<div class="mu sm t" style="margin-top:10px">'+esc(t('den_unset'))+'</div>')+'</section>'}
-function valLine(e){return hasD(e)?'<div class="ltr" style="font-weight:700;margin-top:6px">'+esc(t('value'))+': '+num(sum(cassVals(e)))+' '+esc(curOf(e))+'</div>':''}
+function valLine(e){return hasD(e)?'<div class="t" style="font-weight:700;margin-top:6px">'+esc(t('value'))+': <span class="ltr">'+num(sum(cassVals(e)))+' '+esc(curOf(e))+'</span></div>':''}
 function devCard(e){const x=[...e].reverse().find(y=>y.rem);if(!x)return '';const d=denOf(x),th=k=>'<th>'+esc(t(k))+'</th>',rj=x.rejc||[0,0,0,0];
  return '<div class="card"><h2 class="t" style="margin:0">'+esc(t('dev_title'))+'</h2><div class="mu xs ltr" style="margin:2px 0 12px">'+esc([fmtDate(x.date),x.time].filter(Boolean).join(' · '))+'</div><div class="tw sm0"><table class="tb"><thead><tr><th></th>'+(d?th('den_val'):'')+th('rem_l')+th('rej_l')+(d?th('value'):'')+'</tr></thead><tbody>'+x.rem.map((n,i)=>'<tr><td>'+esc(t('note_n',{n:i+1}))+'</td>'+(d?'<td>'+num(d[i])+'</td>':'')+'<td>'+num(n)+'</td><td>'+num(rj[i]||0)+'</td>'+(d?'<td>'+num(n*d[i])+'</td>':'')+'</tr>').join('')+'</tbody><tfoot><tr><td>'+esc(t('tot'))+'</td>'+(d?'<td></td>':'')+'<td>'+num(sum(x.rem))+'</td><td>'+num(sum(rj))+'</td>'+(d?'<td>'+num(x.rem.reduce((s,n,i)=>s+n*d[i],0))+'</td>':'')+'</tr></tfoot></table></div></div>'}
 function declCard(e){const m={};e.forEach(x=>{if(x.code=='DECLINED'){const k=x.arg||'?';m[k]=(m[k]||0)+1}});const ks=Object.keys(m).sort((a,b)=>m[b]-m[a]);if(!ks.length)return '';
@@ -625,7 +641,120 @@ function act3(a,el){const d=el.dataset;
  if(a=='emptytrash'){S.trash=[];sset('trash','[]');render();return 1}
  if(a=='undo'){restoreTrash({at:S.lastDel});$('#toast').innerHTML='';return 1}
  if(a=='dups'){S.sheet='dups';render();return 1}
+ if(a=='addacct'){addAccount();return 1}
+ if(a=='switchacct'){S.sheet=null;const x=S.accts.find(y=>y.uid==d.uid);
+  if(x&&(!S.user||S.user.uid!=x.uid)){activate(x.uid,false);toast('acct_switched',{n:x.email||x.name})}else render();return 1}
  return 0}
+// ── Subscriptions (v5): server-enforced cloud sync + UI gating, manual payment, notifications ──
+const REGION="europe-west1"; // must match functions/index.js
+P.Bell=["M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9","M10.3 21a1.94 1.94 0 0 0 3.4 0"];
+Object.assign(D.ar,{sub_title:"الاشتراك",h_type:"النوع",sub_status:"حالة الاشتراك",ss_free:"مجاني",ss_pending:"قيد المراجعة",ss_active:"فعّال",ss_expired:"منتهٍ",ss_cancelled:"ملغى",ss_suspended:"معلّق",plan_l:"الخطة",started_on:"بداية الاشتراك",expires_on:"ينتهي في",days_left:"{n} يوم متبقٍ",last_pay:"آخر دفعة",plans_title:"الخطط المتاحة",per_month:"/ شهر",months_n:"مدة الاشتراك: {n} شهر",choose_plan:"اختيار الخطة",renew_plan:"تجديد",current_tag:"خطتك الحالية",cmp_docs:"عدد المستندات",unlimited:"بلا حد",f_cloudSync:"مزامنة سحابية بين الأجهزة",f_reports:"التقارير والإحصاءات المتقدمة",f_xlsx:"تصدير Excel (.xlsx)",no_plans:"لا توجد خطط متاحة حاليًا.",reqs_title:"طلبات الدفع",rs_pending:"قيد المراجعة",rs_approved:"مقبول",rs_rejected:"مرفوض",why_rej:"سبب الرفض",hist_title:"سجل المدفوعات",ty_payment:"اشتراك",ty_renewal:"تجديد",ty_manual:"تفعيل من الإدارة",ty_extension:"تمديد",hist_none:"لا توجد عمليات بعد.",reqs_none:"لا توجد طلبات.",sub_unavail:"تعذّر تحميل حالة الاشتراك. تحقق من الاتصال ثم أعد المحاولة.",expired_t:"انتهى اشتراكك",expired_d:"توقفت المزايا المدفوعة فقط. بياناتك وملفاتك وتقاريرك محفوظة كما هي. جدّد اشتراكك لاستعادتها.",expiring_t:"اشتراكك ينتهي قريبًا",expiring_d:"ينتهي في {d}.",pending_t:"طلب الدفع قيد المراجعة",pending_d:"لن يُفعَّل الاشتراك إلا بعد أن تراجع الإدارة إثبات الدفع.",susp_t:"الاشتراك معلّق من الإدارة",pay_title:"الدفع",pay_amount:"المبلغ المطلوب",pay_instr_t:"تعليمات الدفع",pay_no_instr:"لم تحدد الإدارة تعليمات الدفع بعد. تعذّر إرسال الطلب حاليًا.",pay_ref:"رقم العملية / الوصل (اختياري)",pay_proof:"إثبات الدفع",pay_choose:"اختيار صورة أو PDF",pay_hint:"صورة (JPG/PNG/WebP) أو PDF، حتى 600 كيلوبايت. تُصغَّر الصور تلقائيًا.",pay_note:"إرسال الإثبات لا يعني أن الدفع تم: يُفعَّل الاشتراك فقط بعد مراجعة الإدارة وقبولها.",pay_submit:"إرسال الطلب",pay_sent:"أُرسل الطلب وهو قيد المراجعة",pe_PROOF_REQUIRED:"أرفق إثبات الدفع.",pe_PROOF_TOO_BIG:"الملف أكبر من 600 كيلوبايت.",pe_PROOF_BAD_TYPE:"نوع الملف غير مدعوم. استخدم صورة أو PDF.",pe_ALREADY_PENDING:"لديك طلب قيد المراجعة بالفعل.",pe_DUPLICATE_PAYMENT:"هذا الإثبات أو رقم العملية سُجّل من قبل.",pe_PLAN_UNAVAILABLE:"هذه الخطة لم تعد متاحة.",pe_NETWORK:"تعذّر الاتصال بالخادم. لم يتغير شيء، يمكنك إعادة المحاولة بأمان.",pe_GENERIC:"حدث خطأ. حاول مرة أخرى.",locked_feature:"هذه الميزة ضمن خطة مدفوعة.",locked_login:"سجّل الدخول لاستخدام هذه الميزة.",sync_locked:"المزامنة السحابية متوقفة: يلزم اشتراك فعّال. بياناتك المحلية سليمة.",notif_title:"الإشعارات",notif_none:"لا توجد إشعارات.",nt_request_submitted:"أُرسل طلب الاشتراك في خطة {plan} وهو قيد المراجعة.",nt_payment_approved:"تم قبول دفعتك لخطة {plan}.",nt_payment_rejected:"رُفض طلب الدفع. السبب: {reason}",nt_sub_activated:"تم تفعيل اشتراكك في {plan} حتى {until}.",nt_renewed:"تم تجديد اشتراكك في {plan} حتى {until}.",nt_expiring:"ينتهي اشتراكك خلال {days} يوم ({until}).",nt_expired:"انتهى اشتراكك. جدّد لاستعادة المزايا المدفوعة.",nt_extended:"مُدِّد اشتراكك حتى {until}.",nt_suspended:"عُلِّق اشتراكك من الإدارة. {reason}",nt_unsuspended:"أُعيد تفعيل اشتراكك.",nt_cancelled:"أُلغي اشتراكك.",nt_plan_changed:"تغيّرت خطتك إلى {plan}.",limit_docs:"بلغت الحد الأقصى للمستندات في خطتك."});
+Object.assign(D.en,{sub_title:"Subscription",h_type:"Type",sub_status:"Subscription status",ss_free:"Free",ss_pending:"Under review",ss_active:"Active",ss_expired:"Expired",ss_cancelled:"Cancelled",ss_suspended:"Suspended",plan_l:"Plan",started_on:"Started",expires_on:"Expires",days_left:"{n} day(s) left",last_pay:"Last payment",plans_title:"Available plans",per_month:"/ month",months_n:"Duration: {n} month(s)",choose_plan:"Choose plan",renew_plan:"Renew",current_tag:"Your plan",cmp_docs:"Documents",unlimited:"Unlimited",f_cloudSync:"Cloud sync across devices",f_reports:"Advanced reports and statistics",f_xlsx:"Excel export (.xlsx)",no_plans:"No plans available right now.",reqs_title:"Payment requests",rs_pending:"Under review",rs_approved:"Approved",rs_rejected:"Rejected",why_rej:"Reason",hist_title:"Payment history",ty_payment:"Subscription",ty_renewal:"Renewal",ty_manual:"Activated by admin",ty_extension:"Extension",hist_none:"No operations yet.",reqs_none:"No requests.",sub_unavail:"Couldn't load your subscription. Check your connection and try again.",expired_t:"Your subscription has expired",expired_d:"Only paid features stopped. Your data, files and reports are untouched. Renew to get them back.",expiring_t:"Your subscription ends soon",expiring_d:"Ends on {d}.",pending_t:"Payment request under review",pending_d:"The subscription is activated only after an administrator reviews your proof of payment.",susp_t:"Subscription suspended by the administrator",pay_title:"Payment",pay_amount:"Amount due",pay_instr_t:"Payment instructions",pay_no_instr:"The administrator hasn't set payment instructions yet. You can't send a request for now.",pay_ref:"Transaction / receipt number (optional)",pay_proof:"Proof of payment",pay_choose:"Choose image or PDF",pay_hint:"Image (JPG/PNG/WebP) or PDF, up to 600 KB. Images are shrunk automatically.",pay_note:"Sending proof does not mean the payment is done: the subscription is activated only after an administrator approves it.",pay_submit:"Send request",pay_sent:"Request sent and under review",pe_PROOF_REQUIRED:"Attach the proof of payment.",pe_PROOF_TOO_BIG:"The file is larger than 600 KB.",pe_PROOF_BAD_TYPE:"Unsupported file type. Use an image or PDF.",pe_ALREADY_PENDING:"You already have a request under review.",pe_DUPLICATE_PAYMENT:"This proof or transaction number was already submitted.",pe_PLAN_UNAVAILABLE:"This plan is no longer available.",pe_NETWORK:"Couldn't reach the server. Nothing changed; you can safely retry.",pe_GENERIC:"Something went wrong. Try again.",locked_feature:"This feature needs a paid plan.",locked_login:"Sign in to use this feature.",sync_locked:"Cloud sync is paused: an active subscription is required. Your local data is safe.",notif_title:"Notifications",notif_none:"No notifications.",nt_request_submitted:"Your request for the {plan} plan was sent and is under review.",nt_payment_approved:"Your payment for the {plan} plan was approved.",nt_payment_rejected:"Payment request rejected. Reason: {reason}",nt_sub_activated:"Your {plan} subscription is active until {until}.",nt_renewed:"Your {plan} subscription was renewed until {until}.",nt_expiring:"Your subscription ends in {days} day(s) ({until}).",nt_expired:"Your subscription expired. Renew to restore paid features.",nt_extended:"Your subscription was extended to {until}.",nt_suspended:"Your subscription was suspended by the administrator. {reason}",nt_unsuspended:"Your subscription was reactivated.",nt_cancelled:"Your subscription was cancelled.",nt_plan_changed:"Your plan changed to {plan}.",limit_docs:"You reached your plan's document limit."});
+Object.assign(D.fr,{sub_title:"Abonnement",h_type:"Type",sub_status:"État de l'abonnement",ss_free:"Gratuit",ss_pending:"En vérification",ss_active:"Actif",ss_expired:"Expiré",ss_cancelled:"Annulé",ss_suspended:"Suspendu",plan_l:"Formule",started_on:"Début",expires_on:"Expire le",days_left:"{n} jour(s) restant(s)",last_pay:"Dernier paiement",plans_title:"Formules disponibles",per_month:"/ mois",months_n:"Durée : {n} mois",choose_plan:"Choisir",renew_plan:"Renouveler",current_tag:"Votre formule",cmp_docs:"Documents",unlimited:"Illimité",f_cloudSync:"Synchronisation cloud entre appareils",f_reports:"Rapports et statistiques avancés",f_xlsx:"Export Excel (.xlsx)",no_plans:"Aucune formule disponible pour le moment.",reqs_title:"Demandes de paiement",rs_pending:"En vérification",rs_approved:"Acceptée",rs_rejected:"Refusée",why_rej:"Motif",hist_title:"Historique des paiements",ty_payment:"Abonnement",ty_renewal:"Renouvellement",ty_manual:"Activé par l'admin",ty_extension:"Prolongation",hist_none:"Aucune opération.",reqs_none:"Aucune demande.",sub_unavail:"Impossible de charger l'abonnement. Vérifiez la connexion et réessayez.",expired_t:"Votre abonnement a expiré",expired_d:"Seules les fonctions payantes sont arrêtées. Vos données, fichiers et rapports sont intacts. Renouvelez pour les retrouver.",expiring_t:"Votre abonnement expire bientôt",expiring_d:"Expire le {d}.",pending_t:"Demande de paiement en vérification",pending_d:"L'abonnement n'est activé qu'après vérification de votre preuve de paiement par un administrateur.",susp_t:"Abonnement suspendu par l'administrateur",pay_title:"Paiement",pay_amount:"Montant à payer",pay_instr_t:"Instructions de paiement",pay_no_instr:"L'administrateur n'a pas encore défini les instructions de paiement. Envoi impossible pour le moment.",pay_ref:"N° de transaction / reçu (facultatif)",pay_proof:"Preuve de paiement",pay_choose:"Choisir une image ou un PDF",pay_hint:"Image (JPG/PNG/WebP) ou PDF, jusqu'à 600 Ko. Les images sont réduites automatiquement.",pay_note:"Envoyer une preuve ne signifie pas que le paiement est effectué : l'abonnement n'est activé qu'après validation par un administrateur.",pay_submit:"Envoyer la demande",pay_sent:"Demande envoyée, en vérification",pe_PROOF_REQUIRED:"Joignez la preuve de paiement.",pe_PROOF_TOO_BIG:"Le fichier dépasse 600 Ko.",pe_PROOF_BAD_TYPE:"Type de fichier non pris en charge. Utilisez une image ou un PDF.",pe_ALREADY_PENDING:"Vous avez déjà une demande en vérification.",pe_DUPLICATE_PAYMENT:"Cette preuve ou ce numéro de transaction a déjà été soumis.",pe_PLAN_UNAVAILABLE:"Cette formule n'est plus disponible.",pe_NETWORK:"Serveur injoignable. Rien n'a changé, vous pouvez réessayer sans risque.",pe_GENERIC:"Une erreur est survenue. Réessayez.",locked_feature:"Cette fonction nécessite une formule payante.",locked_login:"Connectez-vous pour utiliser cette fonction.",sync_locked:"Synchronisation cloud suspendue : un abonnement actif est requis. Vos données locales sont intactes.",notif_title:"Notifications",notif_none:"Aucune notification.",nt_request_submitted:"Votre demande pour la formule {plan} a été envoyée et est en vérification.",nt_payment_approved:"Votre paiement pour la formule {plan} a été accepté.",nt_payment_rejected:"Demande de paiement refusée. Motif : {reason}",nt_sub_activated:"Votre abonnement {plan} est actif jusqu'au {until}.",nt_renewed:"Votre abonnement {plan} a été renouvelé jusqu'au {until}.",nt_expiring:"Votre abonnement expire dans {days} jour(s) ({until}).",nt_expired:"Votre abonnement a expiré. Renouvelez pour retrouver les fonctions payantes.",nt_extended:"Votre abonnement a été prolongé jusqu'au {until}.",nt_suspended:"Votre abonnement a été suspendu par l'administrateur. {reason}",nt_unsuspended:"Votre abonnement a été réactivé.",nt_cancelled:"Votre abonnement a été annulé.",nt_plan_changed:"Votre formule est maintenant {plan}.",limit_docs:"Vous avez atteint la limite de documents de votre formule."});
+Object.assign(S,{sub:null,plans:[],settings:null,reqs:[],hist:[],notifs:[],accState:'unknown',payPlan:null,payRef:'',proofFile:null,reqId:'',subBusy:false,syncToast:false});
+const Lc=o=>o&&typeof o=='object'?(o[S.lang]||o.en||o.fr||o.ar||''):String(o==null?'':o);
+const dfmt=ms=>ms?new Date(ms).toLocaleDateString(S.lang=='ar'?'ar-u-nu-latn':S.lang,{dateStyle:'medium'}):'—';
+const cur=()=>(S.settings&&S.settings.currency)||'DZD';
+const FEATS=['cloudSync','reports','xlsx'];
+// Effective status is computed from expiresAt (never trusted from a stored "active" alone). UI only: the server (rules + functions) is the real gate.
+function effSub(){const s=S.sub;if(!s)return{status:'free'};let st=s.status;const g=((S.settings&&S.settings.gracePeriodDays)||0)*864e5;
+ if(st=='active'&&s.expiresAt&&s.expiresAt+g<Date.now())st='expired';return{...s,status:st}}
+function syncOk(){if(S.settings&&S.settings.enforceCloudSync===false)return true;const e=effSub();return e.status=='active'&&!!e.sync}
+function featOn(f){if(!S.fb)return true;const fr=(S.settings&&S.settings.freeFeatures)||{reports:false,xlsx:true};if(fr[f])return true;
+ if(!S.user)return false;if(S.accState!='ok')return true; // unknown/error: don't lock the UI (cloud writes stay protected by the rules)
+ const e=effSub();return e.status=='active'&&!!(e.features&&e.features[f])}
+const GATE={days:'reports',printr:'reports',printd:'reports',fstats:'reports',fsx:'reports',printf:'reports',export:'xlsx'};
+function gate(a){const f=GATE[a];if(!f||featOn(f))return 0;
+ if(S.user){S.sheet='sub';render();loadSubData();toast('locked_feature')}else toast('locked_login');return 1}
+function limitOk(n){const e=effSub();if(!S.user||e.status!='active')return true;const lim=(e.limits&&e.limits.maxDocuments)||0;
+ if(lim>0&&S.docs.length+n>lim){toast('limit_docs');return false}return true}
+async function loadSubData(){const u=S.user;if(!u||!window.FB)return;
+ try{try{await FB.call(u.slot,'getAccess',{})}catch(e){} // lets the server persist "expired" and notify
+  const r=await FB.reads(u.slot,u.uid);if(S.user!==u)return;
+  if(r.sub===undefined&&r.set===undefined)throw 0;
+  S.sub=r.sub||null;if(r.set)S.settings=r.set;S.plans=(r.plans||[]).sort((a,b)=>(a.sortOrder||0)-(b.sortOrder||0));
+  S.reqs=(r.reqs||[]).sort((a,b)=>b.createdAt-a.createdAt);S.hist=(r.hist||[]).sort((a,b)=>b.at-a.at);S.notifs=r.notifs||[];S.accState='ok';S.syncToast=false;
+  if(S.ready&&syncOk())push()}
+ catch(e){if(S.user===u&&S.accState!='ok')S.accState='err'}
+ if(S.sheet!='pay')render()}
+function subBar(){if(!S.fb||!S.user)return'';const e=effSub(),un=S.notifs.filter(n=>!n.read).length,
+ c={active:'var(--ok)',pending:'var(--pr)',expired:'var(--er)',suspended:'var(--er)'}[e.status]||'var(--mu)',
+ lab=S.accState=='unknown'?'…':S.accState=='err'?t('sub_title'):t('ss_'+e.status);
+ return '<button class="chip" data-a="sub" style="color:'+c+';border-color:'+c+';font-weight:700">● '+esc(lab)+'</button><button class="ib" data-a="notif" style="position:relative" aria-label="'+esc(t('notif_title'))+'" title="'+esc(t('notif_title'))+'">'+ic('Bell')+(un?'<span style="position:absolute;top:3px;inset-inline-end:3px;min-width:16px;height:16px;border-radius:8px;background:var(--er);color:#fff;font-size:10px;display:grid;place-items:center;padding:0 3px">'+un+'</span>':'')+'</button>'}
+function subBanner(){if(!S.fb||!S.user||S.accState!='ok')return'';const e=effSub(),go=btn('sub',t(e.status=='expired'?'renew_plan':'sub_title'));
+ if(e.status=='expired')return banner('ERR',t('expired_t'),t('expired_d'),go);
+ if(e.status=='suspended')return banner('ERR',t('susp_t'),e.suspendedReason||'');
+ if(e.status=='pending')return banner('INFO',t('pending_t'),t('pending_d'));
+ const nd=(S.settings&&S.settings.expiryNoticeDays)||7;
+ if(e.status=='active'&&e.expiresAt&&e.expiresAt-Date.now()<=nd*864e5)return banner('INFO',t('expiring_t'),t('expiring_d',{d:dfmt(e.expiresAt)}),go);return''}
+function planCard(p,e){const mine=e.status=='active'&&e.planId==p.id,pend=S.reqs.some(r=>r.status=='pending'),lim=(p.limits&&p.limits.maxDocuments)||0,months=p.durationMonths||1;
+ return '<article class="card ent" style="--c:'+(mine?'var(--ok)':'var(--pr)')+'"><div class="row"><div class="grow t"><h2>'+esc(Lc(p.name))+'</h2><div class="mu sm">'+esc(Lc(p.description))+'</div></div>'+(mine?'<span class="badge t" style="--c:var(--ok)">'+esc(t('current_tag'))+'</span>':'')+'</div>'+
+ '<div class="big ltr" style="margin:10px 0 2px">'+num(p.priceMonthly)+' <span class="sm mu">'+esc(cur())+' '+esc(t('per_month'))+'</span></div><div class="mu xs t">'+esc(t('months_n',{n:months}))+'</div><hr>'+
+ FEATS.map(f=>'<div class="row sm t" style="gap:10px;padding:3px 0;'+(p.features&&p.features[f]?'':'opacity:.45')+'"><span style="color:'+(p.features&&p.features[f]?'var(--ok)':'var(--mu)')+'">'+(p.features&&p.features[f]?ic('Check'):'—')+'</span><span>'+esc(t('f_'+f))+'</span></div>').join('')+
+ '<div class="row sm t" style="gap:10px;padding:3px 0"><span style="color:var(--ok)">'+ic('Check')+'</span><span>'+esc(t('cmp_docs'))+': <b>'+(lim?num(lim):esc(t('unlimited')))+'</b></span></div>'+
+ '<div style="margin-top:14px">'+btn('pickplan',t(mine?'renew_plan':'choose_plan'),{p:1,dis:pend||e.status=='suspended'}).replace('data-a="pickplan"','data-a="pickplan" data-id="'+esc(p.id)+'"')+'</div></article>'}
+function subSheet(){const u=S.user;if(!u)return OV(banner('INFO',t('locked_login'),'')+btn('close',t('done')));
+ const close='<button class="ib" data-a="close" aria-label="'+esc(t('done'))+'">'+ic('Back')+'</button>',head='<div class="row"><div class="grow t"><h2 style="margin:0">'+esc(t('sub_title'))+'</h2></div>'+close+'</div>';
+ if(S.accState=='err')return OV(head+banner('ERR',t('sub_unavail'),'',btn('subrefresh',t('try_again')))+btn('close',t('done')),1);
+ if(S.accState!='ok')return OV(head+banner('RUN',t('reading'),''),1);
+ const e=effSub(),c={active:'var(--ok)',pending:'var(--pr)',expired:'var(--er)',suspended:'var(--er)'}[e.status]||'var(--mu)',pend=S.reqs.find(r=>r.status=='pending'),
+ left=e.status=='active'&&e.expiresAt?Math.max(0,Math.ceil((e.expiresAt-Date.now())/864e5)):null,
+ rows=(k,v)=>v?'<div class="row sm t" style="padding:3px 0"><span class="mu grow">'+esc(t(k))+'</span><b class="ltr">'+esc(v)+'</b></div>':'';
+ let h=head+'<div class="card" style="--c:'+c+'"><div class="row"><div class="tile" style="--c:'+c+'">'+ic('Calc')+'</div><div class="grow t"><div class="mu sm">'+esc(t('sub_status'))+'</div><h2>'+esc(t('ss_'+e.status))+'</h2></div></div><hr>'+
+  rows('plan_l',e.planName?Lc(e.planName):'')+rows('started_on',e.startAt?dfmt(e.startAt):'')+rows('expires_on',e.expiresAt?dfmt(e.expiresAt)+(left!=null?' · '+t('days_left',{n:left}):''):'')+rows('last_pay',e.lastPaymentAt?dfmt(e.lastPaymentAt)+' · '+num(e.lastAmount||0)+' '+cur():'')+'</div>';
+ if(e.status=='expired')h+=banner('ERR',t('expired_t'),t('expired_d'));
+ if(e.status=='suspended')h+=banner('ERR',t('susp_t'),e.suspendedReason||'');
+ if(pend)h+=banner('INFO',t('pending_t'),t('pending_d'));
+ h+=H2('plans_title')+'<div class="list">'+(S.plans.length?S.plans.map(p=>planCard(p,e)).join(''):'<div class="card empty t mu">'+esc(t('no_plans'))+'</div>')+'</div>';
+ h+=H2('reqs_title')+(S.reqs.length?S.reqs.map(r=>{const bc={pending:'var(--pr)',approved:'var(--ok)',rejected:'var(--er)'}[r.status];
+  return '<div class="card ent t" style="--c:'+bc+';padding:12px"><div class="row"><div class="grow"><b>'+esc(Lc(r.plan&&r.plan.name))+'</b><div class="mu sm ltr">'+esc(dfmt(r.createdAt)+' · '+num(r.amount)+' '+(r.currency||cur()))+'</div></div><span class="badge" style="--c:'+bc+'">'+esc(t('rs_'+r.status))+'</span></div>'+(r.status=='rejected'&&r.reason?'<div class="sm" style="margin-top:6px;color:var(--er)">'+esc(t('why_rej'))+': '+esc(r.reason)+'</div>':'')+'</div>'}).join(''):'<div class="mu sm t">'+esc(t('reqs_none'))+'</div>');
+ h+=H2('hist_title')+(S.hist.length?'<div class="tw sm0"><table class="tb"><thead><tr>'+[t('c_date'),t('h_type'),t('plan_l'),t('c_total'),t('expires_on')].map(x=>'<th>'+esc(x)+'</th>').join('')+'</tr></thead><tbody>'+S.hist.map(x=>'<tr><td>'+esc(dfmt(x.at))+'</td><td>'+esc(t('ty_'+x.type))+'</td><td>'+esc(Lc(x.planName))+'</td><td>'+num(x.amount||0)+' '+esc(x.currency||cur())+'</td><td>'+esc(dfmt(x.expiresAt))+'</td></tr>').join('')+'</tbody></table></div>':'<div class="mu sm t">'+esc(t('hist_none'))+'</div>');
+ return OV(h+btn('close',t('done')),1)}
+function paySheet(){const p=S.payPlan;if(!p)return'';const months=p.durationMonths||1,amount=p.priceMonthly*months,ins=Lc(S.settings&&S.settings.paymentInstructions).trim();
+ return OV('<h2 class="t" style="margin:0">'+esc(t('pay_title'))+'</h2><div class="card"><div class="row"><div class="grow t"><b>'+esc(Lc(p.name))+'</b><div class="mu sm">'+esc(t('months_n',{n:months}))+'</div></div><div class="ltr"><div class="mu xs">'+esc(t('pay_amount'))+'</div><b style="font-size:20px">'+num(amount)+' '+esc(cur())+'</b></div></div></div>'+
+ H2('pay_instr_t')+(ins?'<div class="card t" style="white-space:pre-wrap;word-break:break-word">'+esc(ins)+'</div>':banner('ERR',t('pay_no_instr'),''))+
+ '<label><span class="mu sm t">'+esc(t('pay_ref'))+'</span><div class="field"><input id="payref" maxlength="64" value="'+esc(S.payRef)+'"></div></label>'+
+ '<div class="mu sm t">'+esc(t('pay_proof'))+'</div>'+btn('payfile',S.proofFile?S.proofFile.name:t('pay_choose'),{icon:'Upload'})+'<div class="mu xs t">'+esc(t('pay_hint'))+'</div><input type="file" id="pfile" accept="image/jpeg,image/png,image/webp,application/pdf" hidden>'+
+ '<div class="sm t" id="perr" style="color:var(--er)" hidden></div>'+banner('INFO',t('pay_note'),'')+
+ '<div class="g2">'+btn('payback',t('cancel'))+btn('paysubmit',t('pay_submit'),{p:1,dis:S.subBusy||!ins,load:S.subBusy})+'</div>')}
+function notifText(n){const q={...(n.params||{})};if(q.plan)q.plan=Lc(q.plan);if(q.until)q.until=dfmt(q.until);return t('nt_'+n.type,q)}
+function notifSheet(){return OV('<div class="row"><div class="grow t"><h2 style="margin:0">'+esc(t('notif_title'))+'</h2></div><button class="ib" data-a="close" aria-label="'+esc(t('done'))+'">'+ic('Back')+'</button></div>'+
+ (S.notifs.length?S.notifs.map(n=>'<div class="card ent t" style="--c:'+(n.read?'var(--mu)':'var(--pr)')+';padding:12px"><div class="'+(n.read?'mu':'')+'">'+esc(notifText(n))+'</div><div class="mu xs" style="margin-top:4px">'+esc(dfmt(n.createdAt))+'</div></div>').join(''):'<div class="mu t">'+esc(t('notif_none'))+'</div>')+btn('close',t('done')))}
+async function markAllRead(){const u=S.user,ids=S.notifs.filter(n=>!n.read).map(n=>n.id);if(!u||!ids.length)return;
+ try{await FB.markRead(u.slot,u.uid,ids);S.notifs.forEach(n=>n.read=true)}catch(e){}if(S.user===u&&S.sheet!='notif')render()}
+function errMsg(e){const k=e&&e.message;if(k&&D.en['pe_'+k])return t('pe_'+k);const c=e&&e.code;
+ if(!navigator.onLine||c=='functions/unavailable'||c=='functions/deadline-exceeded'||c=='functions/internal'||c=='unavailable')return t('pe_NETWORK');return t('pe_GENERIC')}
+const readB64=f=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(',')[1]||'');r.onerror=()=>rej(r.error);r.readAsDataURL(f)});
+async function prepProof(f){const MAX=600*1024;let blob=f;
+ if(f.type=='application/pdf'){if(f.size>MAX)throw{message:'PROOF_TOO_BIG'}}
+ else if(/^image\/(jpeg|png|webp)$/.test(f.type)){
+  if(f.size>MAX*.9){const bmp=await createImageBitmap(f);let sc=Math.min(1,1600/Math.max(bmp.width,bmp.height)),q=.85,b=null;
+   for(let i=0;i<6;i++){const c=document.createElement('canvas');c.width=Math.max(1,Math.round(bmp.width*sc));c.height=Math.max(1,Math.round(bmp.height*sc));c.getContext('2d').drawImage(bmp,0,0,c.width,c.height);
+    b=await new Promise(r=>c.toBlob(r,'image/jpeg',q));if(b&&b.size<=MAX)break;sc*=.75;q=Math.max(.5,q-.1)}
+   if(!b||b.size>MAX)throw{message:'PROOF_TOO_BIG'};blob=b}}
+ else throw{message:'PROOF_BAD_TYPE'};
+ return{name:f.name,b64:await readB64(blob)}}
+async function paySubmit(){const u=S.user,p=S.payPlan;if(!u||!p||S.subBusy)return;
+ const er=m=>{const e=$('#perr');if(e){e.textContent=m;e.hidden=false}};
+ if(!S.proofFile){er(t('pe_PROOF_REQUIRED'));return}
+ S.subBusy=true;render();
+ try{const proof=await prepProof(S.proofFile);
+  await FB.call(u.slot,'submitPayment',{requestId:S.reqId,planId:p.id,reference:S.payRef.trim(),proof}); // same requestId on retry → no duplicate
+  S.subBusy=false;S.payPlan=null;S.proofFile=null;S.payRef='';S.reqId='';S.sheet='sub';render();toast('pay_sent');loadSubData()}
+ catch(e){S.subBusy=false;render();er(errMsg(e))}}
+function actSub(a,el){const d=el.dataset;
+ if(a=='sub'){S.sheet='sub';render();loadSubData();return 1}
+ if(a=='subrefresh'){S.accState='unknown';render();loadSubData();return 1}
+ if(a=='notif'){S.sheet='notif';render();markAllRead();return 1}
+ if(a=='pickplan'){const p=S.plans.find(x=>x.id==d.id);if(!p)return 1;if(!S.reqId||!S.payPlan||S.payPlan.id!=p.id){S.reqId=uid()+uid();S.proofFile=null;S.payRef=''}
+  S.payPlan=p;S.sheet='pay';render();return 1}
+ if(a=='payfile'){const i=$('#pfile');i&&i.click();return 1}
+ if(a=='paysubmit'){paySubmit();return 1}
+ if(a=='payback'){S.sheet='sub';render();return 1}
+ return 0}
+document.addEventListener('input',ev=>{if(ev.target.id=='payref')S.payRef=ev.target.value});
+document.addEventListener('change',ev=>{if(ev.target.id!='pfile')return;const f=ev.target.files&&ev.target.files[0];ev.target.value='';if(!f)return;S.proofFile=f;render()});
+Object.assign(SH3,{sub:subSheet,pay:paySheet,notif:notifSheet});
 // ── Cloud sync (Firebase) — one set of documents per account ──
 function pack(){return JSON.stringify({v:3,docs:S.docs,del:S.del,folders:S.folders})}
 function unpack(json,ts){try{const p=JSON.parse(json);
@@ -634,42 +763,94 @@ function unpack(json,ts){try{const p=JSON.parse(json);
 function merge(a,b){const del={...a.del};for(const k in b.del)del[k]=Math.max(del[k]||0,b.del[k]);
  const mk=(x,y)=>{const m={};[...(x||[]),...(y||[])].forEach(d=>{if(!m[d.id]||d.ts>m[d.id].ts)m[d.id]=d});return Object.values(m).filter(d=>!(del[d.id]>=d.ts))};
  return{docs:mk(a.docs,b.docs),folders:mk(a.folders,b.folders),del}}
-function push(){if(!S.user||!window.FB)return;clearTimeout(pt);pt=setTimeout(async()=>{try{await FB.save(S.user.uid,TS,pack())}catch(e){toast('sync_err')}},800)}
-async function login(){try{await FB.login()}catch(e){if(!e||(e.code!='auth/popup-closed-by-user'&&e.code!='auth/cancelled-popup-request'))toast('login_err')}}
-async function logout(){clearTimeout(pt);try{await FB.logout()}catch(e){}
- S.docs=[];S.del={};S.folders=[];S.fol=null;S.sel=false;S.ids.clear();S.cur=null;S.entries=[];TS=0;['docs','del','folders','cur','uid','entries','trash'].forEach(sdel);S.trash=[];sset('ts','0');
- S.sheet=null;S.q='';S.dq='';S.onlyV=false;go(0)}
-function fbInit(){S.fb=true;FB.onUser(async u=>{S.user=u?{uid:u.uid,name:u.displayName||'',email:u.email||'',photo:u.photo||u.photoURL||''}:null;render();if(!u)return;
- // documents of another account must never mix into this one
- const prev=sget('uid');
- if(prev&&prev!=u.uid){S.docs=[];S.del={};S.folders=[];S.fol=null;S.sel=false;S.ids.clear();S.cur=null;S.entries=[];sdel('cur');S.trash=[];sdel('trash');S.screen=0}
- sset('uid',u.uid);
- try{const c=await FB.load(u.uid),remote=c?unpack(c.json,c.ts):{docs:[],del:{}};
+Object.assign(D.ar,{add_acct:"إضافة حساب آخر",acct_switched:"تم التبديل إلى {n}",acct_dup:"هذا الحساب مضاف بالفعل",acct_active:"نشط",acct_desc2:"يمكنك إضافة أكثر من حساب والتبديل بينها دون تسجيل الخروج، ولكل حساب مستنداته الخاصة. تسجيل الخروج يزيل الحساب الحالي من هذا المتصفح فقط (تبقى بياناته في حسابه)."});
+Object.assign(D.en,{add_acct:"Add another account",acct_switched:"Switched to {n}",acct_dup:"This account is already added",acct_active:"Active",acct_desc2:"You can add several accounts and switch between them without signing out. Each account keeps its own documents. Signing out removes the current account from this browser only (its data stays in the account)."});
+Object.assign(D.fr,{add_acct:"Ajouter un autre compte",acct_switched:"Passé à {n}",acct_dup:"Ce compte est déjà ajouté",acct_active:"Actif",acct_desc2:"Vous pouvez ajouter plusieurs comptes et passer de l'un à l'autre sans vous déconnecter. Chaque compte garde ses propres documents. La déconnexion retire le compte actuel de ce navigateur uniquement (ses données restent dans le compte)."});
+S.accts=(a=>Array.isArray(a)?a.filter(x=>x&&x.uid&&x.slot):[])(jget('accts',[]));
+S.user=S.accts.find(x=>NS=='u_'+x.uid+'_')||null;S.ready=false;
+function saveReg(){try{LS&&LS.setItem('accts',JSON.stringify(S.accts));LS&&LS.setItem('slots',JSON.stringify(S.accts.map(a=>a.slot)))}catch(e){}}
+function push(){if(!S.user||!window.FB||!S.ready)return;if(S.accState=='ok'&&!syncOk()){if(!S.syncToast){S.syncToast=true;toast('sync_locked')}return}clearTimeout(pt);const u=S.user,j=pack(),ts=TS;pt=setTimeout(async()=>{try{await FB.save(u.slot,u.uid,ts,j)}catch(e){toast(e&&e.code=='permission-denied'?'sync_locked':'sync_err')}},800)}
+function loadLocal(){const d=jget('docs',[]);S.docs=Array.isArray(d)?d.filter(x=>x&&x.id&&Array.isArray(x.entries)):[];
+ const fl=jget('folders',[]);S.folders=Array.isArray(fl)?fl.filter(x=>x&&x.id&&x.name):[];
+ const dl=jget('del',{});S.del=dl&&typeof dl=='object'&&!Array.isArray(dl)?dl:{};
+ const dn=jget('den',null);S.den=Array.isArray(dn)&&dn.length==4?dn.map(n=>+n||0):[0,0,0,0];
+ const tr=jget('trash',[]);S.trash=Array.isArray(tr)?tr.filter(x=>x&&x.d&&x.d.id):[];
+ TS=+sget('ts')||0;const cd=S.docs.find(x=>x.id==sget('cur'));S.cur=cd?cd.id:null;S.entries=cd?cd.entries:[];
+ Object.assign(S,{fol:null,sel:false,sheet:null,q:'',dq:'',onlyV:false,onlyM:false,screen:0,idx:0,delId:null,fs:[],lastDel:0,homeErr:null,homeInfo:null});S.ids.clear();
+ if(location.hash)history.replaceState(null,'',location.pathname+location.search)}
+// switch the active account (its documents are kept in a separate local store)
+async function activate(uid,keep){const a=S.accts.find(x=>x.uid==uid)||null;
+ NS=a?'u_'+a.uid+'_':'';try{LS&&LS.setItem('active',a?a.uid:'guest')}catch(e){}
+ S.user=a;S.ready=false;Object.assign(S,{sub:null,plans:[],settings:null,reqs:[],hist:[],notifs:[],accState:'unknown',syncToast:false,payPlan:null,proofFile:null,reqId:'',payRef:''});if(!keep)loadLocal();render();if(a){loadSubData();await syncActive()}}
+async function syncActive(){const u=S.user;if(!u)return;
+ try{const c=await FB.load(u.slot,u.uid),remote=c?unpack(c.json,c.ts):{docs:[],del:{},folders:[]};
+  if(S.user!==u)return;
   const m=merge({docs:S.docs,del:S.del,folders:S.folders},remote);
   S.docs=m.docs;S.del=m.del;S.folders=m.folders;
   const cd=curDoc();if(cd){S.entries=cd.entries}else{S.cur=null;S.entries=[];S.screen=0}
-  const mr=merge(remote,{docs:[],del:{},folders:[]}),fk=a=>JSON.stringify((a||[]).map(d=>d.id+':'+d.ts).sort()),needPush=fk(mr.folders)!=fk(S.folders)||JSON.stringify(mr.docs.map(d=>d.id+':'+d.ts).sort())!=JSON.stringify(S.docs.map(d=>d.id+':'+d.ts).sort())||JSON.stringify(remote.del)!=JSON.stringify(S.del);
-  TS=Date.now();sset('docs',JSON.stringify(S.docs));sset('del',JSON.stringify(S.del));sset('ts',String(TS));
-  sset('folders',JSON.stringify(S.folders));
-  if(needPush)await FB.save(u.uid,TS,pack());
-  render();toast('synced')}
- catch(e){toast('sync_err')}})}
+  const mr=merge(remote,{docs:[],del:{},folders:[]}),fk=a=>JSON.stringify((a||[]).map(d=>d.id+':'+d.ts).sort()),needPush=fk(mr.folders)!=fk(S.folders)||fk(mr.docs)!=fk(S.docs)||JSON.stringify(remote.del||{})!=JSON.stringify(S.del);
+  TS=Date.now();sset('docs',JSON.stringify(S.docs));sset('del',JSON.stringify(S.del));sset('ts',String(TS));sset('folders',JSON.stringify(S.folders));
+  if(needPush)await FB.save(u.slot,u.uid,TS,pack());
+  if(S.user!==u)return;
+  S.ready=true;render();toast('synced')}
+ catch(e){if(S.user===u){if(e&&e.code=='permission-denied'){S.ready=true;render();toast('sync_locked')}else toast('sync_err')}}}
+async function addAccount(){let r;
+ try{r=await FB.add()}catch(e){if(!e||(e.code!='auth/popup-closed-by-user'&&e.code!='auth/cancelled-popup-request'))toast('login_err');return}
+ const u=r.user,ex=S.accts.find(x=>x.uid==u.uid);
+ if(ex){await FB.drop(r.slot,true);S.sheet=null;await activate(ex.uid,!!S.user&&S.user.uid==ex.uid);toast('acct_dup');return}
+ // documents made before the first sign-in (guest mode) move into the new account
+ if(!S.user&&LS)try{DK.forEach(k=>{const v=LS.getItem(k),nk='u_'+u.uid+'_'+k;if(v!=null&&LS.getItem(nk)==null){LS.setItem(nk,v);LS.removeItem(k)}})}catch(e){}
+ S.accts.push({slot:r.slot,uid:u.uid,name:u.displayName||'',email:u.email||'',photo:u.photoURL||''});saveReg();S.sheet=null;await activate(u.uid,false)}
+const login=()=>addAccount();
+async function logout(){const u=S.user;if(!u)return;clearTimeout(pt);
+ try{await FB.drop(u.slot,true)}catch(e){}
+ ['docs','del','folders','cur','entries','trash','den','ts'].forEach(sdel);
+ S.accts=S.accts.filter(x=>x.uid!=u.uid);saveReg();S.sheet=null;
+ const nx=S.accts[0]||null;await activate(nx?nx.uid:null,false)}
+const avHtml=u=>'<div class="av ib">'+(u.photo?'<img src="'+esc(u.photo)+'" alt="" referrerpolicy="no-referrer">':esc((u.name||u.email||'?').charAt(0).toUpperCase()))+'</div>';
+function acctSheet(){const rows=S.accts.map(u=>{const on=S.user&&S.user.uid==u.uid;
+  return '<button class="lang'+(on?' on':'')+'" data-a="switchacct" data-uid="'+esc(u.uid)+'"><span class="who" style="flex:1;min-width:0">'+avHtml(u)+'<span class="grow t" style="text-align:start"><b>'+esc(u.name||u.email)+'</b><span class="mu sm ltr" style="display:block;font-weight:400">'+esc(u.email)+'</span></span></span>'+(on?'<span class="badge t" style="--c:var(--ok)">'+esc(t('acct_active'))+'</span>':'')+'</button>'}).join('');
+ return OV('<h2 class="t" style="margin:0">'+esc(t('account'))+'</h2><div class="mu sm t">'+esc(t('acct_desc2'))+'</div>'+rows+btn('addacct','+ '+t('add_acct'))+'<div class="g2">'+btn('close',t('cancel'))+(S.user?btn('logout',t('signout'),{p:1}):'')+'</div>')}
+async function fbInit(){S.fb=true;render();
+ let slots=jget('slots',null);if(!Array.isArray(slots)||!slots.length)slots=['[DEFAULT]'];
+ const us=await Promise.all(slots.map(s=>FB.user(s).catch(()=>null))),reg=[],seen=new Set();
+ for(let i=0;i<slots.length;i++){const u=us[i];
+  if(u&&!seen.has(u.uid)){seen.add(u.uid);const o=S.accts.find(x=>x.uid==u.uid)||{};reg.push({slot:slots[i],uid:u.uid,name:u.displayName||o.name||'',email:u.email||o.email||'',photo:u.photoURL||o.photo||''})}
+  else await FB.drop(slots[i],!!u)}
+ S.accts=reg;saveReg();
+ const want=LS&&LS.getItem('active'),act=reg.find(x=>x.uid==want)||reg[0]||null;
+ await activate(act?act.uid:null,!!act&&!!S.user&&S.user.uid==act.uid)}
 window.addEventListener('fbready',fbInit);if(window.FB)fbInit();
 render();
 </script>
 <script type="module">
-import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import {initializeApp,deleteApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import {getAuth,GoogleAuthProvider,signInWithPopup,signOut,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-import {getFirestore,doc,getDoc,getDocs,collection,writeBatch} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-const app=initializeApp({apiKey:"AIzaSyC3MMC-7dGU3ztshP0mYUWrV_c1Zm8njoc",authDomain:"youyou-f869f.firebaseapp.com",projectId:"youyou-f869f",storageBucket:"youyou-f869f.firebasestorage.app",messagingSenderId:"185167516974",appId:"1:185167516974:web:6d44fc5c98e63b554696bf"});
-const auth=getAuth(app),db=getFirestore(app);
+import {getFirestore,doc,getDoc,getDocs,collection,writeBatch,query,where,orderBy,limit} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import {getFunctions,httpsCallable} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-functions.js";
+const cfg={apiKey:"AIzaSyC3MMC-7dGU3ztshP0mYUWrV_c1Zm8njoc",authDomain:"youyou-f869f.firebaseapp.com",projectId:"youyou-f869f",storageBucket:"youyou-f869f.firebasestorage.app",messagingSenderId:"185167516974",appId:"1:185167516974:web:6d44fc5c98e63b554696bf"};
+// every signed-in account has its own app: separate Auth session, separate Firestore connection
+const apps={};
+function get(slot){if(apps[slot])return apps[slot];const app=slot=='[DEFAULT]'?initializeApp(cfg):initializeApp(cfg,slot);return apps[slot]={app,auth:getAuth(app),db:getFirestore(app)}}
+const REGION="europe-west1"; // must match functions/index.js
+const pl=o=>{if(o==null)return o;if(typeof o.toMillis=='function')return o.toMillis();if(Array.isArray(o))return o.map(pl);if(typeof o=='object'){const r={};for(const k in o)r[k]=pl(o[k]);return r}return o};
+const rows=q=>q.docs.map(d=>({id:d.id,...pl(d.data())}));
 window.FB={
- onUser:f=>onAuthStateChanged(auth,f),
- login:()=>signInWithPopup(auth,new GoogleAuthProvider()),
- logout:()=>signOut(auth),
- async load(uid){const m=await getDoc(doc(db,'users',uid));if(!m.exists())return null;const d=m.data(),cs=await getDocs(collection(db,'users',uid,'chunks')),parts=[];
+ async call(slot,name,data){const fn=httpsCallable(getFunctions(get(slot).app,REGION),name);return (await fn(data)).data},
+ // read-only data about this user; rules guarantee nobody can read another user's documents. undefined = that read failed.
+ async reads(slot,uid){const db=get(slot).db,ok=(r,f)=>r.status=='fulfilled'?f(r.value):undefined,
+  [sub,set,plans,reqs,hist,nt]=await Promise.allSettled([getDoc(doc(db,'subscriptions',uid)),getDoc(doc(db,'adminSettings','global')),
+   getDocs(query(collection(db,'plans'),where('active','==',true))),getDocs(query(collection(db,'paymentRequests'),where('uid','==',uid))),
+   getDocs(query(collection(db,'paymentHistory'),where('uid','==',uid))),getDocs(query(collection(db,'notifications',uid,'items'),orderBy('createdAt','desc'),limit(30)))]);
+  return{sub:ok(sub,s=>s.exists()?pl(s.data()):null),set:ok(set,s=>s.exists()?pl(s.data()):null),plans:ok(plans,rows),reqs:ok(reqs,rows),hist:ok(hist,rows),notifs:ok(nt,rows)}},
+ async markRead(slot,uid,ids){const db=get(slot).db,b=writeBatch(db);ids.forEach(i=>b.update(doc(db,'notifications',uid,'items',i),{read:true}));await b.commit()},
+ user:slot=>new Promise(res=>{const a=get(slot),un=onAuthStateChanged(a.auth,u=>{un();res(u)},()=>res(null))}),
+ async add(){const slot='a'+Date.now().toString(36),a=get(slot),p=new GoogleAuthProvider();p.setCustomParameters({prompt:'select_account'});
+  try{const c=await signInWithPopup(a.auth,p);return{slot,user:c.user}}catch(e){await FB.drop(slot,false);throw e}},
+ async drop(slot,out){const a=apps[slot];if(!a)return;try{if(out)await signOut(a.auth)}catch(e){}try{await deleteApp(a.app)}catch(e){}delete apps[slot]},
+ async load(slot,uid){const db=get(slot).db,m=await getDoc(doc(db,'users',uid));if(!m.exists())return null;const d=m.data(),cs=await getDocs(collection(db,'users',uid,'chunks')),parts=[];
   cs.forEach(c=>{parts[+c.id]=c.data().d});return{ts:d.ts,json:parts.slice(0,d.n).join('')}},
- async save(uid,ts,json){const CH=400000,parts=[];for(let i=0;i<json.length;i+=CH)parts.push(json.slice(i,i+CH));
+ async save(slot,uid,ts,json){const db=get(slot).db,CH=400000,parts=[];for(let i=0;i<json.length;i+=CH)parts.push(json.slice(i,i+CH));
   const old=await getDocs(collection(db,'users',uid,'chunks')),b=writeBatch(db);
   parts.forEach((d,i)=>b.set(doc(db,'users',uid,'chunks',String(i)),{d}));
   old.forEach(c=>{if(+c.id>=parts.length)b.delete(c.ref)});

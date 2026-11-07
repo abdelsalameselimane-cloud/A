@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>لوحة إدارة الاشتراكات</title>
+<meta name="theme-color" content="#4f6bff">
+<style>
+:root{--bg:#f4f5f8;--card:#fff;--tx:#12151c;--mu:#6a7282;--bd:#e5e8ee;--in:#f1f3f8;--pr:#4f6bff;--pr2:#7c5cff;--ok:#15803d;--er:#dc2626;--wa:#b45309;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#0b0d12;--card:#141821;--tx:#eceef3;--mu:#9aa3b5;--bd:#262c3a;--in:#1b2030;--pr:#6580ff;--pr2:#8e74ff;--ok:#34d399;--er:#f87171;--wa:#fbbf24;color-scheme:dark}}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.6 system-ui,-apple-system,"Segoe UI",Tahoma,"Noto Sans Arabic",Arial,sans-serif;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+button,input,select,textarea{font:inherit;color:inherit}
+.wrap{max-width:1200px;margin:0 auto;padding:0 16px 48px}
+header{display:flex;align-items:center;gap:12px;padding:18px 0;flex-wrap:wrap}
+header h1{margin:0;font-size:19px;flex:1;min-width:180px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:18px;padding:16px;margin-bottom:14px}
+.btn{min-height:40px;padding:0 16px;border-radius:12px;border:1px solid var(--bd);background:var(--card);cursor:pointer;font-weight:700}
+.btn:hover{filter:brightness(.97)}.btn:disabled{opacity:.5;cursor:default}
+.btn.p{background:linear-gradient(135deg,var(--pr),var(--pr2));color:#fff;border:0}
+.btn.d{background:var(--er);color:#fff;border:0}.btn.s{min-height:32px;padding:0 10px;font-size:13px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.tab{min-height:38px;padding:0 16px;border-radius:50px;border:1px solid var(--bd);background:var(--card);cursor:pointer}
+.tab.on{border-color:var(--pr);color:var(--pr);background:color-mix(in srgb,var(--pr) 12%,transparent);font-weight:700}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(190px,1fr))}
+.stat b{display:block;font-size:26px;font-variant-numeric:tabular-nums}.mu{color:var(--mu)}.sm{font-size:13px}
+.tw{overflow:auto;border:1px solid var(--bd);border-radius:12px}
+table{border-collapse:collapse;width:100%;white-space:nowrap;font-variant-numeric:tabular-nums}
+th,td{padding:8px 12px;border-bottom:1px solid var(--bd);text-align:start}
+th{background:var(--in);position:sticky;top:0}
+.badge{font-size:12px;font-weight:700;padding:2px 10px;border-radius:50px;color:var(--c);background:color-mix(in srgb,var(--c) 13%,transparent);white-space:nowrap}
+.f{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px}
+label{display:flex;flex-direction:column;gap:3px;font-size:13px;color:var(--mu)}
+input,select,textarea{background:var(--in);border:1px solid var(--bd);border-radius:10px;padding:8px 10px;min-height:38px;color:var(--tx)}
+textarea{min-height:90px;width:100%}
+input[type=checkbox]{min-height:0;width:18px;height:18px}
+.ck{flex-direction:row;align-items:center;gap:8px;color:var(--tx)}
+dialog{border:1px solid var(--bd);border-radius:18px;background:var(--card);color:var(--tx);width:min(560px,94vw);padding:18px;max-height:90vh;overflow:auto}
+dialog::backdrop{background:rgba(10,12,18,.55)}
+dialog form{display:flex;flex-direction:column;gap:12px}
+.row{display:flex;gap:10px;flex-wrap:wrap}.row>*{flex:1;min-width:130px}
+.err{color:var(--er);font-size:13px}
+.ban{padding:12px 14px;border-radius:12px;border:1px solid var(--bd);margin-bottom:12px}
+.center{max-width:460px;margin:12vh auto;text-align:center}
+.ltr{direction:ltr;unicode-bidi:isolate}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:10px 20px;border-radius:50px;z-index:99;font-weight:700}
+img.proof{max-width:100%;border-radius:10px}
+iframe.proof{width:100%;height:60vh;border:0;border-radius:10px;background:#fff}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<dialog id="dlg"></dialog>
+<div id="toast" hidden></div>
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import {getAuth,GoogleAuthProvider,signInWithPopup,signOut,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import {getFirestore,doc,getDoc,getDocs,collection,query,orderBy,limit} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import {getFunctions,httpsCallable} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-functions.js";
+// نفس إعدادات التطبيق (مفاتيح الويب عامة بطبيعتها؛ الحماية الفعلية في قواعد Firestore والدوال). لا مفاتيح سرية هنا.
+const cfg={apiKey:"AIzaSyC3MMC-7dGU3ztshP0mYUWrV_c1Zm8njoc",authDomain:"youyou-f869f.firebaseapp.com",projectId:"youyou-f869f",storageBucket:"youyou-f869f.firebasestorage.app",messagingSenderId:"185167516974",appId:"1:185167516974:web:6d44fc5c98e63b554696bf"};
+const REGION="europe-west1"; // يجب أن تطابق functions/index.js
+const app=initializeApp(cfg),auth=getAuth(app),db=getFirestore(app),fns=getFunctions(app,REGION);
+const call=async(n,d)=>(await httpsCallable(fns,n)(d||{})).data;
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+const num=n=>Number(n||0).toLocaleString('en-US');
+const dt=ms=>ms?new Date(ms).toLocaleString('ar-u-nu-latn',{dateStyle:'medium',timeStyle:'short'}):'—';
+const dd=ms=>ms?new Date(ms).toLocaleDateString('ar-u-nu-latn',{dateStyle:'medium'}):'—';
+const ST={free:['مجاني','var(--mu)'],pending:['قيد المراجعة','var(--pr)'],active:['فعّال','var(--ok)'],expired:['منتهٍ','var(--er)'],cancelled:['ملغى','var(--mu)'],suspended:['معلّق','var(--wa)']};
+const RS={pending:['قيد المراجعة','var(--pr)'],approved:['مقبول','var(--ok)'],rejected:['مرفوض','var(--er)']};
+const badge=([l,c])=>'<span class="badge" style="--c:'+c+'">'+esc(l)+'</span>';
+const ERR={NOT_ADMIN:'ليست لديك صلاحية المدير.',REASON_REQUIRED:'اكتب سبب الرفض.',ALREADY_REVIEWED:'تمت مراجعة هذا الطلب من قبل.',NOT_FOUND:'غير موجود.',SUSPENDED_UNSUSPEND_FIRST:'الاشتراك معلّق. ارفع التعليق أولًا ثم اقبل الطلب.',USER_NOT_FOUND:'المستخدم غير موجود.',NO_SUB:'لا يوجد اشتراك لهذا المستخدم.',CANCELLED_USE_ACTIVATE:'الاشتراك ملغى: استخدم «تفعيل».',BAD_STATE:'الإجراء غير مناسب لحالة الاشتراك الحالية.',NOT_ACTIVE:'يتطلب اشتراكًا فعّالًا.',PLAN_UNAVAILABLE:'الخطة غير موجودة.',BAD_PLAN_ID:'معرّف الخطة: أحرف إنجليزية صغيرة وأرقام و - _ (2-30).',PLAN_NAME_REQUIRED:'اكتب اسم الخطة بلغة واحدة على الأقل.',BAD_PRICE:'سعر غير صالح.',BAD_REQUEST:'بيانات غير صالحة.'};
+const errT=e=>ERR[e&&e.message]||((!navigator.onLine||/unavailable|internal|deadline/.test((e&&e.code)||''))?'تعذّر الاتصال بالخادم. لم يتغير شيء، أعد المحاولة.':'حدث خطأ: '+esc((e&&e.message)||e));
+let tt;const toast=m=>{const e=$('#toast');e.textContent=m;e.hidden=false;clearTimeout(tt);tt=setTimeout(()=>e.hidden=true,2800)};
+const A={user:null,admin:false,tab:'payments',users:[],plans:[],settings:null,reqs:[],audit:[],stats:null,busy:false,pf:'pending',q:'',range:{from:new Date(Date.now()-365*864e5).toISOString().slice(0,10),to:new Date().toISOString().slice(0,10)}};
+const pm=o=>{if(o==null)return o;if(typeof o.toMillis=='function')return o.toMillis();if(Array.isArray(o))return o.map(pm);if(typeof o=='object'){const r={};for(const k in o)r[k]=pm(o[k]);return r}return o};
+const rows=q=>q.docs.map(d=>({id:d.id,...pm(d.data())}));
+const nm=o=>o&&typeof o=='object'?(o.ar||o.fr||o.en||''):String(o||'');
+
+// ── dialog helper: body(html) + onOk(formData) → throws to keep it open ──
+function modal(title,body,okLabel,onOk,danger){const d=$('#dlg');
+ d.innerHTML='<form method="dialog"><h2 style="margin:0;font-size:17px">'+esc(title)+'</h2>'+body+'<div class="err" id="derr" hidden></div><div class="row" style="justify-content:flex-end"><button class="btn" value="x" type="button" id="dno">إغلاق</button>'+(okLabel?'<button class="btn '+(danger?'d':'p')+'" type="submit" id="dok">'+esc(okLabel)+'</button>':'')+'</div></form>';
+ $('#dno').onclick=()=>d.close();
+ d.querySelector('form').onsubmit=async ev=>{ev.preventDefault();if(!onOk)return;const b=$('#dok');b.disabled=true;
+  try{await onOk(new FormData(ev.target));d.close()}catch(e){const x=$('#derr');x.textContent=typeof e=='string'?e:errT(e);x.hidden=false;b.disabled=false}};
+ d.showModal()}
+const planOpts=(sel)=>A.plans.map(p=>'<option value="'+esc(p.id)+'"'+(p.id==sel?' selected':'')+'>'+esc(nm(p.name))+' — '+num(p.priceMonthly)+'</option>').join('');
+
+// ── data ──
+async function loadAll(){A.busy=true;render();
+ try{
+  const [pl,st,rq,au]=await Promise.all([getDocs(collection(db,'plans')),getDoc(doc(db,'adminSettings','global')),getDocs(collection(db,'paymentRequests')),getDocs(query(collection(db,'auditLogs'),orderBy('at','desc'),limit(100)))]);
+  A.plans=rows(pl).sort((a,b)=>(a.sortOrder||0)-(b.sortOrder||0));A.settings=st.exists()?pm(st.data()):null;
+  A.reqs=rows(rq).sort((a,b)=>b.createdAt-a.createdAt);A.audit=rows(au);
+ }catch(e){toast(errT(e))}
+ A.busy=false;render()}
+async function loadUsers(){try{A.users=(await call('adminListUsers')).users;A.users.sort((a,b)=>b.created-a.created)}catch(e){toast(errT(e))}render()}
+async function loadStats(){try{const f=new Date(A.range.from+'T00:00:00').getTime(),t=new Date(A.range.to+'T23:59:59').getTime();A.stats=await call('adminStats',{from:f,to:t})}catch(e){toast(errT(e))}render()}
+
+// ── views ──
+function render(){const app=$('#app');
+ if(A.user===undefined){app.innerHTML='<div class="center">…</div>';return}
+ if(!A.user){app.innerHTML='<div class="center card"><h1 style="font-size:20px">لوحة إدارة الاشتراكات</h1><p class="mu">سجّل الدخول بحساب المدير.</p><button class="btn p" data-a="login">تسجيل الدخول بـ Google</button></div>';return}
+ if(!A.admin){app.innerHTML='<div class="center card"><h1 style="font-size:20px">غير مصرّح</h1><p class="mu">الحساب <span class="ltr">'+esc(A.user.email)+'</span> ليس مديرًا. تتحقق الخوادم من ذلك في كل عملية، فلا يفيد إخفاء أو إظهار أي زر هنا.</p><div class="row"><button class="btn" data-a="recheck">إعادة التحقق</button><button class="btn" data-a="logout">تسجيل الخروج</button></div></div>';return}
+ const tabs=[['payments','طلبات الدفع'],['users','المستخدمون والاشتراكات'],['plans','الخطط'],['settings','الإعدادات'],['stats','الإحصائيات'],['audit','سجل التدقيق']];
+ let h='<header><h1>لوحة إدارة الاشتراكات</h1><span class="mu sm ltr">'+esc(A.user.email)+'</span><button class="btn s" data-a="refresh">تحديث</button><button class="btn s" data-a="logout">خروج</button></header>';
+ if(!A.busy&&(!A.settings||!A.plans.length))h+='<div class="ban">لم تُهيَّأ الخطط/الإعدادات بعد. <button class="btn s p" data-a="seed">تهيئة الخطط الافتراضية (Basic / Pro / Office)</button></div>';
+ h+='<div class="tabs">'+tabs.map(([k,l])=>'<button class="tab'+(A.tab==k?' on':'')+'" data-a="tab" data-v="'+k+'">'+l+(k=='payments'&&A.reqs.some(r=>r.status=='pending')?' ('+A.reqs.filter(r=>r.status=='pending').length+')':'')+'</button>').join('')+'</div>';
+ h+=({payments:vPay,users:vUsers,plans:vPlans,settings:vSet,stats:vStats,audit:vAudit})[A.tab]();
+ app.innerHTML=h}
+function vPay(){const f=A.pf,list=A.reqs.filter(r=>f=='all'||r.status==f);
+ return '<div class="f">'+[['pending','قيد المراجعة'],['approved','مقبولة'],['rejected','مرفوضة'],['all','الكل']].map(([k,l])=>'<button class="tab'+(f==k?' on':'')+'" data-a="pf" data-v="'+k+'">'+l+'</button>').join('')+'</div>'+
+ '<div class="tw"><table><thead><tr><th>التاريخ</th><th>المستخدم</th><th>الخطة</th><th>المبلغ</th><th>رقم العملية</th><th>الحالة</th><th></th></tr></thead><tbody>'+
+ (list.length?list.map(r=>'<tr><td>'+dt(r.createdAt)+'</td><td class="ltr">'+esc(r.email)+'</td><td>'+esc(nm(r.plan&&r.plan.name))+' × '+num(r.months)+'</td><td>'+num(r.amount)+' '+esc(r.currency||'')+'</td><td class="ltr">'+esc(r.reference||'—')+'</td><td>'+badge(RS[r.status]||['?','var(--mu)'])+(r.reason?'<div class="sm mu">'+esc(r.reason)+'</div>':'')+'</td><td>'+
+  '<button class="btn s" data-a="proof" data-id="'+esc(r.id)+'">الإثبات</button> '+(r.status=='pending'?'<button class="btn s p" data-a="approve" data-id="'+esc(r.id)+'">قبول</button> <button class="btn s d" data-a="reject" data-id="'+esc(r.id)+'">رفض</button>':'')+'</td></tr>').join(''):'<tr><td colspan="7" class="mu">لا توجد طلبات.</td></tr>')+'</tbody></table></div>'}
+function vUsers(){if(!A.users.length&&!A._ul){A._ul=1;loadUsers()}
+ const q=A.q.trim().toLowerCase(),l=A.users.filter(u=>!q||u.email.toLowerCase().includes(q)||u.name.toLowerCase().includes(q)||u.uid.includes(q));
+ return '<div class="f"><label>بحث (بريد / اسم / UID)<input id="uq" value="'+esc(A.q)+'"></label><span class="mu sm">'+num(l.length)+' / '+num(A.users.length)+'</span></div><div class="tw"><table><thead><tr><th>المستخدم</th><th>الخطة</th><th>الحالة</th><th>البداية</th><th>الانتهاء</th><th>المدفوع</th><th>إجراءات</th></tr></thead><tbody>'+
+ (l.length?l.map(u=>{const s=u.sub||{},id=esc(u.uid),b=(a,t,c)=>'<button class="btn s '+(c||'')+'" data-a="uact" data-act="'+a+'" data-id="'+id+'">'+t+'</button>';
+  return '<tr><td><span class="ltr">'+esc(u.email)+'</span><div class="sm mu">'+esc(u.name)+(u.isAdmin?' · مدير':'')+'</div></td><td>'+esc(nm(s.planName)||'—')+'</td><td>'+badge(ST[u.status]||['?','var(--mu)'])+(s.suspendedReason&&u.status=='suspended'?'<div class="sm mu">'+esc(s.suspendedReason)+'</div>':'')+'</td><td>'+dd(s.startAt)+'</td><td>'+dd(s.expiresAt)+'</td><td>'+num(s.totalPaid||0)+'</td><td>'+b('activate','تفعيل','p')+' '+b('extend','تمديد')+' '+b('changePlan','تغيير الخطة')+' '+(u.status=='suspended'?b('unsuspend','رفع التعليق'):b('suspend','تعليق'))+' '+b('cancel','إلغاء','d')+'</td></tr>'}).join(''):'<tr><td colspan="7" class="mu">لا نتائج.</td></tr>')+'</tbody></table></div>'}
+function vPlans(){return '<div class="f"><button class="btn p" data-a="plan" data-id="">+ خطة جديدة</button></div><div class="tw"><table><thead><tr><th>المعرّف</th><th>الاسم</th><th>السعر الشهري</th><th>المدة (شهر)</th><th>المزايا</th><th>حد المستندات</th><th>الحالة</th><th></th></tr></thead><tbody>'+
+ A.plans.map(p=>'<tr><td class="ltr">'+esc(p.id)+'</td><td>'+esc(nm(p.name))+'</td><td>'+num(p.priceMonthly)+'</td><td>'+num(p.durationMonths)+'</td><td>'+['cloudSync:مزامنة','reports:تقارير','xlsx:Excel'].filter(x=>p.features&&p.features[x.split(':')[0]]).map(x=>x.split(':')[1]).join('، ')+'</td><td>'+((p.limits&&p.limits.maxDocuments)||'بلا حد')+'</td><td>'+badge(p.active?['مفعّلة','var(--ok)']:['معطّلة','var(--mu)'])+'</td><td><button class="btn s" data-a="plan" data-id="'+esc(p.id)+'">تعديل</button></td></tr>').join('')+'</tbody></table></div><p class="mu sm">تغيير السعر لا يؤثر على طلبات الدفع المرسلة سابقًا (يُحفظ سعر الطلب وقت إرساله) ولا على اشتراكات فعّالة.</p>'}
+function vSet(){const s=A.settings||{currency:'DZD',gracePeriodDays:0,expiryNoticeDays:7,enforceCloudSync:true,freeFeatures:{reports:false,xlsx:true},paymentInstructions:{}},pi=s.paymentInstructions||{},ff=s.freeFeatures||{};
+ return '<form class="card" id="setf"><div class="row"><label>العملة<input name="currency" value="'+esc(s.currency)+'" maxlength="5"></label><label>مدة السماح بعد الانتهاء (أيام)<input type="number" name="grace" min="0" max="60" value="'+esc(s.gracePeriodDays)+'"></label><label>إشعار الانتهاء قبل (أيام)<input type="number" name="notice" min="1" max="60" value="'+esc(s.expiryNoticeDays)+'"></label></div>'+
+ '<label class="ck"><input type="checkbox" name="enforce"'+(s.enforceCloudSync!==false?' checked':'')+'> المزامنة السحابية تتطلب اشتراكًا فعّالًا (تُفرض في قواعد Firestore)</label>'+
+ '<div class="mu sm" style="margin-top:8px">مزايا مجانية للجميع (تُطبَّق في الواجهة فقط):</div><div class="row"><label class="ck"><input type="checkbox" name="ffr"'+(ff.reports?' checked':'')+'> التقارير والإحصاءات</label><label class="ck"><input type="checkbox" name="ffx"'+(ff.xlsx?' checked':'')+'> تصدير Excel</label></div>'+
+ ['ar:العربية','fr:الفرنسية','en:الإنجليزية'].map(x=>{const[k,l]=x.split(':');return '<label style="margin-top:8px">تعليمات الدفع ('+l+') — مثال: رقم الحساب / الوصل / طريقة التحويل<textarea name="pi_'+k+'" maxlength="2000">'+esc(pi[k]||'')+'</textarea></label>'}).join('')+
+ '<div class="err" id="serr" hidden></div><button class="btn p" type="submit" style="margin-top:12px">حفظ الإعدادات</button></form>'}
+function vStats(){const s=A.stats;if(!s&&!A._sl){A._sl=1;loadStats()}
+ let h='<div class="f"><label>من<input type="date" id="sf" value="'+A.range.from+'"></label><label>إلى<input type="date" id="st" value="'+A.range.to+'"></label><button class="btn" data-a="stats">عرض</button></div>';
+ if(!s)return h+'<div class="mu">…</div>';
+ const c=(l,v,col)=>'<div class="card stat"><span class="mu sm">'+l+'</span><b'+(col?' style="color:'+col+'"':'')+'>'+v+'</b></div>',cu=esc(s.currency||'');
+ return h+'<div class="grid">'+c('عدد المستخدمين',num(s.users))+c('المشتركون النشطون',num(s.active),'var(--ok)')+c('الاشتراكات المنتهية',num(s.expired),'var(--er)')+c('معلّقة من الإدارة',num(s.suspended))+c('طلبات قيد المراجعة',num(s.pendingCount),'var(--pr)')+'</div>'+
+ '<div class="grid" style="margin-top:12px">'+c('مدفوع ومؤكَّد (كل الفترات)',num(s.confirmedTotal)+' '+cu,'var(--ok)')+c('مدفوع ومؤكَّد (الفترة المحددة)',num(s.periodTotal)+' '+cu,'var(--ok)')+c('قيد المراجعة (غير محسوب كإيراد)',num(s.pendingAmount)+' '+cu,'var(--pr)')+'</div>'+
+ '<div class="card"><b>الإيرادات المؤكَّدة حسب الشهر</b><div class="tw" style="margin-top:8px"><table><thead><tr><th>الشهر</th><th>المبلغ</th></tr></thead><tbody>'+(s.byMonth.length?s.byMonth.map(m=>'<tr><td class="ltr">'+esc(m.month)+'</td><td>'+num(m.total)+' '+cu+'</td></tr>').join(''):'<tr><td colspan="2" class="mu">لا مدفوعات مؤكَّدة في هذه الفترة.</td></tr>')+'</tbody></table></div></div>'}
+function vAudit(){return '<div class="tw"><table><thead><tr><th>الوقت</th><th>المدير</th><th>الإجراء</th><th>الهدف</th><th>التفاصيل</th></tr></thead><tbody>'+(A.audit.length?A.audit.map(a=>'<tr><td>'+dt(a.at)+'</td><td class="ltr">'+esc(a.adminEmail)+'</td><td class="ltr">'+esc(a.action)+'</td><td class="ltr">'+esc(a.target)+'</td><td class="ltr sm">'+esc(JSON.stringify(a.details||{}))+'</td></tr>').join(''):'<tr><td colspan="5" class="mu">لا سجلات.</td></tr>')+'</tbody></table></div>'}
+
+// ── actions ──
+async function login(){try{const p=new GoogleAuthProvider();p.setCustomParameters({prompt:'select_account'});await signInWithPopup(auth,p)}catch(e){if(e&&e.code!='auth/popup-closed-by-user')toast('فشل تسجيل الدخول')}}
+async function checkAdmin(u){A.user=u;A.admin=false;if(u){try{const t=await u.getIdTokenResult(true);A.admin=t.claims.admin===true}catch(e){}}render();if(A.admin)loadAll()}
+function userById(id){return A.users.find(u=>u.uid==id)}
+function userAction(act,id){const u=userById(id);if(!u)return;const s=u.sub||{};const T={activate:'تفعيل يدوي',extend:'تمديد الاشتراك',changePlan:'تغيير الخطة',suspend:'تعليق الاشتراك',unsuspend:'رفع التعليق',cancel:'إلغاء الاشتراك'}[act];
+ const who='<div class="mu sm ltr">'+esc(u.email)+'</div>',why='<label>السبب / ملاحظة (يُسجَّل)<input name="reason" maxlength="300"></label>';
+ let body=who;
+ if(act=='activate')body+='<label>الخطة<select name="plan">'+planOpts(s.planId)+'</select></label><div class="row"><label>المدة بالأشهر (فارغ = مدة الخطة)<input type="number" name="months" min="1" max="60"></label><label>المبلغ المدفوع فعلًا (0 = تفعيل مجاني لا يُحسب إيرادًا)<input type="number" name="amount" min="0" value="0"></label></div>'+why;
+ else if(act=='extend')body+='<div class="row"><label>أشهر<input type="number" name="months" min="0" max="60" value="0"></label><label>أيام<input type="number" name="days" min="0" max="3650" value="0"></label></div>'+why;
+ else if(act=='changePlan')body+='<label>الخطة الجديدة<select name="plan">'+planOpts(s.planId)+'</select></label>'+why;
+ else body+=why;
+ modal(T,body,T,async fd=>{const d={uid:id,action:act,reason:fd.get('reason')||''};
+  if(fd.get('plan'))d.planId=fd.get('plan');if(fd.get('months'))d.months=+fd.get('months');if(fd.get('days'))d.days=+fd.get('days');if(fd.get('amount'))d.amount=+fd.get('amount');
+  await call('adminSubscriptionAction',d);toast('تم');await Promise.all([loadUsers(),loadAll()])},act=='cancel'||act=='suspend')}
+async function showProof(id){try{const s=await getDoc(doc(db,'paymentProofs',id));if(!s.exists()){toast('لا يوجد إثبات');return}const p=s.data(),url='data:'+p.type+';base64,'+p.data;
+  modal('إثبات الدفع','<div class="mu sm ltr">'+esc(p.name)+' · '+esc(p.type)+' · '+num(p.size)+' B</div>'+(p.type=='application/pdf'?'<iframe class="proof" src="'+url+'"></iframe>':'<img class="proof" alt="proof" src="'+url+'">')+'<a class="btn s" download="'+esc(p.name)+'" href="'+url+'">تنزيل</a>',null)}catch(e){toast(errT(e))}}
+function reviewPay(id,action){const r=A.reqs.find(x=>x.id==id);if(!r)return;
+ const sum='<div class="card sm"><b>'+esc(r.email)+'</b><br>'+esc(nm(r.plan&&r.plan.name))+' × '+num(r.months)+' شهر — <b>'+num(r.amount)+' '+esc(r.currency||'')+'</b><br>رقم العملية: <span class="ltr">'+esc(r.reference||'—')+'</span></div>';
+ if(action=='approve')modal('قبول الدفع',sum+'<div class="mu sm">تأكد من وصول المبلغ فعليًا وفحص الإثبات قبل القبول. سيُفعَّل الاشتراك فورًا وتُحسب مدته تلقائيًا.</div>','قبول وتفعيل',async()=>{await call('reviewPayment',{requestId:id,action:'approve'});toast('تم التفعيل');await loadAll()});
+ else modal('رفض الطلب',sum+'<label>سبب الرفض (يظهر للمستخدم)<textarea name="reason" maxlength="300" required></textarea></label>','رفض',async fd=>{await call('reviewPayment',{requestId:id,action:'reject',reason:fd.get('reason')||''});toast('تم الرفض');await loadAll()},true)}
+function editPlan(id){const p=A.plans.find(x=>x.id==id)||{id:'',name:{},description:{},priceMonthly:0,durationMonths:1,features:{cloudSync:true},limits:{maxDocuments:0},active:true,sortOrder:100},isNew=!id,f=p.features||{};
+ const L3=(k,t,o)=>['ar:ع','fr:Fr','en:En'].map(x=>{const[c,l]=x.split(':');return '<label>'+t+' ('+l+')<input name="'+k+'_'+c+'" maxlength="'+(k=='name'?60:300)+'" value="'+esc((o||{})[c]||'')+'"></label>'}).join('');
+ modal(isNew?'خطة جديدة':'تعديل الخطة','<label>المعرّف (لا يتغير لاحقًا)<input name="id" class="ltr" value="'+esc(p.id)+'"'+(isNew?'':' readonly')+' maxlength="30" required></label><div class="row">'+L3('name','الاسم',p.name)+'</div><div class="row">'+L3('desc','الوصف',p.description)+'</div>'+
+  '<div class="row"><label>السعر الشهري<input type="number" name="price" min="0" value="'+esc(p.priceMonthly)+'"></label><label>مدة الاشتراك (أشهر)<input type="number" name="dur" min="1" max="36" value="'+esc(p.durationMonths)+'"></label><label>حد المستندات (0 = بلا حد)<input type="number" name="maxdocs" min="0" value="'+esc((p.limits&&p.limits.maxDocuments)||0)+'"></label><label>الترتيب<input type="number" name="order" value="'+esc(p.sortOrder)+'"></label></div>'+
+  '<div class="row"><label class="ck"><input type="checkbox" name="f_cloudSync"'+(f.cloudSync?' checked':'')+'> مزامنة سحابية</label><label class="ck"><input type="checkbox" name="f_reports"'+(f.reports?' checked':'')+'> تقارير وإحصاءات</label><label class="ck"><input type="checkbox" name="f_xlsx"'+(f.xlsx?' checked':'')+'> تصدير Excel</label></div><label class="ck"><input type="checkbox" name="active"'+(p.active?' checked':'')+'> الخطة مفعّلة (تظهر للمستخدمين)</label>','حفظ',async fd=>{
+  const g=k=>fd.get(k)||'',loc=k=>({ar:g(k+'_ar'),fr:g(k+'_fr'),en:g(k+'_en')});
+  await call('adminSavePlan',{plan:{id:g('id').trim(),name:loc('name'),description:loc('desc'),priceMonthly:+g('price'),durationMonths:+g('dur'),limits:{maxDocuments:+g('maxdocs')},sortOrder:+g('order'),active:fd.get('active')=='on',features:{cloudSync:fd.get('f_cloudSync')=='on',reports:fd.get('f_reports')=='on',xlsx:fd.get('f_xlsx')=='on'}}});toast('تم الحفظ');await loadAll()})}
+async function saveSettings(ev){ev.preventDefault();const fd=new FormData(ev.target),e=$('#serr');e.hidden=true;
+ try{await call('adminSaveSettings',{settings:{currency:fd.get('currency'),gracePeriodDays:+fd.get('grace'),expiryNoticeDays:+fd.get('notice'),enforceCloudSync:fd.get('enforce')=='on',freeFeatures:{reports:fd.get('ffr')=='on',xlsx:fd.get('ffx')=='on'},paymentInstructions:{ar:fd.get('pi_ar')||'',fr:fd.get('pi_fr')||'',en:fd.get('pi_en')||''}}});toast('تم حفظ الإعدادات');await loadAll()}
+ catch(x){e.textContent=errT(x);e.hidden=false}}
+
+document.addEventListener('click',async ev=>{const el=ev.target.closest('[data-a]');if(!el)return;const a=el.dataset.a,d=el.dataset;
+ if(a=='login')login();else if(a=='logout'){await signOut(auth)}else if(a=='recheck')checkAdmin(auth.currentUser)
+ else if(a=='refresh'){A.stats=null;A._sl=0;await loadAll();await loadUsers()}
+ else if(a=='tab'){A.tab=d.v;render()}else if(a=='pf'){A.pf=d.v;render()}
+ else if(a=='proof')showProof(d.id);else if(a=='approve')reviewPay(d.id,'approve');else if(a=='reject')reviewPay(d.id,'reject')
+ else if(a=='uact')userAction(d.act,d.id);else if(a=='plan')editPlan(d.id)
+ else if(a=='stats'){A.range.from=$('#sf').value||A.range.from;A.range.to=$('#st').value||A.range.to;loadStats()}
+ else if(a=='seed'){try{const r=await call('adminSeed');toast('تمت التهيئة ('+r.created+')');loadAll()}catch(e){toast(errT(e))}}});
+document.addEventListener('input',ev=>{if(ev.target.id=='uq'){A.q=ev.target.value;const p=ev.target.selectionStart;render();const i=$('#uq');if(i){i.focus();i.setSelectionRange(p,p)}}});
+document.addEventListener('submit',ev=>{if(ev.target.id=='setf')saveSettings(ev)});
+A.user=undefined;render();
+onAuthStateChanged(auth,u=>checkAdmin(u));
+</script>
+</body>
+</html>

@@ -1,0 +1,94 @@
+rules_version = '2';
+// قواعد Firestore — نظام الاشتراكات.
+// ملاحظة: users/{uid} و users/{uid}/chunks هما بنية المزامنة السحابية الموجودة أصلًا في التطبيق.
+// القراءة للمالك دائمًا (لا تُحجب بيانات أحد عند انتهاء اشتراكه)، والكتابة تتطلب اشتراكًا فعالًا
+// ما دام adminSettings/global.enforceCloudSync != false.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function isAdmin() { return signedIn() && request.auth.token.admin == true; }
+    function owner(uid) { return signedIn() && request.auth.uid == uid; }
+
+    function settingsPath() { return /databases/$(database)/documents/adminSettings/global; }
+    function subPath(uid) { return /databases/$(database)/documents/subscriptions/$(uid); }
+
+    function enforceSync() {
+      return !exists(settingsPath()) || get(settingsPath()).data.get('enforceCloudSync', true) == true;
+    }
+    function graceDays() {
+      return exists(settingsPath()) ? get(settingsPath()).data.get('gracePeriodDays', 0) : 0;
+    }
+    function paidSync(uid) {
+      return exists(subPath(uid))
+        && get(subPath(uid)).data.status == 'active'
+        && get(subPath(uid)).data.get('sync', false) == true
+        && request.time < get(subPath(uid)).data.expiresAt + duration.value(graceDays(), 'd');
+    }
+    function canSync(uid) { return owner(uid) && (!enforceSync() || paidSync(uid)); }
+
+    // ── مزامنة المستندات (البنية الحالية) ──
+    match /users/{uid} {
+      allow read: if owner(uid);
+      allow write: if canSync(uid);
+      match /chunks/{id} {
+        allow read: if owner(uid);
+        allow write: if canSync(uid);
+      }
+    }
+
+    // ── الاشتراك: قراءة فقط. أي كتابة تتم من Cloud Functions (Admin SDK) فقط ──
+    match /subscriptions/{uid} {
+      allow read: if owner(uid) || isAdmin();
+      allow write: if false;
+    }
+
+    // ── الخطط: المستخدم يرى الفعّالة فقط ──
+    match /plans/{id} {
+      allow read: if signedIn() && (resource.data.active == true || isAdmin());
+      allow write: if false;
+    }
+
+    // ── إعدادات عامة (تعليمات الدفع، فترة السماح...) ──
+    match /adminSettings/{id} {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+
+    // ── طلبات الدفع وسجل الدفع ──
+    match /paymentRequests/{id} {
+      allow read: if signedIn() && (resource.data.uid == request.auth.uid || isAdmin());
+      allow write: if false;
+    }
+    match /paymentHistory/{id} {
+      allow read: if signedIn() && (resource.data.uid == request.auth.uid || isAdmin());
+      allow write: if false;
+    }
+    // إثباتات الدفع: للمدير فقط
+    match /paymentProofs/{id} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+    // أقفال منع تكرار الدفع: داخلية
+    match /paymentLocks/{id} {
+      allow read, write: if false;
+    }
+
+    // ── سجل التدقيق: للمدير قراءة فقط ──
+    match /auditLogs/{id} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
+    // ── إشعارات داخل التطبيق: المالك يقرأ ويعلّم "مقروء" فقط ──
+    match /notifications/{uid}/items/{id} {
+      allow read: if owner(uid);
+      allow update: if owner(uid) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']);
+      allow create, delete: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
