@@ -116,6 +116,14 @@ header .chip{white-space:nowrap;flex:none;min-height:40px;padding:0 14px}
  header .ib[data-a=theme]{margin-inline-start:auto}
  h1{font-size:17px;word-break:normal;overflow-wrap:anywhere}
 }
+
+.fz .tb{white-space:normal}.fz .tb th,.fz .tb td{padding:7px 6px;font-size:12.5px}
+.fk{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.kp{background:var(--in);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:4px;min-width:0}.kp b{font-size:18px;overflow-wrap:anywhere}
+.tabs{flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px}.tabs .chip{white-space:nowrap;flex:none}
+.field select{flex:1;min-width:0;border:0;background:transparent;outline:0;min-height:44px;color:inherit;font:inherit}
+.field select option{color:#12151c}
+.ib:disabled{opacity:.35;cursor:default}
 </style>
 </head>
 <body>
@@ -309,8 +317,8 @@ function banner(kind,title,desc,act){const c={RUN:'var(--pr)',INFO:'var(--pr)',E
 const btn=(a,label,o={})=>'<button class="btn '+(o.p?'p':'')+(o.d?'d':'')+'" data-a="'+a+'"'+(o.dis?' disabled':'')+'>'+(o.load?'<span class="spin"></span>':o.icon?ic(o.icon):'')+'<span class="t">'+esc(label)+'</span></button>';
 const copyBtn=v=>'<button class="ib" data-a="copy" data-v="'+v+'" title="'+esc(t('copy_total'))+'" aria-label="'+esc(t('copy_total'))+'">'+ic('Copy')+'</button>';
 // ── views ──
-function header(){const back=S.screen==1&&S.entries.length,cd=curDoc();
- return '<header>'+(back?'<button class="ib" data-a="back" aria-label="'+esc(t('back'))+'" title="'+esc(t('back'))+'">'+ic('Back')+'</button>':'')+'<div class="logo">'+ic('Calc')+'</div><div class="grow"><h1 class="t">'+esc(back&&cd?cd.name:t('name'))+'</h1><div class="mu sm t">'+esc(back?t('results'):t('tagline'))+'</div></div><button class="ib" data-a="theme" aria-label="'+esc(t(isDark()?'theme_light':'theme_dark'))+'" title="'+esc(t(isDark()?'theme_light':'theme_dark'))+'">'+ic(isDark()?'Sun':'Moon')+'</button><button class="ib" data-a="lang" aria-label="'+esc(t('language'))+'" title="'+esc(t('language'))+'">'+ic('Globe')+'</button>'+subBar()+acctBtn()+'</header>'}
+function header(){const back=(S.screen==1&&S.entries.length)||S.screen==2,cd=curDoc();
+ return '<header>'+(back?'<button class="ib" data-a="back" aria-label="'+esc(t('back'))+'" title="'+esc(t('back'))+'">'+ic('Back')+'</button>':'')+'<div class="logo">'+ic('Calc')+'</div><div class="grow"><h1 class="t">'+esc(S.screen==2?t('f_title'):back&&cd?cd.name:t('name'))+'</h1><div class="mu sm t">'+esc(S.screen==2?t('f_sub'):back?t('results'):t('tagline'))+'</div></div><button class="ib" data-a="theme" aria-label="'+esc(t(isDark()?'theme_light':'theme_dark'))+'" title="'+esc(t(isDark()?'theme_light':'theme_dark'))+'">'+ic(isDark()?'Sun':'Moon')+'</button><button class="ib" data-a="lang" aria-label="'+esc(t('language'))+'" title="'+esc(t('language'))+'">'+ic('Globe')+'</button>'+acctBtn()+'</header>'}
 function acctBtn(){if(!S.fb)return'';if(!S.user)return'<button class="chip on" data-a="login">'+esc(t('signin'))+'</button>';
  const u=S.user;return'<button class="ib av" data-a="acct" aria-label="'+esc(t('account'))+'" title="'+esc(u.email)+'">'+(u.photo?'<img src="'+esc(u.photo)+'" alt="" referrerpolicy="no-referrer">':esc((u.name||u.email||'?').charAt(0).toUpperCase()))+'</button>'}
 const fid=d=>S.folders.some(f=>f.id===d.folder)?d.folder:null;
@@ -329,9 +337,9 @@ function home(){if(S.fol&&!S.folders.some(f=>f.id===S.fol))S.fol=null;const has=
  if(S.busy)h+=banner('RUN',t('reading'),t('reading_desc'));
  else if(S.homeErr)h+=banner('ERR',t('err_'+S.homeErr),t('err_'+S.homeErr+'_desc'),btn('pick',t('try_again')));
  else if(S.homeInfo)h+=banner('OK',t('imported',{n:S.homeInfo.ok}),S.homeInfo.skipped.length?t('skipped',{names:S.homeInfo.skipped.join(', ')}):'');
- h+=subBanner();h+='<div class="card"><div class="row"><div class="tile">'+ic('Upload')+'</div><div class="grow t"><h2>'+esc(t('import_title'))+'</h2><div class="mu sm">'+esc(t('import_desc'))+'</div></div></div>'+
+ h+='<div class="card"><div class="row"><div class="tile">'+ic('Upload')+'</div><div class="grow t"><h2>'+esc(t('import_title'))+'</h2><div class="mu sm">'+esc(t('import_desc'))+'</div></div></div>'+
  '<div class="drop t" id="drop">'+esc(t('drop'))+btn('pick',t('choose_file'),{p:1,icon:'Upload',dis:S.busy,load:S.busy})+'</div></div>';
- h+=toolsCard();if(has)h+='<section class="card">'+secHead()+
+ h+=(typeof finCard=='function'?finCard():'')+toolsCard();if(has)h+='<section class="card">'+secHead()+
   '<label class="field" style="margin-top:14px">'+ic('Search')+'<input id="dq" type="search" value="'+esc(S.dq)+'" placeholder="'+esc(t('docs_search'))+'" aria-label="'+esc(t('docs_search'))+'"></label><div class="list" id="dlist" style="margin-top:14px"></div></section>';
  return h+'</div>'+selBar()}
 function docCard(d){const s=summarize(d.entries),dt=new Date(d.ts).toLocaleString(S.lang=='ar'?'ar-u-nu-latn':S.lang,{dateStyle:'medium',timeStyle:'short'}),id=esc(d.id),on=S.ids.has(d.id),fo=S.folders.find(f=>f.id===fid(d)),tc=fo?col(fo.color):'var(--pr)';
@@ -362,7 +370,7 @@ function list(){const q=S.q.trim(),sh=S.entries.map((e,i)=>[e,i]).filter(([e])=>
  $('#list').innerHTML=sh.length?sh.map(([e,i])=>entry(e,i)).join(''):'<div class="card empty t"><p class="mu" style="margin-top:0">'+esc(t('empty_filter'))+'</p>'+btn('clear',t('clear_filters'))+'</div>'}
 function render(){document.documentElement.lang=S.lang;document.title=t('name');
  const res=S.screen==1&&S.entries.length;
- $('#app').innerHTML=header()+(res?results():home());
+ $('#app').innerHTML=header()+(res?results():S.screen==2&&typeof finPage=='function'?finPage():home());
  if(res){filters();list()}else dlist();
  const L=$('#layer');
  if(S.sheet=='lang')L.innerHTML='<div class="ov" data-a="close"><div class="sheet" role="dialog" aria-modal="true"><h2 class="t" style="margin:0">'+esc(t('language'))+'</h2>'+LANGS.map(([c,n])=>'<button class="lang '+(c==S.lang?'on':'')+'" data-a="setlang" data-v="'+c+'"><span>'+n+'</span>'+(c==S.lang?ic('Check'):'')+'</button>').join('')+'</div></div>';
@@ -444,7 +452,7 @@ function act2(a,el){const d=el.dataset;
  if(a=='mv'){moveSel(d.v||null);return 1}
  if(a=='bdel'){S.sheet='bdel';render();return 1}
  if(a=='confirmbdel'){delSel();return 1}
- if(act3(a,el)||actSub(a,el))return 1
+ if(act3(a,el)||(typeof actF=='function'&&actF(a,el)))return 1
  return 0}
 // long-press on a document starts selection
 let lp,lpF=false;
@@ -456,7 +464,7 @@ document.addEventListener('contextmenu',e=>{if(e.target.closest&&e.target.closes
 // ── actions ──
 function uniqName(n){const names=new Set(S.docs.map(d=>d.name));if(!names.has(n))return n;
  const m=/^(.*?)(\.[^.]*)?$/.exec(n),b=m[1],x=m[2]||'';let i=2;while(names.has(b+' ('+i+')'+x))i++;return b+' ('+i+')'+x}
-async function readFiles(files){files=[...files];if(!files.length)return;if(!limitOk(files.length))return;
+async function readFiles(files){files=[...files];if(!files.length)return;
  S.busy=true;S.homeErr=null;S.homeInfo=null;S.screen=0;render();
  let ok=0,last=null,skipped=[],failed=0;
  for(const f of files){
@@ -490,7 +498,7 @@ function saveEdit(){const v=[...document.querySelectorAll('#layer .n')].map(i=>i
 document.addEventListener('click',ev=>{const el=ev.target.closest('[data-a]');if(!el)return;const a=el.dataset.a;
  if(lpF){lpF=false;return}
  if(a=='close'&&el.classList.contains('ov')&&ev.target!==el)return;
- if(gate(a)||act2(a,el))return;
+ if(act2(a,el))return;
  if(a=='pick')$('#file').click();else if(a=='open')openDoc(el.dataset.id);else if(a=='back')go(0);else if(a=='lang'){S.sheet='lang';render()}
  else if(a=='deldoc'){S.delId=el.dataset.id;S.sheet='del';render()}else if(a=='confirmdel')delDoc()
  else if(a=='setlang'){S.lang=el.dataset.v;sset('lang',S.lang);S.sheet=null;render()}
@@ -586,7 +594,7 @@ function printReport(title,e){const s=sum2(e),set=hasD(e),susp=e.filter(x=>x.sta
  sr=[[t('detected'),s.detected],[t('valid'),s.valid],[t('verify'),s.verify],[t('no_dispense'),s.noDispense],[t('mm'),s.mm],[t('grand'),num(s.grand)]].concat(set?[[t('value'),num(sum(cassVals(e)))]]:[]);
  const sus=susp.length?'<div class="tw sm0"><table class="tb"><thead><tr>'+[t('c_ref'),t('c_date'),t('c_time'),'REQ','N1','N2','N3','N4',t('c_total'),t('c_calc'),t('c_note')].map(h=>'<th>'+esc(h)+'</th>').join('')+'</tr></thead><tbody>'+susp.map(x=>{const c=calcOf(x);return '<tr><td>'+esc(x.ref)+'</td><td>'+esc(fmtDate(x.date))+'</td><td>'+esc(x.time)+'</td><td>'+amt(x.req)+'</td>'+[0,1,2,3].map(i=>'<td>'+(x.numbers[i]??'')+'</td>').join('')+'<td>'+(x.numbers.length==4?num(x.total):'')+'</td><td>'+(c==null?'':num(c))+'</td><td>'+esc(noteOf(x))+'</td></tr>'}).join('')+'</tbody></table></div>':'<p>'+esc(t('all_ok'))+'</p>';
  const P=$('#prt');P.dir=S.lang=='ar'?'rtl':'ltr';
- P.innerHTML='<h1>'+esc(title)+'</h1><div class="pm">'+esc(new Date().toLocaleString(S.lang=='ar'?'ar-u-nu-latn':S.lang))+'</div><div class="tw sm0" style="margin-top:12px"><table class="tb"><tbody>'+sr.map(([k,v])=>'<tr><td style="text-align:start">'+esc(k)+'</td><td>'+esc(v)+'</td></tr>').join('')+'</tbody></table></div>'+H2('cass_title')+cassHtml(e)+H2('days_title')+dayTbl(dayAgg(e))+'<h2 class="t" style="margin:16px 0 6px;font-size:15px">'+esc(t('rep_susp')+' ('+susp.length+')')+'</h2>'+sus;
+ P.innerHTML='<h1>'+esc(title)+'</h1><div class="pm">'+esc(new Date().toLocaleString(S.lang=='ar'?'ar-u-nu-latn':S.lang))+'</div><div class="tw sm0 fz" style="margin-top:12px;direction:'+(S.lang=='ar'?'rtl':'ltr')+'"><table class="tb"><tbody>'+sr.map(([k,v])=>'<tr><td style="text-align:start">'+esc(k)+'</td><td>'+esc(v)+'</td></tr>').join('')+'</tbody></table></div>'+H2('cass_title')+cassHtml(e)+H2('days_title')+dayTbl(dayAgg(e))+'<h2 class="t" style="margin:16px 0 6px;font-size:15px">'+esc(t('rep_susp')+' ('+susp.length+')')+'</h2>'+sus;
  setTimeout(()=>window.print(),80)}
 // trash / undo / backup / duplicates
 function trashAdd(docs){const now=Date.now();docs.forEach(d=>S.trash.unshift({d,at:now}));S.trash=S.trash.filter(x=>now-x.at<14*864e5).slice(0,30);S.lastDel=now;sset('trash',JSON.stringify(S.trash))}
@@ -645,116 +653,6 @@ function act3(a,el){const d=el.dataset;
  if(a=='switchacct'){S.sheet=null;const x=S.accts.find(y=>y.uid==d.uid);
   if(x&&(!S.user||S.user.uid!=x.uid)){activate(x.uid,false);toast('acct_switched',{n:x.email||x.name})}else render();return 1}
  return 0}
-// ── Subscriptions (v5): server-enforced cloud sync + UI gating, manual payment, notifications ──
-const REGION="europe-west1"; // must match functions/index.js
-P.Bell=["M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9","M10.3 21a1.94 1.94 0 0 0 3.4 0"];
-Object.assign(D.ar,{sub_title:"الاشتراك",h_type:"النوع",sub_status:"حالة الاشتراك",ss_free:"مجاني",ss_pending:"قيد المراجعة",ss_active:"فعّال",ss_expired:"منتهٍ",ss_cancelled:"ملغى",ss_suspended:"معلّق",plan_l:"الخطة",started_on:"بداية الاشتراك",expires_on:"ينتهي في",days_left:"{n} يوم متبقٍ",last_pay:"آخر دفعة",plans_title:"الخطط المتاحة",per_month:"/ شهر",months_n:"مدة الاشتراك: {n} شهر",choose_plan:"اختيار الخطة",renew_plan:"تجديد",current_tag:"خطتك الحالية",cmp_docs:"عدد المستندات",unlimited:"بلا حد",f_cloudSync:"مزامنة سحابية بين الأجهزة",f_reports:"التقارير والإحصاءات المتقدمة",f_xlsx:"تصدير Excel (.xlsx)",no_plans:"لا توجد خطط متاحة حاليًا.",reqs_title:"طلبات الدفع",rs_pending:"قيد المراجعة",rs_approved:"مقبول",rs_rejected:"مرفوض",why_rej:"سبب الرفض",hist_title:"سجل المدفوعات",ty_payment:"اشتراك",ty_renewal:"تجديد",ty_manual:"تفعيل من الإدارة",ty_extension:"تمديد",hist_none:"لا توجد عمليات بعد.",reqs_none:"لا توجد طلبات.",sub_unavail:"تعذّر تحميل حالة الاشتراك. تحقق من الاتصال ثم أعد المحاولة.",expired_t:"انتهى اشتراكك",expired_d:"توقفت المزايا المدفوعة فقط. بياناتك وملفاتك وتقاريرك محفوظة كما هي. جدّد اشتراكك لاستعادتها.",expiring_t:"اشتراكك ينتهي قريبًا",expiring_d:"ينتهي في {d}.",pending_t:"طلب الدفع قيد المراجعة",pending_d:"لن يُفعَّل الاشتراك إلا بعد أن تراجع الإدارة إثبات الدفع.",susp_t:"الاشتراك معلّق من الإدارة",pay_title:"الدفع",pay_amount:"المبلغ المطلوب",pay_instr_t:"تعليمات الدفع",pay_no_instr:"لم تحدد الإدارة تعليمات الدفع بعد. تعذّر إرسال الطلب حاليًا.",pay_ref:"رقم العملية / الوصل (اختياري)",pay_proof:"إثبات الدفع",pay_choose:"اختيار صورة أو PDF",pay_hint:"صورة (JPG/PNG/WebP) أو PDF، حتى 600 كيلوبايت. تُصغَّر الصور تلقائيًا.",pay_note:"إرسال الإثبات لا يعني أن الدفع تم: يُفعَّل الاشتراك فقط بعد مراجعة الإدارة وقبولها.",pay_submit:"إرسال الطلب",pay_sent:"أُرسل الطلب وهو قيد المراجعة",pe_PROOF_REQUIRED:"أرفق إثبات الدفع.",pe_PROOF_TOO_BIG:"الملف أكبر من 600 كيلوبايت.",pe_PROOF_BAD_TYPE:"نوع الملف غير مدعوم. استخدم صورة أو PDF.",pe_ALREADY_PENDING:"لديك طلب قيد المراجعة بالفعل.",pe_DUPLICATE_PAYMENT:"هذا الإثبات أو رقم العملية سُجّل من قبل.",pe_PLAN_UNAVAILABLE:"هذه الخطة لم تعد متاحة.",pe_NETWORK:"تعذّر الاتصال بالخادم. لم يتغير شيء، يمكنك إعادة المحاولة بأمان.",pe_GENERIC:"حدث خطأ. حاول مرة أخرى.",locked_feature:"هذه الميزة ضمن خطة مدفوعة.",locked_login:"سجّل الدخول لاستخدام هذه الميزة.",sync_locked:"المزامنة السحابية متوقفة: يلزم اشتراك فعّال. بياناتك المحلية سليمة.",notif_title:"الإشعارات",notif_none:"لا توجد إشعارات.",nt_request_submitted:"أُرسل طلب الاشتراك في خطة {plan} وهو قيد المراجعة.",nt_payment_approved:"تم قبول دفعتك لخطة {plan}.",nt_payment_rejected:"رُفض طلب الدفع. السبب: {reason}",nt_sub_activated:"تم تفعيل اشتراكك في {plan} حتى {until}.",nt_renewed:"تم تجديد اشتراكك في {plan} حتى {until}.",nt_expiring:"ينتهي اشتراكك خلال {days} يوم ({until}).",nt_expired:"انتهى اشتراكك. جدّد لاستعادة المزايا المدفوعة.",nt_extended:"مُدِّد اشتراكك حتى {until}.",nt_suspended:"عُلِّق اشتراكك من الإدارة. {reason}",nt_unsuspended:"أُعيد تفعيل اشتراكك.",nt_cancelled:"أُلغي اشتراكك.",nt_plan_changed:"تغيّرت خطتك إلى {plan}.",limit_docs:"بلغت الحد الأقصى للمستندات في خطتك."});
-Object.assign(D.en,{sub_title:"Subscription",h_type:"Type",sub_status:"Subscription status",ss_free:"Free",ss_pending:"Under review",ss_active:"Active",ss_expired:"Expired",ss_cancelled:"Cancelled",ss_suspended:"Suspended",plan_l:"Plan",started_on:"Started",expires_on:"Expires",days_left:"{n} day(s) left",last_pay:"Last payment",plans_title:"Available plans",per_month:"/ month",months_n:"Duration: {n} month(s)",choose_plan:"Choose plan",renew_plan:"Renew",current_tag:"Your plan",cmp_docs:"Documents",unlimited:"Unlimited",f_cloudSync:"Cloud sync across devices",f_reports:"Advanced reports and statistics",f_xlsx:"Excel export (.xlsx)",no_plans:"No plans available right now.",reqs_title:"Payment requests",rs_pending:"Under review",rs_approved:"Approved",rs_rejected:"Rejected",why_rej:"Reason",hist_title:"Payment history",ty_payment:"Subscription",ty_renewal:"Renewal",ty_manual:"Activated by admin",ty_extension:"Extension",hist_none:"No operations yet.",reqs_none:"No requests.",sub_unavail:"Couldn't load your subscription. Check your connection and try again.",expired_t:"Your subscription has expired",expired_d:"Only paid features stopped. Your data, files and reports are untouched. Renew to get them back.",expiring_t:"Your subscription ends soon",expiring_d:"Ends on {d}.",pending_t:"Payment request under review",pending_d:"The subscription is activated only after an administrator reviews your proof of payment.",susp_t:"Subscription suspended by the administrator",pay_title:"Payment",pay_amount:"Amount due",pay_instr_t:"Payment instructions",pay_no_instr:"The administrator hasn't set payment instructions yet. You can't send a request for now.",pay_ref:"Transaction / receipt number (optional)",pay_proof:"Proof of payment",pay_choose:"Choose image or PDF",pay_hint:"Image (JPG/PNG/WebP) or PDF, up to 600 KB. Images are shrunk automatically.",pay_note:"Sending proof does not mean the payment is done: the subscription is activated only after an administrator approves it.",pay_submit:"Send request",pay_sent:"Request sent and under review",pe_PROOF_REQUIRED:"Attach the proof of payment.",pe_PROOF_TOO_BIG:"The file is larger than 600 KB.",pe_PROOF_BAD_TYPE:"Unsupported file type. Use an image or PDF.",pe_ALREADY_PENDING:"You already have a request under review.",pe_DUPLICATE_PAYMENT:"This proof or transaction number was already submitted.",pe_PLAN_UNAVAILABLE:"This plan is no longer available.",pe_NETWORK:"Couldn't reach the server. Nothing changed; you can safely retry.",pe_GENERIC:"Something went wrong. Try again.",locked_feature:"This feature needs a paid plan.",locked_login:"Sign in to use this feature.",sync_locked:"Cloud sync is paused: an active subscription is required. Your local data is safe.",notif_title:"Notifications",notif_none:"No notifications.",nt_request_submitted:"Your request for the {plan} plan was sent and is under review.",nt_payment_approved:"Your payment for the {plan} plan was approved.",nt_payment_rejected:"Payment request rejected. Reason: {reason}",nt_sub_activated:"Your {plan} subscription is active until {until}.",nt_renewed:"Your {plan} subscription was renewed until {until}.",nt_expiring:"Your subscription ends in {days} day(s) ({until}).",nt_expired:"Your subscription expired. Renew to restore paid features.",nt_extended:"Your subscription was extended to {until}.",nt_suspended:"Your subscription was suspended by the administrator. {reason}",nt_unsuspended:"Your subscription was reactivated.",nt_cancelled:"Your subscription was cancelled.",nt_plan_changed:"Your plan changed to {plan}.",limit_docs:"You reached your plan's document limit."});
-Object.assign(D.fr,{sub_title:"Abonnement",h_type:"Type",sub_status:"État de l'abonnement",ss_free:"Gratuit",ss_pending:"En vérification",ss_active:"Actif",ss_expired:"Expiré",ss_cancelled:"Annulé",ss_suspended:"Suspendu",plan_l:"Formule",started_on:"Début",expires_on:"Expire le",days_left:"{n} jour(s) restant(s)",last_pay:"Dernier paiement",plans_title:"Formules disponibles",per_month:"/ mois",months_n:"Durée : {n} mois",choose_plan:"Choisir",renew_plan:"Renouveler",current_tag:"Votre formule",cmp_docs:"Documents",unlimited:"Illimité",f_cloudSync:"Synchronisation cloud entre appareils",f_reports:"Rapports et statistiques avancés",f_xlsx:"Export Excel (.xlsx)",no_plans:"Aucune formule disponible pour le moment.",reqs_title:"Demandes de paiement",rs_pending:"En vérification",rs_approved:"Acceptée",rs_rejected:"Refusée",why_rej:"Motif",hist_title:"Historique des paiements",ty_payment:"Abonnement",ty_renewal:"Renouvellement",ty_manual:"Activé par l'admin",ty_extension:"Prolongation",hist_none:"Aucune opération.",reqs_none:"Aucune demande.",sub_unavail:"Impossible de charger l'abonnement. Vérifiez la connexion et réessayez.",expired_t:"Votre abonnement a expiré",expired_d:"Seules les fonctions payantes sont arrêtées. Vos données, fichiers et rapports sont intacts. Renouvelez pour les retrouver.",expiring_t:"Votre abonnement expire bientôt",expiring_d:"Expire le {d}.",pending_t:"Demande de paiement en vérification",pending_d:"L'abonnement n'est activé qu'après vérification de votre preuve de paiement par un administrateur.",susp_t:"Abonnement suspendu par l'administrateur",pay_title:"Paiement",pay_amount:"Montant à payer",pay_instr_t:"Instructions de paiement",pay_no_instr:"L'administrateur n'a pas encore défini les instructions de paiement. Envoi impossible pour le moment.",pay_ref:"N° de transaction / reçu (facultatif)",pay_proof:"Preuve de paiement",pay_choose:"Choisir une image ou un PDF",pay_hint:"Image (JPG/PNG/WebP) ou PDF, jusqu'à 600 Ko. Les images sont réduites automatiquement.",pay_note:"Envoyer une preuve ne signifie pas que le paiement est effectué : l'abonnement n'est activé qu'après validation par un administrateur.",pay_submit:"Envoyer la demande",pay_sent:"Demande envoyée, en vérification",pe_PROOF_REQUIRED:"Joignez la preuve de paiement.",pe_PROOF_TOO_BIG:"Le fichier dépasse 600 Ko.",pe_PROOF_BAD_TYPE:"Type de fichier non pris en charge. Utilisez une image ou un PDF.",pe_ALREADY_PENDING:"Vous avez déjà une demande en vérification.",pe_DUPLICATE_PAYMENT:"Cette preuve ou ce numéro de transaction a déjà été soumis.",pe_PLAN_UNAVAILABLE:"Cette formule n'est plus disponible.",pe_NETWORK:"Serveur injoignable. Rien n'a changé, vous pouvez réessayer sans risque.",pe_GENERIC:"Une erreur est survenue. Réessayez.",locked_feature:"Cette fonction nécessite une formule payante.",locked_login:"Connectez-vous pour utiliser cette fonction.",sync_locked:"Synchronisation cloud suspendue : un abonnement actif est requis. Vos données locales sont intactes.",notif_title:"Notifications",notif_none:"Aucune notification.",nt_request_submitted:"Votre demande pour la formule {plan} a été envoyée et est en vérification.",nt_payment_approved:"Votre paiement pour la formule {plan} a été accepté.",nt_payment_rejected:"Demande de paiement refusée. Motif : {reason}",nt_sub_activated:"Votre abonnement {plan} est actif jusqu'au {until}.",nt_renewed:"Votre abonnement {plan} a été renouvelé jusqu'au {until}.",nt_expiring:"Votre abonnement expire dans {days} jour(s) ({until}).",nt_expired:"Votre abonnement a expiré. Renouvelez pour retrouver les fonctions payantes.",nt_extended:"Votre abonnement a été prolongé jusqu'au {until}.",nt_suspended:"Votre abonnement a été suspendu par l'administrateur. {reason}",nt_unsuspended:"Votre abonnement a été réactivé.",nt_cancelled:"Votre abonnement a été annulé.",nt_plan_changed:"Votre formule est maintenant {plan}.",limit_docs:"Vous avez atteint la limite de documents de votre formule."});
-Object.assign(S,{sub:null,plans:[],settings:null,reqs:[],hist:[],notifs:[],accState:'unknown',payPlan:null,payRef:'',proofFile:null,reqId:'',subBusy:false,syncToast:false});
-const Lc=o=>o&&typeof o=='object'?(o[S.lang]||o.en||o.fr||o.ar||''):String(o==null?'':o);
-const dfmt=ms=>ms?new Date(ms).toLocaleDateString(S.lang=='ar'?'ar-u-nu-latn':S.lang,{dateStyle:'medium'}):'—';
-const cur=()=>(S.settings&&S.settings.currency)||'DZD';
-const FEATS=['cloudSync','reports','xlsx'];
-// Effective status is computed from expiresAt (never trusted from a stored "active" alone). UI only: the server (rules + functions) is the real gate.
-function effSub(){const s=S.sub;if(!s)return{status:'free'};let st=s.status;const g=((S.settings&&S.settings.gracePeriodDays)||0)*864e5;
- if(st=='active'&&s.expiresAt&&s.expiresAt+g<Date.now())st='expired';return{...s,status:st}}
-function syncOk(){if(S.settings&&S.settings.enforceCloudSync===false)return true;const e=effSub();return e.status=='active'&&!!e.sync}
-function featOn(f){if(!S.fb)return true;const fr=(S.settings&&S.settings.freeFeatures)||{reports:false,xlsx:true};if(fr[f])return true;
- if(!S.user)return false;if(S.accState!='ok')return true; // unknown/error: don't lock the UI (cloud writes stay protected by the rules)
- const e=effSub();return e.status=='active'&&!!(e.features&&e.features[f])}
-const GATE={days:'reports',printr:'reports',printd:'reports',fstats:'reports',fsx:'reports',printf:'reports',export:'xlsx'};
-function gate(a){const f=GATE[a];if(!f||featOn(f))return 0;
- if(S.user){S.sheet='sub';render();loadSubData();toast('locked_feature')}else toast('locked_login');return 1}
-function limitOk(n){const e=effSub();if(!S.user||e.status!='active')return true;const lim=(e.limits&&e.limits.maxDocuments)||0;
- if(lim>0&&S.docs.length+n>lim){toast('limit_docs');return false}return true}
-async function loadSubData(){const u=S.user;if(!u||!window.FB)return;
- try{try{await FB.call(u.slot,'getAccess',{})}catch(e){} // lets the server persist "expired" and notify
-  const r=await FB.reads(u.slot,u.uid);if(S.user!==u)return;
-  if(r.sub===undefined&&r.set===undefined)throw 0;
-  S.sub=r.sub||null;if(r.set)S.settings=r.set;S.plans=(r.plans||[]).sort((a,b)=>(a.sortOrder||0)-(b.sortOrder||0));
-  S.reqs=(r.reqs||[]).sort((a,b)=>b.createdAt-a.createdAt);S.hist=(r.hist||[]).sort((a,b)=>b.at-a.at);S.notifs=r.notifs||[];S.accState='ok';S.syncToast=false;
-  if(S.ready&&syncOk())push()}
- catch(e){if(S.user===u&&S.accState!='ok')S.accState='err'}
- if(S.sheet!='pay')render()}
-function subBar(){if(!S.fb||!S.user)return'';const e=effSub(),un=S.notifs.filter(n=>!n.read).length,
- c={active:'var(--ok)',pending:'var(--pr)',expired:'var(--er)',suspended:'var(--er)'}[e.status]||'var(--mu)',
- lab=S.accState=='unknown'?'…':S.accState=='err'?t('sub_title'):t('ss_'+e.status);
- return '<button class="chip" data-a="sub" style="color:'+c+';border-color:'+c+';font-weight:700">● '+esc(lab)+'</button><button class="ib" data-a="notif" style="position:relative" aria-label="'+esc(t('notif_title'))+'" title="'+esc(t('notif_title'))+'">'+ic('Bell')+(un?'<span style="position:absolute;top:3px;inset-inline-end:3px;min-width:16px;height:16px;border-radius:8px;background:var(--er);color:#fff;font-size:10px;display:grid;place-items:center;padding:0 3px">'+un+'</span>':'')+'</button>'}
-function subBanner(){if(!S.fb||!S.user||S.accState!='ok')return'';const e=effSub(),go=btn('sub',t(e.status=='expired'?'renew_plan':'sub_title'));
- if(e.status=='expired')return banner('ERR',t('expired_t'),t('expired_d'),go);
- if(e.status=='suspended')return banner('ERR',t('susp_t'),e.suspendedReason||'');
- if(e.status=='pending')return banner('INFO',t('pending_t'),t('pending_d'));
- const nd=(S.settings&&S.settings.expiryNoticeDays)||7;
- if(e.status=='active'&&e.expiresAt&&e.expiresAt-Date.now()<=nd*864e5)return banner('INFO',t('expiring_t'),t('expiring_d',{d:dfmt(e.expiresAt)}),go);return''}
-function planCard(p,e){const mine=e.status=='active'&&e.planId==p.id,pend=S.reqs.some(r=>r.status=='pending'),lim=(p.limits&&p.limits.maxDocuments)||0,months=p.durationMonths||1;
- return '<article class="card ent" style="--c:'+(mine?'var(--ok)':'var(--pr)')+'"><div class="row"><div class="grow t"><h2>'+esc(Lc(p.name))+'</h2><div class="mu sm">'+esc(Lc(p.description))+'</div></div>'+(mine?'<span class="badge t" style="--c:var(--ok)">'+esc(t('current_tag'))+'</span>':'')+'</div>'+
- '<div class="big ltr" style="margin:10px 0 2px">'+num(p.priceMonthly)+' <span class="sm mu">'+esc(cur())+' '+esc(t('per_month'))+'</span></div><div class="mu xs t">'+esc(t('months_n',{n:months}))+'</div><hr>'+
- FEATS.map(f=>'<div class="row sm t" style="gap:10px;padding:3px 0;'+(p.features&&p.features[f]?'':'opacity:.45')+'"><span style="color:'+(p.features&&p.features[f]?'var(--ok)':'var(--mu)')+'">'+(p.features&&p.features[f]?ic('Check'):'—')+'</span><span>'+esc(t('f_'+f))+'</span></div>').join('')+
- '<div class="row sm t" style="gap:10px;padding:3px 0"><span style="color:var(--ok)">'+ic('Check')+'</span><span>'+esc(t('cmp_docs'))+': <b>'+(lim?num(lim):esc(t('unlimited')))+'</b></span></div>'+
- '<div style="margin-top:14px">'+btn('pickplan',t(mine?'renew_plan':'choose_plan'),{p:1,dis:pend||e.status=='suspended'}).replace('data-a="pickplan"','data-a="pickplan" data-id="'+esc(p.id)+'"')+'</div></article>'}
-function subSheet(){const u=S.user;if(!u)return OV(banner('INFO',t('locked_login'),'')+btn('close',t('done')));
- const close='<button class="ib" data-a="close" aria-label="'+esc(t('done'))+'">'+ic('Back')+'</button>',head='<div class="row"><div class="grow t"><h2 style="margin:0">'+esc(t('sub_title'))+'</h2></div>'+close+'</div>';
- if(S.accState=='err')return OV(head+banner('ERR',t('sub_unavail'),'',btn('subrefresh',t('try_again')))+btn('close',t('done')),1);
- if(S.accState!='ok')return OV(head+banner('RUN',t('reading'),''),1);
- const e=effSub(),c={active:'var(--ok)',pending:'var(--pr)',expired:'var(--er)',suspended:'var(--er)'}[e.status]||'var(--mu)',pend=S.reqs.find(r=>r.status=='pending'),
- left=e.status=='active'&&e.expiresAt?Math.max(0,Math.ceil((e.expiresAt-Date.now())/864e5)):null,
- rows=(k,v)=>v?'<div class="row sm t" style="padding:3px 0"><span class="mu grow">'+esc(t(k))+'</span><b class="ltr">'+esc(v)+'</b></div>':'';
- let h=head+'<div class="card" style="--c:'+c+'"><div class="row"><div class="tile" style="--c:'+c+'">'+ic('Calc')+'</div><div class="grow t"><div class="mu sm">'+esc(t('sub_status'))+'</div><h2>'+esc(t('ss_'+e.status))+'</h2></div></div><hr>'+
-  rows('plan_l',e.planName?Lc(e.planName):'')+rows('started_on',e.startAt?dfmt(e.startAt):'')+rows('expires_on',e.expiresAt?dfmt(e.expiresAt)+(left!=null?' · '+t('days_left',{n:left}):''):'')+rows('last_pay',e.lastPaymentAt?dfmt(e.lastPaymentAt)+' · '+num(e.lastAmount||0)+' '+cur():'')+'</div>';
- if(e.status=='expired')h+=banner('ERR',t('expired_t'),t('expired_d'));
- if(e.status=='suspended')h+=banner('ERR',t('susp_t'),e.suspendedReason||'');
- if(pend)h+=banner('INFO',t('pending_t'),t('pending_d'));
- h+=H2('plans_title')+'<div class="list">'+(S.plans.length?S.plans.map(p=>planCard(p,e)).join(''):'<div class="card empty t mu">'+esc(t('no_plans'))+'</div>')+'</div>';
- h+=H2('reqs_title')+(S.reqs.length?S.reqs.map(r=>{const bc={pending:'var(--pr)',approved:'var(--ok)',rejected:'var(--er)'}[r.status];
-  return '<div class="card ent t" style="--c:'+bc+';padding:12px"><div class="row"><div class="grow"><b>'+esc(Lc(r.plan&&r.plan.name))+'</b><div class="mu sm ltr">'+esc(dfmt(r.createdAt)+' · '+num(r.amount)+' '+(r.currency||cur()))+'</div></div><span class="badge" style="--c:'+bc+'">'+esc(t('rs_'+r.status))+'</span></div>'+(r.status=='rejected'&&r.reason?'<div class="sm" style="margin-top:6px;color:var(--er)">'+esc(t('why_rej'))+': '+esc(r.reason)+'</div>':'')+'</div>'}).join(''):'<div class="mu sm t">'+esc(t('reqs_none'))+'</div>');
- h+=H2('hist_title')+(S.hist.length?'<div class="tw sm0"><table class="tb"><thead><tr>'+[t('c_date'),t('h_type'),t('plan_l'),t('c_total'),t('expires_on')].map(x=>'<th>'+esc(x)+'</th>').join('')+'</tr></thead><tbody>'+S.hist.map(x=>'<tr><td>'+esc(dfmt(x.at))+'</td><td>'+esc(t('ty_'+x.type))+'</td><td>'+esc(Lc(x.planName))+'</td><td>'+num(x.amount||0)+' '+esc(x.currency||cur())+'</td><td>'+esc(dfmt(x.expiresAt))+'</td></tr>').join('')+'</tbody></table></div>':'<div class="mu sm t">'+esc(t('hist_none'))+'</div>');
- return OV(h+btn('close',t('done')),1)}
-function paySheet(){const p=S.payPlan;if(!p)return'';const months=p.durationMonths||1,amount=p.priceMonthly*months,ins=Lc(S.settings&&S.settings.paymentInstructions).trim();
- return OV('<h2 class="t" style="margin:0">'+esc(t('pay_title'))+'</h2><div class="card"><div class="row"><div class="grow t"><b>'+esc(Lc(p.name))+'</b><div class="mu sm">'+esc(t('months_n',{n:months}))+'</div></div><div class="ltr"><div class="mu xs">'+esc(t('pay_amount'))+'</div><b style="font-size:20px">'+num(amount)+' '+esc(cur())+'</b></div></div></div>'+
- H2('pay_instr_t')+(ins?'<div class="card t" style="white-space:pre-wrap;word-break:break-word">'+esc(ins)+'</div>':banner('ERR',t('pay_no_instr'),''))+
- '<label><span class="mu sm t">'+esc(t('pay_ref'))+'</span><div class="field"><input id="payref" maxlength="64" value="'+esc(S.payRef)+'"></div></label>'+
- '<div class="mu sm t">'+esc(t('pay_proof'))+'</div>'+btn('payfile',S.proofFile?S.proofFile.name:t('pay_choose'),{icon:'Upload'})+'<div class="mu xs t">'+esc(t('pay_hint'))+'</div><input type="file" id="pfile" accept="image/jpeg,image/png,image/webp,application/pdf" hidden>'+
- '<div class="sm t" id="perr" style="color:var(--er)" hidden></div>'+banner('INFO',t('pay_note'),'')+
- '<div class="g2">'+btn('payback',t('cancel'))+btn('paysubmit',t('pay_submit'),{p:1,dis:S.subBusy||!ins,load:S.subBusy})+'</div>')}
-function notifText(n){const q={...(n.params||{})};if(q.plan)q.plan=Lc(q.plan);if(q.until)q.until=dfmt(q.until);return t('nt_'+n.type,q)}
-function notifSheet(){return OV('<div class="row"><div class="grow t"><h2 style="margin:0">'+esc(t('notif_title'))+'</h2></div><button class="ib" data-a="close" aria-label="'+esc(t('done'))+'">'+ic('Back')+'</button></div>'+
- (S.notifs.length?S.notifs.map(n=>'<div class="card ent t" style="--c:'+(n.read?'var(--mu)':'var(--pr)')+';padding:12px"><div class="'+(n.read?'mu':'')+'">'+esc(notifText(n))+'</div><div class="mu xs" style="margin-top:4px">'+esc(dfmt(n.createdAt))+'</div></div>').join(''):'<div class="mu t">'+esc(t('notif_none'))+'</div>')+btn('close',t('done')))}
-async function markAllRead(){const u=S.user,ids=S.notifs.filter(n=>!n.read).map(n=>n.id);if(!u||!ids.length)return;
- try{await FB.markRead(u.slot,u.uid,ids);S.notifs.forEach(n=>n.read=true)}catch(e){}if(S.user===u&&S.sheet!='notif')render()}
-function errMsg(e){const k=e&&e.message;if(k&&D.en['pe_'+k])return t('pe_'+k);const c=e&&e.code;
- if(!navigator.onLine||c=='functions/unavailable'||c=='functions/deadline-exceeded'||c=='functions/internal'||c=='unavailable')return t('pe_NETWORK');return t('pe_GENERIC')}
-const readB64=f=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(',')[1]||'');r.onerror=()=>rej(r.error);r.readAsDataURL(f)});
-async function prepProof(f){const MAX=600*1024;let blob=f;
- if(f.type=='application/pdf'){if(f.size>MAX)throw{message:'PROOF_TOO_BIG'}}
- else if(/^image\/(jpeg|png|webp)$/.test(f.type)){
-  if(f.size>MAX*.9){const bmp=await createImageBitmap(f);let sc=Math.min(1,1600/Math.max(bmp.width,bmp.height)),q=.85,b=null;
-   for(let i=0;i<6;i++){const c=document.createElement('canvas');c.width=Math.max(1,Math.round(bmp.width*sc));c.height=Math.max(1,Math.round(bmp.height*sc));c.getContext('2d').drawImage(bmp,0,0,c.width,c.height);
-    b=await new Promise(r=>c.toBlob(r,'image/jpeg',q));if(b&&b.size<=MAX)break;sc*=.75;q=Math.max(.5,q-.1)}
-   if(!b||b.size>MAX)throw{message:'PROOF_TOO_BIG'};blob=b}}
- else throw{message:'PROOF_BAD_TYPE'};
- return{name:f.name,b64:await readB64(blob)}}
-async function paySubmit(){const u=S.user,p=S.payPlan;if(!u||!p||S.subBusy)return;
- const er=m=>{const e=$('#perr');if(e){e.textContent=m;e.hidden=false}};
- if(!S.proofFile){er(t('pe_PROOF_REQUIRED'));return}
- S.subBusy=true;render();
- try{const proof=await prepProof(S.proofFile);
-  await FB.call(u.slot,'submitPayment',{requestId:S.reqId,planId:p.id,reference:S.payRef.trim(),proof}); // same requestId on retry → no duplicate
-  S.subBusy=false;S.payPlan=null;S.proofFile=null;S.payRef='';S.reqId='';S.sheet='sub';render();toast('pay_sent');loadSubData()}
- catch(e){S.subBusy=false;render();er(errMsg(e))}}
-function actSub(a,el){const d=el.dataset;
- if(a=='sub'){S.sheet='sub';render();loadSubData();return 1}
- if(a=='subrefresh'){S.accState='unknown';render();loadSubData();return 1}
- if(a=='notif'){S.sheet='notif';render();markAllRead();return 1}
- if(a=='pickplan'){const p=S.plans.find(x=>x.id==d.id);if(!p)return 1;if(!S.reqId||!S.payPlan||S.payPlan.id!=p.id){S.reqId=uid()+uid();S.proofFile=null;S.payRef=''}
-  S.payPlan=p;S.sheet='pay';render();return 1}
- if(a=='payfile'){const i=$('#pfile');i&&i.click();return 1}
- if(a=='paysubmit'){paySubmit();return 1}
- if(a=='payback'){S.sheet='sub';render();return 1}
- return 0}
-document.addEventListener('input',ev=>{if(ev.target.id=='payref')S.payRef=ev.target.value});
-document.addEventListener('change',ev=>{if(ev.target.id!='pfile')return;const f=ev.target.files&&ev.target.files[0];ev.target.value='';if(!f)return;S.proofFile=f;render()});
-Object.assign(SH3,{sub:subSheet,pay:paySheet,notif:notifSheet});
 // ── Cloud sync (Firebase) — one set of documents per account ──
 function pack(){return JSON.stringify({v:3,docs:S.docs,del:S.del,folders:S.folders})}
 function unpack(json,ts){try{const p=JSON.parse(json);
@@ -769,7 +667,7 @@ Object.assign(D.fr,{add_acct:"Ajouter un autre compte",acct_switched:"Passé à 
 S.accts=(a=>Array.isArray(a)?a.filter(x=>x&&x.uid&&x.slot):[])(jget('accts',[]));
 S.user=S.accts.find(x=>NS=='u_'+x.uid+'_')||null;S.ready=false;
 function saveReg(){try{LS&&LS.setItem('accts',JSON.stringify(S.accts));LS&&LS.setItem('slots',JSON.stringify(S.accts.map(a=>a.slot)))}catch(e){}}
-function push(){if(!S.user||!window.FB||!S.ready)return;if(S.accState=='ok'&&!syncOk()){if(!S.syncToast){S.syncToast=true;toast('sync_locked')}return}clearTimeout(pt);const u=S.user,j=pack(),ts=TS;pt=setTimeout(async()=>{try{await FB.save(u.slot,u.uid,ts,j)}catch(e){toast(e&&e.code=='permission-denied'?'sync_locked':'sync_err')}},800)}
+function push(){if(!S.user||!window.FB||!S.ready)return;clearTimeout(pt);const u=S.user,j=pack(),ts=TS;pt=setTimeout(async()=>{try{await FB.save(u.slot,u.uid,ts,j)}catch(e){toast('sync_err')}},800)}
 function loadLocal(){const d=jget('docs',[]);S.docs=Array.isArray(d)?d.filter(x=>x&&x.id&&Array.isArray(x.entries)):[];
  const fl=jget('folders',[]);S.folders=Array.isArray(fl)?fl.filter(x=>x&&x.id&&x.name):[];
  const dl=jget('del',{});S.del=dl&&typeof dl=='object'&&!Array.isArray(dl)?dl:{};
@@ -781,7 +679,7 @@ function loadLocal(){const d=jget('docs',[]);S.docs=Array.isArray(d)?d.filter(x=
 // switch the active account (its documents are kept in a separate local store)
 async function activate(uid,keep){const a=S.accts.find(x=>x.uid==uid)||null;
  NS=a?'u_'+a.uid+'_':'';try{LS&&LS.setItem('active',a?a.uid:'guest')}catch(e){}
- S.user=a;S.ready=false;Object.assign(S,{sub:null,plans:[],settings:null,reqs:[],hist:[],notifs:[],accState:'unknown',syncToast:false,payPlan:null,proofFile:null,reqId:'',payRef:''});if(!keep)loadLocal();render();if(a){loadSubData();await syncActive()}}
+ S.user=a;S.ready=false;if(!keep)loadLocal();render();if(a)await syncActive()}
 async function syncActive(){const u=S.user;if(!u)return;
  try{const c=await FB.load(u.slot,u.uid),remote=c?unpack(c.json,c.ts):{docs:[],del:{},folders:[]};
   if(S.user!==u)return;
@@ -793,7 +691,7 @@ async function syncActive(){const u=S.user;if(!u)return;
   if(needPush)await FB.save(u.slot,u.uid,TS,pack());
   if(S.user!==u)return;
   S.ready=true;render();toast('synced')}
- catch(e){if(S.user===u){if(e&&e.code=='permission-denied'){S.ready=true;render();toast('sync_locked')}else toast('sync_err')}}}
+ catch(e){if(S.user===u)toast('sync_err')}}
 async function addAccount(){let r;
  try{r=await FB.add()}catch(e){if(!e||(e.code!='auth/popup-closed-by-user'&&e.code!='auth/cancelled-popup-request'))toast('login_err');return}
  const u=r.user,ex=S.accts.find(x=>x.uid==u.uid);
@@ -823,27 +721,304 @@ async function fbInit(){S.fb=true;render();
 window.addEventListener('fbready',fbInit);if(window.FB)fbInit();
 render();
 </script>
+<script>
+// ════════ Cash transactions (postmaster only, local storage) ════════
+(function(){
+const FT={
+ar:{f_title:"المعاملات المالية",f_sub:"وضعية الخزنة اليومية",f_card_desc:"تتبّع النقد بين الخزنة والشبابيك والقباضة والصرافات، مع جرد وإقفال يومي.",f_open_btn:"فتح الصفحة",f_cur:"دج",
+f_tab_day:"اليوم",f_tab_parties:"الجهات",f_tab_hist:"السجل",f_tab_set:"الإعدادات",f_st_open:"مفتوح",f_st_closed:"مقفل",
+f_opening:"رصيد أول اليوم",f_recv:"المستلَم (داخل)",f_given:"المُعطى (خارج)",f_theo:"الرصيد النظري",f_counted:"الرصيد الفعلي (الجرد)",f_diff:"الفرق",
+f_in:"استلام",f_out:"إعطاء",f_close_day:"إقفال اليوم",f_reopen:"إعادة فتح اليوم",f_today:"اليوم",f_prev:"اليوم السابق",f_next:"اليوم التالي",
+f_unclosed:"{n} يوم سابق غير مقفل",f_unclosed_go:"عرض أقدم يوم",f_pos:"وضعية الجهات",f_col_party:"الجهة",f_col_given:"أُعطي",f_col_recv:"استُلم",f_col_net:"الصافي لديها",
+f_pos_hint:"الصافي = ما أُعطي للجهة − ما استُلم منها (تراكميًا). الموجب = مبلغ بحوزة الجهة.",f_atm_log:"مصروف الصرافات حسب السجلات المستوردة",f_txs:"حركات اليوم",f_no_tx:"لا توجد حركات في هذا اليوم.",
+f_locked:"اليوم مقفل. أعد فتحه لإضافة الحركات أو تعديلها.",f_no_party:"أضف جهة أولًا (شباك، قباضة، صرافة...).",
+f_t_worker:"شباك",f_t_atm:"صرافة",f_t_central:"قباضة",f_t_other:"أخرى",
+f_v_worker_out:"تموين",f_v_worker_in:"تفريغ",f_v_atm_out:"تعبئة",f_v_atm_in:"تفريغ",f_v_central_out:"إرسال إلى",f_v_central_in:"استلام من",f_v_other_out:"دفع إلى",f_v_other_in:"استلام من",
+f_tx_in:"استلام نقد",f_tx_out:"إعطاء نقد",f_tx_edit:"تعديل الحركة",f_dir_in:"استلام (يدخل الخزنة)",f_dir_out:"إعطاء (يخرج من الخزنة)",f_party:"الجهة",f_amount:"المبلغ (دج)",f_note:"ملاحظة (اختياري)",f_date:"التاريخ",
+f_after:"الرصيد النظري بعد الحركة",f_neg:"سيصبح الرصيد سالبًا، تأكد من المبلغ.",f_err_amt:"أدخل مبلغًا أكبر من صفر.",f_err_party:"اختر الجهة.",f_err_date:"التاريخ قبل بداية المتابعة.",f_err_closed:"هذا اليوم مقفل.",f_add_party:"+ جهة جديدة",f_tx_saved:"تم حفظ الحركة",
+f_del_tx:"حذف الحركة؟",f_del_tx_d:"ستُحذف الحركة ويُسجَّل ذلك في سجل العمليات.",f_deleted:"تم الحذف",
+f_p_new:"جهة جديدة",f_p_edit:"تعديل الجهة",f_p_name:"اسم الجهة",f_p_type:"النوع",f_p_cap:"حد أقصى للنقد بحوزتها (اختياري)",f_p_cap_h:"يظهر تنبيه عند تجاوزه.",f_p_err:"اكتب اسم الجهة.",f_p_saved:"تم حفظ الجهة",f_p_stop:"إيقاف الجهة",f_p_resume:"إعادة تفعيل",f_p_del:"حذف الجهة",f_p_stopped:"موقوفة",f_p_has:"لها حركات سابقة، لذلك تُوقَف ولا تُحذف.",f_over:"تجاوز الحد",f_no_parties:"لم تضف أي جهة بعد.",f_p_color:"اللون",
+f_c_title:"إقفال اليوم",f_c_desc:"عُدّ النقد الموجود فعليًا في الخزنة وأدخل عدد الأوراق من كل فئة.",f_c_count:"العدد",f_c_other:"قطع نقدية / مبلغ آخر (دج)",f_c_total:"المجموع المعدود",f_c_theo:"الرصيد النظري",f_c_ok:"مطابق",f_c_short:"عجز",f_c_over:"زيادة",f_c_hold:"لم يفرّغوا بعد: {names}",f_c_confirm:"تأكيد الإقفال",f_c_done:"تم إقفال اليوم",f_ro_title:"إعادة فتح اليوم؟",f_ro_desc:"سيُفتح اليوم للتعديل ويُسجَّل ذلك. أرصدة الأيام اللاحقة تُعاد حسابًا تلقائيًا.",f_ro_ok:"تم فتح اليوم",f_c_notes:"تفصيل الجرد",
+f_h_title:"سجل الأيام",f_h_from:"من",f_h_to:"إلى",f_col_date:"التاريخ",f_col_open:"الافتتاح",f_col_in:"داخل",f_col_out:"خارج",f_col_theo:"النظري",f_col_cnt:"الفعلي",f_col_diff:"الفرق",f_col_st:"الحالة",f_h_tot:"الإجمالي",f_h_print:"طباعة اليوم",f_h_csv:"تصدير CSV",f_h_party:"مجاميع الجهات في الفترة",f_h_empty:"لا توجد أيام في هذه الفترة.",f_print_day:"طباعة وضعية اليوم",
+f_s_office:"اسم المكتب",f_s_den:"فئات الأوراق النقدية",f_s_den_h:"افصل بينها بفاصلة، مثال: 2000,1000,500,200,100",f_s_start:"تاريخ بداية المتابعة",f_s_bal:"الرصيد الافتتاحي (دج)",f_s_warn:"تغيير تاريخ البداية أو الرصيد يعيد حساب كل الأيام.",f_s_save:"حفظ الإعدادات",f_s_saved:"تم حفظ الإعدادات",f_s_den_err:"أدخل فئات صحيحة.",
+f_bak:"نسخة احتياطية",f_bak_exp:"تصدير بيانات المالية",f_bak_imp:"استيراد نسخة",f_bak_note:"بياناتك محفوظة على هذا الجهاز فقط. خذ نسخة احتياطية بانتظام.",f_imp_ok:"تم استيراد بيانات المالية",f_imp_err:"الملف غير صالح",
+f_audit:"سجل العمليات",f_audit_empty:"لا توجد عمليات مسجّلة.",f_reset:"حذف كل بيانات المالية",f_reset_d:"سيُحذف كل شيء نهائيًا من هذا الجهاز. تأكد من أخذ نسخة احتياطية أولًا.",f_reset_ok:"تم الحذف",
+f_su_title:"إعداد المكتب",f_su_desc:"ابدأ بإدخال بيانات مكتبك. يمكنك تغيير كل شيء لاحقًا من الإعدادات.",f_su_n:"عدد الشبابيك (العمال)",f_su_central:"إضافة القباضة الرئيسية",f_su_atm:"إضافة الصرافة الآلية",f_su_go:"ابدأ",f_su_first:"المكتب لم يُعدّ بعد",
+f_n_worker:"الشباك {n}",f_n_central:"القباضة الرئيسية",f_n_atm:"الصرافة الآلية",f_pr_title:"وضعية الخزنة اليومية",f_pr_sign:"رئيس المكتب",f_pr_gen:"أُنشئ في",f_log_tx_add:"إضافة حركة",f_log_tx_edit:"تعديل حركة",f_log_tx_del:"حذف حركة",f_log_close:"إقفال يوم",f_log_reopen:"إعادة فتح يوم",f_log_set:"تعديل الإعدادات",f_log_p:"جهة",f_log_imp:"استيراد نسخة",f_cancel:"إلغاء",f_save:"حفظ",f_done:"تم",f_edit:"تعديل",f_del:"حذف"},
+en:{f_title:"Cash transactions",f_sub:"Daily cash position",f_card_desc:"Track cash between the vault, counters, main treasury and ATMs, with a daily count and close.",f_open_btn:"Open page",f_cur:"DZD",
+f_tab_day:"Day",f_tab_parties:"Parties",f_tab_hist:"History",f_tab_set:"Settings",f_st_open:"Open",f_st_closed:"Closed",
+f_opening:"Opening balance",f_recv:"Received (in)",f_given:"Given out",f_theo:"Expected balance",f_counted:"Counted balance",f_diff:"Difference",
+f_in:"Receive",f_out:"Give",f_close_day:"Close the day",f_reopen:"Reopen the day",f_today:"Today",f_prev:"Previous day",f_next:"Next day",
+f_unclosed:"{n} earlier day(s) not closed",f_unclosed_go:"Go to the oldest",f_pos:"Parties position",f_col_party:"Party",f_col_given:"Given",f_col_recv:"Received",f_col_net:"Net held",
+f_pos_hint:"Net = given to the party − received from it (cumulative). Positive = cash held by the party.",f_atm_log:"ATM dispensed per imported logs",f_txs:"Today's movements",f_no_tx:"No movements on this day.",
+f_locked:"This day is closed. Reopen it to add or edit movements.",f_no_party:"Add a party first (counter, treasury, ATM…).",
+f_t_worker:"Counter",f_t_atm:"ATM",f_t_central:"Treasury",f_t_other:"Other",
+f_v_worker_out:"Funding",f_v_worker_in:"Emptying",f_v_atm_out:"Loading",f_v_atm_in:"Emptying",f_v_central_out:"Sent to",f_v_central_in:"Received from",f_v_other_out:"Paid to",f_v_other_in:"Received from",
+f_tx_in:"Receive cash",f_tx_out:"Give cash",f_tx_edit:"Edit movement",f_dir_in:"Receive (enters the vault)",f_dir_out:"Give (leaves the vault)",f_party:"Party",f_amount:"Amount (DZD)",f_note:"Note (optional)",f_date:"Date",
+f_after:"Expected balance after",f_neg:"The balance will become negative, check the amount.",f_err_amt:"Enter an amount above zero.",f_err_party:"Choose a party.",f_err_date:"Date is before tracking start.",f_err_closed:"This day is closed.",f_add_party:"+ New party",f_tx_saved:"Movement saved",
+f_del_tx:"Delete this movement?",f_del_tx_d:"It will be removed and recorded in the activity log.",f_deleted:"Deleted",
+f_p_new:"New party",f_p_edit:"Edit party",f_p_name:"Party name",f_p_type:"Type",f_p_cap:"Cash limit held by it (optional)",f_p_cap_h:"A warning shows when exceeded.",f_p_err:"Enter a party name.",f_p_saved:"Party saved",f_p_stop:"Deactivate",f_p_resume:"Reactivate",f_p_del:"Delete party",f_p_stopped:"inactive",f_p_has:"It has past movements, so it can only be deactivated.",f_over:"Over limit",f_no_parties:"No party added yet.",f_p_color:"Color",
+f_c_title:"Close the day",f_c_desc:"Count the cash actually in the vault and enter the number of notes of each denomination.",f_c_count:"Count",f_c_other:"Coins / other amount (DZD)",f_c_total:"Counted total",f_c_theo:"Expected balance",f_c_ok:"Matches",f_c_short:"Shortage",f_c_over:"Surplus",f_c_hold:"Not emptied yet: {names}",f_c_confirm:"Confirm close",f_c_done:"Day closed",f_ro_title:"Reopen this day?",f_ro_desc:"The day becomes editable and this is logged. Later days are recalculated automatically.",f_ro_ok:"Day reopened",f_c_notes:"Count details",
+f_h_title:"Daily history",f_h_from:"From",f_h_to:"To",f_col_date:"Date",f_col_open:"Opening",f_col_in:"In",f_col_out:"Out",f_col_theo:"Expected",f_col_cnt:"Counted",f_col_diff:"Diff",f_col_st:"Status",f_h_tot:"Total",f_h_print:"Print day",f_h_csv:"Export CSV",f_h_party:"Party totals in the period",f_h_empty:"No days in this period.",f_print_day:"Print the day's position",
+f_s_office:"Office name",f_s_den:"Banknote denominations",f_s_den_h:"Separate with commas, e.g. 2000,1000,500,200,100",f_s_start:"Tracking start date",f_s_bal:"Opening balance (DZD)",f_s_warn:"Changing the start date or balance recalculates every day.",f_s_save:"Save settings",f_s_saved:"Settings saved",f_s_den_err:"Enter valid denominations.",
+f_bak:"Backup",f_bak_exp:"Export cash data",f_bak_imp:"Import a backup",f_bak_note:"Your data is saved on this device only. Take a backup regularly.",f_imp_ok:"Cash data imported",f_imp_err:"Invalid file",
+f_audit:"Activity log",f_audit_empty:"No recorded activity.",f_reset:"Delete all cash data",f_reset_d:"Everything will be permanently deleted from this device. Take a backup first.",f_reset_ok:"Deleted",
+f_su_title:"Office setup",f_su_desc:"Start by entering your office details. You can change everything later in Settings.",f_su_n:"Number of counters (staff)",f_su_central:"Add the main treasury",f_su_atm:"Add the ATM",f_su_go:"Start",f_su_first:"The office is not set up yet",
+f_n_worker:"Counter {n}",f_n_central:"Main treasury",f_n_atm:"ATM",f_pr_title:"Daily cash position",f_pr_sign:"Postmaster",f_pr_gen:"Generated",f_log_tx_add:"Movement added",f_log_tx_edit:"Movement edited",f_log_tx_del:"Movement deleted",f_log_close:"Day closed",f_log_reopen:"Day reopened",f_log_set:"Settings changed",f_log_p:"Party",f_log_imp:"Backup imported",f_cancel:"Cancel",f_save:"Save",f_done:"Done",f_edit:"Edit",f_del:"Delete"},
+fr:{f_title:"Transactions de caisse",f_sub:"Position de caisse journalière",f_card_desc:"Suivez l'argent entre le coffre, les guichets, la recette principale et les DAB, avec comptage et clôture quotidiens.",f_open_btn:"Ouvrir la page",f_cur:"DA",
+f_tab_day:"Jour",f_tab_parties:"Parties",f_tab_hist:"Historique",f_tab_set:"Réglages",f_st_open:"Ouvert",f_st_closed:"Clôturé",
+f_opening:"Solde d'ouverture",f_recv:"Reçu (entrée)",f_given:"Remis (sortie)",f_theo:"Solde théorique",f_counted:"Solde compté",f_diff:"Écart",
+f_in:"Recevoir",f_out:"Remettre",f_close_day:"Clôturer le jour",f_reopen:"Rouvrir le jour",f_today:"Aujourd'hui",f_prev:"Jour précédent",f_next:"Jour suivant",
+f_unclosed:"{n} jour(s) précédent(s) non clôturé(s)",f_unclosed_go:"Aller au plus ancien",f_pos:"Position des parties",f_col_party:"Partie",f_col_given:"Remis",f_col_recv:"Reçu",f_col_net:"Net détenu",
+f_pos_hint:"Net = remis à la partie − reçu d'elle (cumulé). Positif = espèces détenues par la partie.",f_atm_log:"Distribué par les DAB selon les journaux importés",f_txs:"Mouvements du jour",f_no_tx:"Aucun mouvement ce jour.",
+f_locked:"Ce jour est clôturé. Rouvrez-le pour ajouter ou modifier des mouvements.",f_no_party:"Ajoutez d'abord une partie (guichet, recette, DAB…).",
+f_t_worker:"Guichet",f_t_atm:"DAB",f_t_central:"Recette",f_t_other:"Autre",
+f_v_worker_out:"Approvisionnement",f_v_worker_in:"Versement",f_v_atm_out:"Chargement",f_v_atm_in:"Vidage",f_v_central_out:"Envoi à",f_v_central_in:"Reçu de",f_v_other_out:"Paiement à",f_v_other_in:"Reçu de",
+f_tx_in:"Recevoir des espèces",f_tx_out:"Remettre des espèces",f_tx_edit:"Modifier le mouvement",f_dir_in:"Réception (entre au coffre)",f_dir_out:"Remise (sort du coffre)",f_party:"Partie",f_amount:"Montant (DA)",f_note:"Note (facultatif)",f_date:"Date",
+f_after:"Solde théorique après",f_neg:"Le solde deviendra négatif, vérifiez le montant.",f_err_amt:"Saisissez un montant supérieur à zéro.",f_err_party:"Choisissez une partie.",f_err_date:"Date antérieure au début du suivi.",f_err_closed:"Ce jour est clôturé.",f_add_party:"+ Nouvelle partie",f_tx_saved:"Mouvement enregistré",
+f_del_tx:"Supprimer ce mouvement ?",f_del_tx_d:"Il sera supprimé et noté dans le journal d'activité.",f_deleted:"Supprimé",
+f_p_new:"Nouvelle partie",f_p_edit:"Modifier la partie",f_p_name:"Nom de la partie",f_p_type:"Type",f_p_cap:"Plafond d'espèces détenues (facultatif)",f_p_cap_h:"Une alerte s'affiche en cas de dépassement.",f_p_err:"Saisissez un nom.",f_p_saved:"Partie enregistrée",f_p_stop:"Désactiver",f_p_resume:"Réactiver",f_p_del:"Supprimer la partie",f_p_stopped:"inactive",f_p_has:"Elle a des mouvements passés : elle ne peut qu'être désactivée.",f_over:"Plafond dépassé",f_no_parties:"Aucune partie ajoutée.",f_p_color:"Couleur",
+f_c_title:"Clôturer le jour",f_c_desc:"Comptez les espèces réellement au coffre et saisissez le nombre de billets par valeur.",f_c_count:"Nombre",f_c_other:"Pièces / autre montant (DA)",f_c_total:"Total compté",f_c_theo:"Solde théorique",f_c_ok:"Conforme",f_c_short:"Manque",f_c_over:"Excédent",f_c_hold:"Pas encore versé : {names}",f_c_confirm:"Confirmer la clôture",f_c_done:"Jour clôturé",f_ro_title:"Rouvrir ce jour ?",f_ro_desc:"Le jour redevient modifiable et c'est noté. Les jours suivants sont recalculés automatiquement.",f_ro_ok:"Jour rouvert",f_c_notes:"Détail du comptage",
+f_h_title:"Historique des jours",f_h_from:"Du",f_h_to:"Au",f_col_date:"Date",f_col_open:"Ouverture",f_col_in:"Entrées",f_col_out:"Sorties",f_col_theo:"Théorique",f_col_cnt:"Compté",f_col_diff:"Écart",f_col_st:"Statut",f_h_tot:"Total",f_h_print:"Imprimer le jour",f_h_csv:"Exporter CSV",f_h_party:"Totaux des parties sur la période",f_h_empty:"Aucun jour sur cette période.",f_print_day:"Imprimer la position du jour",
+f_s_office:"Nom du bureau",f_s_den:"Valeurs des billets",f_s_den_h:"Séparez par des virgules, ex. 2000,1000,500,200,100",f_s_start:"Date de début du suivi",f_s_bal:"Solde initial (DA)",f_s_warn:"Changer la date de début ou le solde recalcule tous les jours.",f_s_save:"Enregistrer",f_s_saved:"Réglages enregistrés",f_s_den_err:"Saisissez des valeurs valides.",
+f_bak:"Sauvegarde",f_bak_exp:"Exporter les données de caisse",f_bak_imp:"Importer une sauvegarde",f_bak_note:"Vos données sont enregistrées sur cet appareil uniquement. Faites une sauvegarde régulièrement.",f_imp_ok:"Données de caisse importées",f_imp_err:"Fichier invalide",
+f_audit:"Journal d'activité",f_audit_empty:"Aucune activité enregistrée.",f_reset:"Supprimer toutes les données de caisse",f_reset_d:"Tout sera définitivement supprimé de cet appareil. Faites d'abord une sauvegarde.",f_reset_ok:"Supprimé",
+f_su_title:"Configuration du bureau",f_su_desc:"Commencez par saisir les informations de votre bureau. Tout reste modifiable dans les réglages.",f_su_n:"Nombre de guichets (agents)",f_su_central:"Ajouter la recette principale",f_su_atm:"Ajouter le DAB",f_su_go:"Commencer",f_su_first:"Le bureau n'est pas encore configuré",
+f_n_worker:"Guichet {n}",f_n_central:"Recette principale",f_n_atm:"DAB",f_pr_title:"Position de caisse journalière",f_pr_sign:"Receveur",f_pr_gen:"Généré le",f_log_tx_add:"Mouvement ajouté",f_log_tx_edit:"Mouvement modifié",f_log_tx_del:"Mouvement supprimé",f_log_close:"Jour clôturé",f_log_reopen:"Jour rouvert",f_log_set:"Réglages modifiés",f_log_p:"Partie",f_log_imp:"Sauvegarde importée",f_cancel:"Annuler",f_save:"Enregistrer",f_done:"Terminé",f_edit:"Modifier",f_del:"Supprimer"}};
+for(const l in FT)Object.assign(D[l],FT[l]);
+Object.assign(P,{Plus:["M12 5v14","M5 12h14"],Lock:["M6 11h12v9H6z","M8 11V8a4 4 0 0 1 8 0v3"],Unlock:["M6 11h12v9H6z","M8 11V8a4 4 0 0 1 7-2.6"],Print:["M7 9V3h10v6","M7 17H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2","M7 14h10v7H7z"],ChevL:["M15 6l-6 6 6 6"],ChevR:["M9 6l6 6-6 6"],Wallet:["M3 7a2 2 0 0 1 2-2h13v4","M3 7v11a2 2 0 0 0 2 2h15V9H5a2 2 0 0 1-2-2z","M16 14.5h.01"]});
+DK.push('fin');
+
+// ── data ──
+const DEF=()=>({v:1,set:{office:'',den:[2000,1000,500,200,100],start:'',bal:0},parties:[],txs:[],days:{},audit:[]});
+let FC=null,FN=null;
+const F=()=>{if(!FC||FN!==NS){FN=NS;try{const j=JSON.parse(sget('fin'));FC=j&&j.v&&j.set?j:DEF()}catch(e){FC=DEF()}}return FC};
+const save=()=>{sset('fin',JSON.stringify(F()))};
+const log=m=>{const a=F().audit;a.unshift({at:Date.now(),m});if(a.length>300)a.length=300};
+const pad=n=>String(n).padStart(2,'0');
+const today=()=>{const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())};
+const addD=(s,n)=>{const d=new Date(s+'T12:00:00');d.setDate(d.getDate()+n);return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())};
+const loc=()=>S.lang=='ar'?'ar-u-nu-latn':S.lang;
+const wday=s=>new Date(s+'T12:00:00').toLocaleDateString(loc(),{weekday:'long'});
+const dz=n=>'<span class="ltr">'+num(Math.round(n))+'</span> '+esc(t('f_cur'));
+const dzt=n=>num(Math.round(n))+' '+t('f_cur');
+const col2=n=>n<0?'var(--er)':n>0?'var(--ok)':'inherit';
+const P_=id=>F().parties.find(p=>p.id==id);
+const txsOn=d=>F().txs.filter(x=>x.date===d);
+const net=T=>T.reduce((a,x)=>a+(x.dir=='in'?x.amt:-x.amt),0);
+const dayDates=()=>{const s=new Set(F().txs.map(x=>x.date));Object.keys(F().days).forEach(k=>s.add(k));return [...s].sort()};
+function openOf(d){const f=F();let bal=+f.set.bal||0;
+ for(const k of dayDates()){if(k>=d)break;if(f.set.start&&k<f.set.start)continue;const c=f.days[k];bal+=net(txsOn(k));if(c&&c.closed)bal=c.counted}
+ return bal}
+function stat(d){const f=F(),o=openOf(d),T=txsOn(d),inn=T.filter(x=>x.dir=='in').reduce((a,x)=>a+x.amt,0),out=T.filter(x=>x.dir=='out').reduce((a,x)=>a+x.amt,0),theo=o+inn-out,c=f.days[d],closed=!!(c&&c.closed);
+ return{o,inn,out,theo,T,c,closed,counted:closed?c.counted:null,diff:closed?c.counted-theo:null}}
+const held=(pid,upTo)=>F().txs.filter(x=>x.pid==pid&&x.date<=upTo).reduce((a,x)=>a+(x.dir=='out'?x.amt:-x.amt),0);
+function dispensed(day){const seen=new Set();let tot=0;S.docs.forEach(d=>d.entries.forEach(x=>{if(x.date!==day||x.status!='VALID')return;const k=[x.ref,x.date,x.time,x.req].join('|');if(seen.has(k))return;seen.add(k);tot+=x.req}));return tot}
+const unclosed=d=>dayDates().filter(k=>k<d&&!(F().days[k]&&F().days[k].closed)&&(!F().set.start||k>=F().set.start)&&F().txs.some(x=>x.date==k));
+const verb=(p,dir)=>t('f_v_'+(p?p.type:'other')+'_'+dir);
+
+// ── views ──
+const kp=(l,v,c)=>'<div class="kp"><span class="mu xs t">'+esc(t(l))+'</span><b style="color:'+(c||'inherit')+'">'+v+'</b></div>';
+const hdr=(ic_,k,sub)=>'<div class="row"><div class="tile">'+ic(ic_)+'</div><div class="grow t"><h2>'+esc(t(k))+'</h2>'+(sub?'<div class="mu sm">'+sub+'</div>':'')+'</div></div>';
+window.finCard=function(){return '<section class="card"><div class="row"><div class="tile" style="--c:var(--ok)">'+ic('Wallet')+'</div><div class="grow t"><h2>'+esc(t('f_title'))+'</h2><div class="mu sm">'+esc(t('f_card_desc'))+'</div></div></div><div style="margin-top:14px">'+btn('fin',t('f_open_btn'),{p:1,icon:'Wallet'})+'</div></section>'};
+window.finTitle=()=>t('f_title');
+function tabs(){return '<div class="chips tabs">'+[['day','f_tab_day'],['parties','f_tab_parties'],['hist','f_tab_hist'],['set','f_tab_set']].map(([k,l])=>'<button class="chip'+(S.fp==k?' on':'')+'" data-a="ftab" data-v="'+k+'">'+esc(t(l))+'</button>').join('')+'</div>'}
+window.finPage=function(){const f=F();S.fp=S.fp||'day';S.fd=S.fd||today();
+ if(!f.set.start)return '<div class="home"><div class="card"><div class="row"><div class="tile" style="--c:var(--ok)">'+ic('Wallet')+'</div><div class="grow t"><h2>'+esc(t('f_su_first'))+'</h2><div class="mu sm">'+esc(t('f_su_desc'))+'</div></div></div><div style="margin-top:14px">'+btn('fsetup',t('f_su_title'),{p:1})+'</div></div></div>';
+ return '<div class="home">'+tabs()+({day:dayView,parties:partiesView,hist:histView,set:setView}[S.fp]||dayView)()+'</div>'};
+
+function dayView(){const f=F(),d=S.fd,s=stat(d),act=f.parties.filter(p=>!p.arch),prev=S.lang=='ar'?'ChevR':'ChevL',nxt=S.lang=='ar'?'ChevL':'ChevR',un=unclosed(d);
+ let h='<div class="card"><div class="row"><button class="ib" data-a="fprev" title="'+esc(t('f_prev'))+'" aria-label="'+esc(t('f_prev'))+'"'+(d<=f.set.start?' disabled':'')+'>'+ic(prev)+'</button><div class="grow"><div class="field"><input type="date" id="fdate" value="'+d+'" min="'+f.set.start+'"></div></div><button class="ib" data-a="fnext" title="'+esc(t('f_next'))+'" aria-label="'+esc(t('f_next'))+'">'+ic(nxt)+'</button></div>'+
+ '<div class="row" style="margin-top:10px;gap:8px;flex-wrap:wrap"><span class="mu sm t">'+esc(wday(d))+' · '+esc(fmtDate(d))+'</span><span class="badge t" style="--c:'+(s.closed?'var(--ok)':'var(--pr)')+'">'+esc(t(s.closed?'f_st_closed':'f_st_open'))+'</span>'+(d!==today()?'<button class="chip" data-a="ftoday" style="min-height:30px">'+esc(t('f_today'))+'</button>':'')+'</div></div>';
+ if(un.length)h+='<div class="ban" style="--c:var(--er)"><div class="t"><b>'+esc(t('f_unclosed',{n:un.length}))+'</b><button class="btn" data-a="fgo" data-d="'+un[0]+'">'+esc(t('f_unclosed_go'))+' · '+esc(fmtDate(un[0]))+'</button></div></div>';
+ h+='<div class="card"><div class="fk">'+kp('f_opening',dz(s.o))+kp('f_recv','+ '+dz(s.inn),'var(--ok)')+kp('f_given','− '+dz(s.out),'var(--er)')+kp('f_theo',dz(s.theo))+'</div>'+
+ (s.closed?'<div class="fk" style="margin-top:10px">'+kp('f_counted',dz(s.counted))+kp('f_diff',(s.diff>0?'+':'')+dz(s.diff),s.diff?'var(--er)':'var(--ok)')+'</div>':'')+
+ '<div class="g2" style="margin-top:14px">'+btn('ftxnew',t('f_in'),{p:1,icon:'Down',dis:s.closed||!act.length}).replace('data-a="ftxnew"','data-a="ftxnew" data-dir="in"')+btn('ftxnew',t('f_out'),{icon:'Up',dis:s.closed||!act.length}).replace('data-a="ftxnew"','data-a="ftxnew" data-dir="out"')+'</div>'+
+ (s.closed?'<div class="mu sm t" style="margin-top:10px">'+esc(t('f_locked'))+'</div>':!act.length?'<div class="mu sm t" style="margin-top:10px">'+esc(t('f_no_party'))+'</div>':'')+
+ '<div style="margin-top:10px">'+(s.closed?btn('freopen',t('f_reopen'),{icon:'Unlock'}):btn('fclose',t('f_close_day'),{icon:'Lock'}))+'</div></div>';
+ // parties position
+ const rows=f.parties.filter(p=>!p.arch||held(p.id,d)||s.T.some(x=>x.pid==p.id));
+ if(rows.length){const dsp=dispensed(d),hasAtm=rows.some(p=>p.type=='atm');
+  h+='<div class="card">'+hdr('Table','f_pos')+'<div class="tw sm0 fz" style="margin-top:12px;direction:'+(S.lang=='ar'?'rtl':'ltr')+'"><table class="tb"><thead><tr>'+['f_col_party','f_col_given','f_col_recv','f_col_net'].map(k=>'<th>'+esc(t(k))+'</th>').join('')+'</tr></thead><tbody>'+
+  rows.map(p=>{const g=s.T.filter(x=>x.pid==p.id&&x.dir=='out').reduce((a,x)=>a+x.amt,0),r=s.T.filter(x=>x.pid==p.id&&x.dir=='in').reduce((a,x)=>a+x.amt,0),hd=held(p.id,d),over=p.cap&&hd>p.cap;
+   return '<tr><td style="text-align:start"><span class="dot" style="--c:'+col(p.color)+'"></span> '+esc(p.name)+(over?' <span class="badge" style="--c:var(--er)">'+esc(t('f_over'))+'</span>':'')+'</td><td>'+(g?num(g):'')+'</td><td>'+(r?num(r):'')+'</td><td style="font-weight:700;color:'+col2(hd)+'">'+num(hd)+'</td></tr>'}).join('')+'</tbody></table></div><div class="mu xs t" style="margin-top:8px">'+esc(t('f_pos_hint'))+'</div>'+
+  (hasAtm||dsp?'<div class="row t" style="margin-top:10px"><span class="grow mu sm">'+esc(t('f_atm_log'))+'</span><b>'+dz(dsp)+'</b></div>':'')+'</div>'}
+ // transactions
+ h+='<div class="card">'+hdr('File','f_txs')+'<div class="stack" style="gap:10px;margin-top:12px">'+(s.T.length?[...s.T].sort((a,b)=>a.ts-b.ts).map(x=>{const p=P_(x.pid),inn=x.dir=='in';
+  return '<div class="card ent" style="padding:12px;--c:'+(inn?'var(--ok)':'var(--er)')+'"><div class="row" style="align-items:flex-start"><div class="grow t" style="min-width:0"><div class="dn" style="overflow-wrap:anywhere;word-break:normal">'+esc(verb(p,x.dir))+' '+esc(p?p.name:'?')+'</div><b style="display:block;margin-top:2px;white-space:nowrap;color:'+(inn?'var(--ok)':'var(--er)')+'">'+(inn?'+':'−')+' '+dz(x.amt)+'</b>'+(x.note?'<div class="mu sm" style="overflow-wrap:anywhere">'+esc(x.note)+'</div>':'')+'<div class="mu xs">'+esc(new Date(x.ts).toLocaleTimeString(loc(),{hour:'2-digit',minute:'2-digit'}))+'</div></div>'+
+  (s.closed?'':'<button class="ib" data-a="ftxedit" data-id="'+esc(x.id)+'" aria-label="'+esc(t('f_edit'))+'" title="'+esc(t('f_edit'))+'">'+ic('Edit')+'</button><button class="ib" data-a="ftxdel" data-id="'+esc(x.id)+'" aria-label="'+esc(t('f_del'))+'" title="'+esc(t('f_del'))+'">'+ic('Trash')+'</button>')+'</div></div>'
+ }).join(''):'<div class="mu t">'+esc(t('f_no_tx'))+'</div>')+'</div>'+
+  (s.closed&&s.c.cnt?'<div class="mu sm t" style="margin-top:12px"><b>'+esc(t('f_c_notes'))+':</b> '+Object.keys(s.c.cnt).filter(k=>s.c.cnt[k]).sort((a,b)=>b-a).map(k=>num(+k)+'×'+s.c.cnt[k]).join(' · ')+(s.c.other?' · '+esc(t('f_c_other').split(' (')[0])+' '+num(s.c.other):'')+'</div>':'')+'</div>';
+ return h}
+
+function partiesView(){const f=F();
+ return '<div class="card">'+hdr('User','f_tab_parties')+'<div class="stack" style="gap:10px;margin-top:12px">'+(f.parties.length?f.parties.map(p=>{const hd=held(p.id,today());
+  return '<div class="card ent fc" style="padding:12px;--c:'+col(p.color)+(p.arch?';opacity:.6':'')+'"><div class="row"><div class="grow t"><div class="dn">'+esc(p.name)+'</div><div class="mu sm">'+esc(t('f_t_'+p.type))+(p.arch?' · '+esc(t('f_p_stopped')):'')+'</div></div><b style="color:'+col2(hd)+'">'+dz(hd)+'</b><button class="ib" data-a="fpedit" data-id="'+esc(p.id)+'" aria-label="'+esc(t('f_edit'))+'">'+ic('Edit')+'</button></div></div>'}).join(''):'<div class="mu t">'+esc(t('f_no_parties'))+'</div>')+'</div><div style="margin-top:14px">'+btn('fpnew',t('f_p_new'),{p:1,icon:'Plus'})+'</div></div>'}
+
+function range(){const f=F();if(!S.fh){const n=today();S.fh={from:n.slice(0,8)+'01',to:n}}
+ if(S.fh.from<f.set.start&&f.set.start)S.fh.from=f.set.start;return S.fh}
+function histView(){const f=F(),r=range(),ds=[];for(let k=r.from;k<=r.to&&ds.length<400;k=addD(k,1))if(f.txs.some(x=>x.date==k)||(f.days[k]&&f.days[k].closed))ds.push(k);
+ const R=ds.map(k=>({k,...stat(k)})),T={inn:0,out:0,diff:0};R.forEach(x=>{T.inn+=x.inn;T.out+=x.out;T.diff+=x.diff||0});
+ const lb=(k,id,v)=>'<label><span class="mu xs t">'+esc(t(k))+'</span><div class="field"><input type="date" id="'+id+'" value="'+v+'"></div></label>';
+ const pt=f.parties.map(p=>({p,g:f.txs.filter(x=>x.pid==p.id&&x.dir=='out'&&x.date>=r.from&&x.date<=r.to).reduce((a,x)=>a+x.amt,0),r:f.txs.filter(x=>x.pid==p.id&&x.dir=='in'&&x.date>=r.from&&x.date<=r.to).reduce((a,x)=>a+x.amt,0)})).filter(x=>x.g||x.r);
+ return '<div class="card">'+hdr('Table','f_h_title')+'<div class="g2" style="margin-top:12px">'+lb('f_h_from','fhf',r.from)+lb('f_h_to','fht',r.to)+'</div><div class="g2" style="margin-top:12px">'+btn('fhprint',t('f_h_print'),{icon:'Print'})+btn('fcsv',t('f_h_csv'),{icon:'Download',dis:!R.length})+'</div></div>'+
+ '<div class="card">'+(R.length?'<div class="tw sm0 fz" style="direction:'+(S.lang=='ar'?'rtl':'ltr')+'"><table class="tb"><thead><tr>'+['f_col_date','f_col_open','f_col_in','f_col_out','f_col_theo','f_col_cnt','f_col_diff','f_col_st'].map(k=>'<th>'+esc(t(k))+'</th>').join('')+'</tr></thead><tbody>'+
+  R.map(x=>'<tr style="cursor:pointer" data-a="fgo" data-d="'+x.k+'"><td>'+esc(fmtDate(x.k))+'</td><td>'+num(x.o)+'</td><td style="color:var(--ok)">'+num(x.inn)+'</td><td style="color:var(--er)">'+num(x.out)+'</td><td>'+num(x.theo)+'</td><td>'+(x.closed?num(x.counted):'')+'</td><td style="color:'+(x.diff?'var(--er)':'inherit')+'">'+(x.closed?(x.diff>0?'+':'')+num(x.diff):'')+'</td><td>'+esc(t(x.closed?'f_st_closed':'f_st_open'))+'</td></tr>').join('')+
+  '</tbody><tfoot><tr><td>'+esc(t('f_h_tot'))+'</td><td></td><td>'+num(T.inn)+'</td><td>'+num(T.out)+'</td><td></td><td></td><td>'+(T.diff>0?'+':'')+num(T.diff)+'</td><td></td></tr></tfoot></table></div>':'<div class="mu t">'+esc(t('f_h_empty'))+'</div>')+'</div>'+
+ (pt.length?'<div class="card">'+hdr('User','f_h_party')+'<div class="tw sm0 fz" style="margin-top:12px;direction:'+(S.lang=='ar'?'rtl':'ltr')+'"><table class="tb"><thead><tr>'+['f_col_party','f_col_given','f_col_recv'].map(k=>'<th>'+esc(t(k))+'</th>').join('')+'</tr></thead><tbody>'+pt.map(x=>'<tr><td style="text-align:start">'+esc(x.p.name)+'</td><td>'+num(x.g)+'</td><td>'+num(x.r)+'</td></tr>').join('')+'</tbody></table></div></div>':'')}
+
+function setView(){const f=F(),s=f.set,fl=(k,id,v,ty,ex)=>'<label><span class="mu sm t">'+esc(t(k))+'</span><div class="field"><input id="'+id+'" type="'+(ty||'text')+'" value="'+esc(v)+'" '+(ex||'')+'></div></label>';
+ return '<div class="card"><div class="stack" style="gap:12px">'+fl('f_s_office','sfo',s.office)+fl('f_s_den','sfd',s.den.join(','),'text','inputmode="numeric"')+'<div class="mu xs t" style="margin-top:-6px">'+esc(t('f_s_den_h'))+'</div>'+fl('f_s_start','sfs',s.start,'date')+fl('f_s_bal','sfb',s.bal,'text','inputmode="numeric" class="fm"')+'<div class="mu xs t">'+esc(t('f_s_warn'))+'</div><div class="sm t" id="err" style="color:var(--er)" hidden></div>'+btn('fsetsave',t('f_s_save'),{p:1})+'</div></div>'+
+ '<div class="card">'+hdr('Download','f_bak')+'<div class="mu sm t" style="margin:10px 0">'+esc(t('f_bak_note'))+'</div><div class="g2">'+btn('fbak',t('f_bak_exp'),{icon:'Download'})+btn('frest',t('f_bak_imp'),{icon:'Upload'})+'</div></div>'+
+ '<div class="card"><div class="chips">'+'<button class="chip" data-a="faudit">'+esc(t('f_audit'))+'</button><button class="chip" data-a="freset" style="color:var(--er)">'+esc(t('f_reset'))+'</button></div></div>'}
+
+// ── sheets ──
+const partyOpts=sel=>F().parties.filter(p=>!p.arch||p.id==sel).map(p=>'<option value="'+esc(p.id)+'"'+(p.id==sel?' selected':'')+'>'+esc(p.name)+' ('+esc(t('f_t_'+p.type))+')</option>').join('');
+function txSheet(){const x=S.fx,f=F(),inn=x.dir=='in';
+ return OV('<h2 class="t" style="margin:0">'+esc(t(x.id?'f_tx_edit':inn?'f_tx_in':'f_tx_out'))+'</h2><div class="chips"><button class="chip'+(inn?' on':'')+'" data-a="fdir" data-v="in">'+esc(t('f_dir_in'))+'</button><button class="chip'+(!inn?' on':'')+'" data-a="fdir" data-v="out">'+esc(t('f_dir_out'))+'</button></div>'+
+ '<label><span class="mu sm t">'+esc(t('f_party'))+'</span><div class="row" style="gap:8px"><div class="field grow"><select id="fxp">'+partyOpts(x.pid)+'</select></div><button class="chip" data-a="fnewp">'+esc(t('f_add_party'))+'</button></div></label>'+
+ '<label><span class="mu sm t">'+esc(t('f_amount'))+'</span><div class="field"><input id="fxa" class="fm" inputmode="numeric" maxlength="12" placeholder="0" value="'+esc(x.amt)+'"></div></label><div class="sm t" id="fxprev"></div>'+
+ '<label><span class="mu sm t">'+esc(t('f_note'))+'</span><div class="field"><input id="fxn" maxlength="80" value="'+esc(x.note)+'"></div></label>'+
+ '<label><span class="mu sm t">'+esc(t('f_date'))+'</span><div class="field"><input id="fxd" type="date" min="'+f.set.start+'" value="'+x.date+'"></div></label>'+
+ '<div class="sm t" id="err" style="color:var(--er)" hidden></div><div class="g2">'+btn('close',t('f_cancel'))+btn('ftxsave',t('f_save'),{p:1})+'</div>')}
+function fxRead(){const x=S.fx;if(!x)return;const g=id=>document.getElementById(id);
+ if(g('fxp'))x.pid=g('fxp').value;if(g('fxa'))x.amt=g('fxa').value;if(g('fxn'))x.note=g('fxn').value;if(g('fxd'))x.date=g('fxd').value}
+function fxPrev(){const x=S.fx,e=document.getElementById('fxprev');if(!x||!e||S.sheet!='ftx')return;fxRead();const a=+x.amt||0,d=x.date||S.fd;
+ const others=txsOn(d).filter(y=>y.id!=x.id),base=openOf(d)+net(others),th=base+(x.dir=='in'?a:-a);
+ e.innerHTML=a?esc(t('f_after'))+': <b style="color:'+(th<0?'var(--er)':'inherit')+'">'+dz(th)+'</b>'+(th<0?'<div style="color:var(--er)">'+esc(t('f_neg'))+'</div>':''):''}
+function partySheet(){const p=S.fp2,f=F(),has=p.id&&f.txs.some(x=>x.pid==p.id);
+ return OV('<h2 class="t" style="margin:0">'+esc(t(p.id?'f_p_edit':'f_p_new'))+'</h2><label><span class="mu sm t">'+esc(t('f_p_name'))+'</span><div class="field"><input id="fpn" maxlength="40" value="'+esc(p.name)+'"></div></label>'+
+ '<div class="mu sm t">'+esc(t('f_p_type'))+'</div><div class="chips">'+['worker','atm','central','other'].map(k=>'<button class="chip'+(p.type==k?' on':'')+'" data-a="fptype" data-v="'+k+'">'+esc(t('f_t_'+k))+'</button>').join('')+'</div>'+
+ '<label><span class="mu sm t">'+esc(t('f_p_cap'))+'</span><div class="field"><input id="fpc" class="fm" inputmode="numeric" maxlength="12" value="'+esc(p.cap||'')+'"></div><span class="mu xs t">'+esc(t('f_p_cap_h'))+'</span></label>'+
+ '<div class="mu sm t">'+esc(t('f_p_color'))+'</div><div class="sw">'+COLORS.map(c=>'<button class="'+(c==p.color?'on':'')+'" style="--c:'+c+'" data-a="fpcol" data-v="'+c+'" aria-label="'+c+'"></button>').join('')+'</div>'+
+ '<div class="sm t" id="err" style="color:var(--er)" hidden></div><div class="g2">'+btn('close',t('f_cancel'))+btn('fpsave',t('f_save'),{p:1})+'</div>'+
+ (p.id?'<div class="g2">'+btn('fparch',t(p.arch?'f_p_resume':'f_p_stop'))+(has?'':btn('fpdel',t('f_p_del'),{d:1,icon:'Trash'}))+'</div>'+(has?'<div class="mu xs t">'+esc(t('f_p_has'))+'</div>':''):''))}
+function closeSheet(){const f=F(),d=S.fd,s=stat(d),x=S.fx,hold=f.parties.filter(p=>p.type=='worker'&&!p.arch&&held(p.id,d)>0).map(p=>p.name);
+ return OV('<h2 class="t" style="margin:0">'+esc(t('f_c_title'))+' · '+esc(fmtDate(d))+'</h2><div class="mu sm t">'+esc(t('f_c_desc'))+'</div>'+(hold.length?'<div class="ban" style="--c:var(--er)"><div class="t sm">'+esc(t('f_c_hold',{names:hold.join('، ')}))+'</div></div>':'')+
+ '<div class="stack" style="gap:8px">'+[...f.set.den].sort((a,b)=>b-a).map(v=>'<div class="row"><b class="ltr" style="min-width:70px">'+num(v)+'</b><div class="field grow"><input class="fcn" data-v="'+v+'" inputmode="numeric" maxlength="6" placeholder="0" aria-label="'+esc(t('f_c_count'))+' '+v+'" value="'+(x.cnt[v]||'')+'"></div><span class="mu sm ltr" id="fcs'+v+'" style="min-width:90px;text-align:end">'+(x.cnt[v]?num(x.cnt[v]*v):'')+'</span></div>').join('')+
+ '<label><span class="mu sm t">'+esc(t('f_c_other'))+'</span><div class="field"><input id="fco" class="fm" inputmode="numeric" maxlength="12" placeholder="0" value="'+esc(x.other||'')+'"></div></label></div>'+
+ '<div class="kp"><div class="row t"><span class="grow mu sm">'+esc(t('f_c_total'))+'</span><b id="fct"></b></div><div class="row t"><span class="grow mu sm">'+esc(t('f_c_theo'))+'</span><b>'+dz(s.theo)+'</b></div><div class="row t"><span class="grow mu sm">'+esc(t('f_diff'))+'</span><b id="fcd"></b></div></div>'+
+ '<div class="g2">'+btn('close',t('f_cancel'))+btn('fclosesave',t('f_c_confirm'),{p:1,icon:'Lock'})+'</div>')}
+function closeSum(){const x=S.fx,s=stat(S.fd);let tot=0;document.querySelectorAll('#layer .fcn').forEach(i=>{const v=+i.dataset.v,n=+i.value||0;x.cnt[v]=n;tot+=n*v;const e=document.getElementById('fcs'+v);if(e)e.textContent=n?num(n*v):''});
+ const o=document.getElementById('fco');x.other=o?o.value:'';tot+=+x.other||0;x.total=tot;const d=tot-s.theo;
+ const a=document.getElementById('fct'),b=document.getElementById('fcd');if(a)a.innerHTML=dz(tot);
+ if(b)b.innerHTML='<span style="color:'+(d?'var(--er)':'var(--ok)')+'">'+(d?(d>0?'+':'')+dz(d)+' · '+esc(t(d>0?'f_c_over':'f_c_short')):esc(t('f_c_ok')))+'</span>'}
+const sheetBox=(k,body,ok,okLabel,danger)=>OV('<h2 class="t" style="margin:0">'+esc(t(k))+'</h2>'+body+'<div class="g2">'+btn('close',t('f_cancel'))+btn(ok,t(okLabel),{d:danger,p:!danger})+'</div>');
+function setupSheet(){const x=S.fx;
+ return OV('<h2 class="t" style="margin:0">'+esc(t('f_su_title'))+'</h2><div class="mu sm t">'+esc(t('f_su_desc'))+'</div>'+
+ '<label><span class="mu sm t">'+esc(t('f_s_office'))+'</span><div class="field"><input id="suo" maxlength="60" value="'+esc(x.office)+'"></div></label>'+
+ '<label><span class="mu sm t">'+esc(t('f_s_start'))+'</span><div class="field"><input id="sus" type="date" value="'+x.start+'"></div></label>'+
+ '<label><span class="mu sm t">'+esc(t('f_s_bal'))+'</span><div class="field"><input id="sub" class="fm" inputmode="numeric" maxlength="12" placeholder="0" value="'+esc(x.bal)+'"></div></label>'+
+ '<label><span class="mu sm t">'+esc(t('f_s_den'))+'</span><div class="field"><input id="sud" inputmode="numeric" value="'+esc(x.den)+'"></div><span class="mu xs t">'+esc(t('f_s_den_h'))+'</span></label>'+
+ '<label><span class="mu sm t">'+esc(t('f_su_n'))+'</span><div class="field"><input id="sun" class="fm" inputmode="numeric" maxlength="2" value="'+esc(x.n)+'"></div></label>'+
+ '<label class="row" style="gap:10px"><input type="checkbox" id="suc"'+(x.central?' checked':'')+'><span class="t">'+esc(t('f_su_central'))+'</span></label><label class="row" style="gap:10px"><input type="checkbox" id="sua"'+(x.atm?' checked':'')+'><span class="t">'+esc(t('f_su_atm'))+'</span></label>'+
+ '<div class="sm t" id="err" style="color:var(--er)" hidden></div>'+btn('fsugo',t('f_su_go'),{p:1}))}
+function auditSheet(){return OV('<h2 class="t" style="margin:0">'+esc(t('f_audit'))+'</h2>'+(F().audit.length?'<div class="stack" style="gap:8px">'+F().audit.slice(0,60).map(a=>'<div class="t sm"><span class="mu xs">'+esc(new Date(a.at).toLocaleString(loc(),{dateStyle:'short',timeStyle:'short'}))+'</span><br>'+esc(a.m)+'</div>').join('')+'</div>':'<div class="mu t">'+esc(t('f_audit_empty'))+'</div>')+btn('close',t('f_done')))}
+Object.assign(SH3,{ftx:txSheet,fparty:partySheet,fclose:closeSheet,fsetup:setupSheet,faudit:auditSheet,
+ ftdel:()=>sheetBox('f_del_tx','<div class="mu sm t">'+esc(t('f_del_tx_d'))+'</div>','ftxdelok','f_del',1),
+ freopen:()=>sheetBox('f_ro_title','<div class="mu sm t">'+esc(t('f_ro_desc'))+'</div>','freopenok','f_reopen'),
+ freset:()=>sheetBox('f_reset','<div class="mu sm t">'+esc(t('f_reset_d'))+'</div>','fresetok','f_del',1)});
+
+// ── actions ──
+const open_=(sheet,ex)=>{S.sheet=sheet;render();if(ex)ex();};
+const showErr=m=>{const e=document.getElementById('err');if(e){e.textContent=t(m);e.hidden=false}};
+const goDay=d=>{S.fd=d;S.fp='day';render()};
+function newTx(dir,pid){const f=F(),a=f.parties.filter(p=>!p.arch);if(!a.length)return;S.fx={id:null,dir,pid:pid||a[0].id,amt:'',note:'',date:S.fd};open_('ftx',()=>{fxPrev();const i=document.getElementById('fxa');i&&i.focus()})}
+function txSave(){fxRead();const x=S.fx,f=F(),a=Math.round(+x.amt||0);
+ if(!x.pid||!P_(x.pid))return showErr('f_err_party');if(!(a>0))return showErr('f_err_amt');if(!x.date||x.date<f.set.start)return showErr('f_err_date');
+ const dc=f.days[x.date];if(dc&&dc.closed)return showErr('f_err_closed');
+ const p=P_(x.pid),m=verb(p,x.dir)+' '+p.name+' '+dzt(a)+' ('+fmtDate(x.date)+')';
+ if(x.id){const o=f.txs.find(y=>y.id==x.id);if(o){Object.assign(o,{pid:x.pid,dir:x.dir,amt:a,note:x.note.trim(),date:x.date});log(t('f_log_tx_edit')+': '+m)}}
+ else{f.txs.push({id:uid(),ts:Date.now(),date:x.date,pid:x.pid,dir:x.dir,amt:a,note:x.note.trim()});log(t('f_log_tx_add')+': '+m)}
+ save();S.fd=x.date;S.sheet=null;S.fx=null;render();toast('f_tx_saved')}
+function partySave(){const p=S.fp2,n=(document.getElementById('fpn').value||'').trim().slice(0,40),c=Math.round(+document.getElementById('fpc').value||0);if(!n)return showErr('f_p_err');
+ const f=F();let id=p.id;if(id){const o=P_(id);Object.assign(o,{name:n,type:p.type,color:p.color,cap:c||0})}else{id=uid();f.parties.push({id,name:n,type:p.type,color:p.color,cap:c||0,arch:false})}
+ log(t('f_log_p')+': '+n);save();toast('f_p_saved');
+ if(p.back&&S.fx){S.fx.pid=id;S.sheet='ftx';render();fxPrev()}else{S.sheet=null;render()}}
+function closeSave(){closeSum();const x=S.fx,f=F(),d=S.fd,s=stat(d);const cnt={};Object.keys(x.cnt).forEach(k=>{if(x.cnt[k])cnt[k]=x.cnt[k]});
+ f.days[d]={closed:true,counted:x.total||0,cnt,other:+x.other||0,at:Date.now()};log(t('f_log_close')+': '+fmtDate(d)+' · '+dzt(x.total||0)+' / '+dzt(s.theo));save();S.sheet=null;S.fx=null;render();toast('f_c_done')}
+function setSave(){const f=F(),g=id=>document.getElementById(id).value,den=g('sfd').split(/[,\s;،]+/).map(v=>+v).filter(v=>v>0);
+ if(!den.length||den.some(v=>!Number.isInteger(v)))return showErr('f_s_den_err');const st=g('sfs');if(!st)return showErr('f_err_date');
+ f.set.office=g('sfo').trim();f.set.den=[...new Set(den)].sort((a,b)=>b-a);f.set.start=st;f.set.bal=Math.round(+g('sfb')||0);log(t('f_log_set'));save();render();toast('f_s_saved')}
+function suGo(){const g=id=>document.getElementById(id),den=g('sud').value.split(/[,\s;،]+/).map(v=>+v).filter(v=>v>0);
+ if(!den.length)return showErr('f_s_den_err');if(!g('sus').value)return showErr('f_err_date');
+ const f=F();f.set={office:g('suo').value.trim(),den:[...new Set(den)].sort((a,b)=>b-a),start:g('sus').value,bal:Math.round(+g('sub').value||0)};
+ f.parties=[];const n=Math.min(20,+g('sun').value||0);let i=0;
+ if(g('suc').checked)f.parties.push({id:uid(),name:t('f_n_central'),type:'central',color:COLORS[0],cap:0,arch:false});
+ if(g('sua').checked)f.parties.push({id:uid(),name:t('f_n_atm'),type:'atm',color:COLORS[4],cap:0,arch:false});
+ for(i=1;i<=n;i++)f.parties.push({id:uid(),name:t('f_n_worker',{n:i}),type:'worker',color:COLORS[(i+1)%COLORS.length],cap:0,arch:false});
+ log(t('f_log_set'));save();S.fd=today()<f.set.start?f.set.start:today();S.sheet=null;S.fx=null;render();toast('f_s_saved')}
+function csvOut(){const f=F(),r=range(),q=v=>'"'+String(v).replace(/"/g,'""')+'"',rows=[['f_col_date','f_col_open','f_col_in','f_col_out','f_col_theo','f_col_cnt','f_col_diff','f_col_st'].map(k=>q(t(k))).join(';')];
+ for(let k=r.from;k<=r.to;k=addD(k,1)){if(!(f.txs.some(x=>x.date==k)||(f.days[k]&&f.days[k].closed)))continue;const s=stat(k);rows.push([fmtDate(k),s.o,s.inn,s.out,s.theo,s.closed?s.counted:'',s.closed?s.diff:'',t(s.closed?'f_st_closed':'f_st_open')].join(';'))}
+ deliver(new Blob(['﻿'+rows.join('\n')],{type:'text/csv'}),'caisse-'+r.from+'_'+r.to+'.csv').then(ok=>toast(ok?'saved':'err_save'))}
+function printDay(d){const f=F(),s=stat(d),th=k=>'<th>'+esc(t(k))+'</th>',P=document.getElementById('prt');P.dir=S.lang=='ar'?'rtl':'ltr';
+ const rows=f.parties.filter(p=>!p.arch||s.T.some(x=>x.pid==p.id)).map(p=>{const g=s.T.filter(x=>x.pid==p.id&&x.dir=='out').reduce((a,x)=>a+x.amt,0),r=s.T.filter(x=>x.pid==p.id&&x.dir=='in').reduce((a,x)=>a+x.amt,0);return '<tr><td style="text-align:start">'+esc(p.name)+'</td><td>'+(g?num(g):'')+'</td><td>'+(r?num(r):'')+'</td><td>'+num(held(p.id,d))+'</td></tr>'}).join('');
+ const kv=[[t('f_opening'),dzt(s.o)],[t('f_recv'),dzt(s.inn)],[t('f_given'),dzt(s.out)],[t('f_theo'),dzt(s.theo)]].concat(s.closed?[[t('f_counted'),dzt(s.counted)],[t('f_diff'),(s.diff>0?'+':'')+dzt(s.diff)]]:[]);
+ P.innerHTML='<h1>'+esc(f.set.office||t('f_title'))+'</h1><div class="pm">'+esc(t('f_pr_title'))+' — '+esc(wday(d))+' '+esc(fmtDate(d))+' · '+esc(t(s.closed?'f_st_closed':'f_st_open'))+'</div>'+
+ '<div class="tw sm0 fz" style="margin-top:12px;direction:'+(S.lang=='ar'?'rtl':'ltr')+'"><table class="tb"><tbody>'+kv.map(([k,v])=>'<tr><td style="text-align:start">'+esc(k)+'</td><td>'+esc(v)+'</td></tr>').join('')+'</tbody></table></div>'+
+ '<h2 style="margin:16px 0 6px;font-size:15px">'+esc(t('f_pos'))+'</h2><div class="tw sm0"><table class="tb"><thead><tr>'+['f_col_party','f_col_given','f_col_recv','f_col_net'].map(th).join('')+'</tr></thead><tbody>'+rows+'</tbody></table></div>'+
+ '<h2 style="margin:16px 0 6px;font-size:15px">'+esc(t('f_txs'))+'</h2><div class="tw sm0"><table class="tb"><tbody>'+[...s.T].sort((a,b)=>a.ts-b.ts).map(x=>{const p=P_(x.pid);return '<tr><td style="text-align:start">'+esc(verb(p,x.dir)+' '+(p?p.name:'?'))+(x.note?' — '+esc(x.note):'')+'</td><td>'+(x.dir=='in'?'+':'−')+' '+num(x.amt)+'</td></tr>'}).join('')+'</tbody></table></div>'+
+ (s.closed&&s.c.cnt?'<div style="margin-top:10px">'+esc(t('f_c_notes'))+': '+Object.keys(s.c.cnt).sort((a,b)=>b-a).map(k=>num(+k)+'×'+s.c.cnt[k]).join(' · ')+(s.c.other?' · '+num(s.c.other):'')+'</div>':'')+
+ '<div style="display:flex;justify-content:space-between;margin-top:50px"><div>'+esc(t('f_pr_sign'))+'<br><br>________________</div><div class="pm">'+esc(t('f_pr_gen'))+' '+esc(new Date().toLocaleString(loc()))+'</div></div>';
+ setTimeout(()=>window.print(),80)}
+function backupOut(){deliver(new Blob([JSON.stringify({app:'req-fin',...F()})],{type:'application/json'}),'cash-backup-'+today()+'.json').then(ok=>toast(ok?'saved':'err_save'))}
+const ff=document.createElement('input');ff.type='file';ff.accept='.json,application/json';ff.hidden=true;document.body.appendChild(ff);
+ff.addEventListener('change',async e=>{const fl=e.target.files[0];e.target.value='';if(!fl)return;try{const j=JSON.parse(await fl.text());if(!j||!j.set||!Array.isArray(j.txs)||!Array.isArray(j.parties))throw 0;delete j.app;FC=j;FN=NS;log(t('f_log_imp'));save();render();toast('f_imp_ok')}catch(err){toast('f_imp_err')}});
+
+window.actF=function(a,el){const d=el.dataset;if(a[0]!='f')return 0;
+ switch(a){
+ case'fin':S.fp='day';S.fd=today();go(2);return 1;
+ case'ftab':S.fp=d.v;render();return 1;
+ case'fprev':goDay(addD(S.fd,-1));return 1;case'fnext':goDay(addD(S.fd,1));return 1;case'ftoday':goDay(today());return 1;case'fgo':goDay(d.d);return 1;
+ case'fsetup':S.fx={office:'',start:today(),bal:'',den:F().set.den.join(','),n:'2',central:true,atm:true};open_('fsetup');return 1;
+ case'fsugo':suGo();return 1;
+ case'ftxnew':newTx(d.dir);return 1;
+ case'ftxedit':{const x=F().txs.find(y=>y.id==d.id);if(x){S.fx={id:x.id,dir:x.dir,pid:x.pid,amt:String(x.amt),note:x.note||'',date:x.date};open_('ftx',fxPrev)}return 1}
+ case'fdir':fxRead();S.fx.dir=d.v;render();fxPrev();return 1;
+ case'ftxsave':txSave();return 1;
+ case'ftxdel':S.fx={id:d.id};open_('ftdel');return 1;
+ case'ftxdelok':{const f=F(),x=f.txs.find(y=>y.id==S.fx.id);if(x){const p=P_(x.pid);log(t('f_log_tx_del')+': '+verb(p,x.dir)+' '+(p?p.name:'')+' '+dzt(x.amt)+' ('+fmtDate(x.date)+')');f.txs=f.txs.filter(y=>y!==x);save()}S.sheet=null;S.fx=null;render();toast('f_deleted');return 1}
+ case'fpnew':S.fp2={id:null,name:'',type:'worker',color:COLORS[F().parties.length%COLORS.length],cap:0};open_('fparty');return 1;
+ case'fnewp':fxRead();S.fp2={id:null,name:'',type:'worker',color:COLORS[F().parties.length%COLORS.length],cap:0,back:1};open_('fparty');return 1;
+ case'fpedit':{const p=P_(d.id);if(p){S.fp2={...p};open_('fparty')}return 1}
+ case'fptype':S.fp2.name=document.getElementById('fpn').value;S.fp2.cap=document.getElementById('fpc').value;S.fp2.type=d.v;render();return 1;
+ case'fpcol':S.fp2.name=document.getElementById('fpn').value;S.fp2.cap=document.getElementById('fpc').value;S.fp2.color=d.v;render();return 1;
+ case'fpsave':partySave();return 1;
+ case'fparch':{const p=P_(S.fp2.id);if(p){p.arch=!p.arch;log(t('f_log_p')+': '+p.name);save()}S.sheet=null;render();return 1}
+ case'fpdel':{const f=F();f.parties=f.parties.filter(p=>p.id!=S.fp2.id);save();S.sheet=null;render();toast('f_deleted');return 1}
+ case'fclose':S.fx={cnt:{},other:'',total:0};open_('fclose',closeSum);return 1;
+ case'fclosesave':closeSave();return 1;
+ case'freopen':open_('freopen');return 1;
+ case'freopenok':{const f=F();if(f.days[S.fd]){f.days[S.fd].closed=false;log(t('f_log_reopen')+': '+fmtDate(S.fd));save()}S.sheet=null;render();toast('f_ro_ok');return 1}
+ case'fhprint':printDay(S.fd);return 1;case'fcsv':csvOut();return 1;
+ case'fsetsave':setSave();return 1;case'fbak':backupOut();return 1;case'frest':ff.click();return 1;
+ case'faudit':open_('faudit');return 1;case'freset':open_('freset');return 1;
+ case'fresetok':FC=DEF();FN=NS;save();S.sheet=null;S.fd=today();render();toast('f_reset_ok');return 1}
+ return 0};
+
+// ── inputs ──
+document.addEventListener('input',ev=>{const el=ev.target;
+ if(el.classList.contains('fm')){el.value=el.value.replace(/\D/g,'').slice(0,12);if(el.id=='fxa')fxPrev();if(el.id=='fco')closeSum()}
+ else if(el.classList.contains('fcn')){el.value=el.value.replace(/\D/g,'').slice(0,6);closeSum()}
+ else if(el.id=='fxd')fxPrev();else if(el.id=='fxp')fxPrev();
+ const e=document.getElementById('err');if(e&&S.sheet)e.hidden=true});
+document.addEventListener('change',ev=>{const el=ev.target;
+ if(el.id=='fdate'&&el.value){S.fd=el.value<F().set.start?F().set.start:el.value;render()}
+ else if(el.id=='fhf'||el.id=='fht'){const r=range();if(el.value){r[el.id=='fhf'?'from':'to']=el.value;if(r.from>r.to){if(el.id=='fhf')r.to=r.from;else r.from=r.to}render()}}});
+document.addEventListener('keydown',ev=>{if(ev.key!='Enter')return;const el=ev.target;
+ if(S.sheet=='ftx'&&(el.id=='fxa'||el.id=='fxn'))txSave();else if(S.sheet=='fparty'&&el.id=='fpn')partySave();else if(S.sheet=='fclose'&&(el.classList.contains('fcn')||el.id=='fco'))closeSave()});
+render();
+})();
+</script>
 <script type="module">
 import {initializeApp,deleteApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import {getAuth,GoogleAuthProvider,signInWithPopup,signOut,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-import {getFirestore,doc,getDoc,getDocs,collection,writeBatch,query,where,orderBy,limit} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-import {getFunctions,httpsCallable} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-functions.js";
+import {getFirestore,doc,getDoc,getDocs,collection,writeBatch} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 const cfg={apiKey:"AIzaSyC3MMC-7dGU3ztshP0mYUWrV_c1Zm8njoc",authDomain:"youyou-f869f.firebaseapp.com",projectId:"youyou-f869f",storageBucket:"youyou-f869f.firebasestorage.app",messagingSenderId:"185167516974",appId:"1:185167516974:web:6d44fc5c98e63b554696bf"};
 // every signed-in account has its own app: separate Auth session, separate Firestore connection
 const apps={};
 function get(slot){if(apps[slot])return apps[slot];const app=slot=='[DEFAULT]'?initializeApp(cfg):initializeApp(cfg,slot);return apps[slot]={app,auth:getAuth(app),db:getFirestore(app)}}
-const REGION="europe-west1"; // must match functions/index.js
-const pl=o=>{if(o==null)return o;if(typeof o.toMillis=='function')return o.toMillis();if(Array.isArray(o))return o.map(pl);if(typeof o=='object'){const r={};for(const k in o)r[k]=pl(o[k]);return r}return o};
-const rows=q=>q.docs.map(d=>({id:d.id,...pl(d.data())}));
 window.FB={
- async call(slot,name,data){const fn=httpsCallable(getFunctions(get(slot).app,REGION),name);return (await fn(data)).data},
- // read-only data about this user; rules guarantee nobody can read another user's documents. undefined = that read failed.
- async reads(slot,uid){const db=get(slot).db,ok=(r,f)=>r.status=='fulfilled'?f(r.value):undefined,
-  [sub,set,plans,reqs,hist,nt]=await Promise.allSettled([getDoc(doc(db,'subscriptions',uid)),getDoc(doc(db,'adminSettings','global')),
-   getDocs(query(collection(db,'plans'),where('active','==',true))),getDocs(query(collection(db,'paymentRequests'),where('uid','==',uid))),
-   getDocs(query(collection(db,'paymentHistory'),where('uid','==',uid))),getDocs(query(collection(db,'notifications',uid,'items'),orderBy('createdAt','desc'),limit(30)))]);
-  return{sub:ok(sub,s=>s.exists()?pl(s.data()):null),set:ok(set,s=>s.exists()?pl(s.data()):null),plans:ok(plans,rows),reqs:ok(reqs,rows),hist:ok(hist,rows),notifs:ok(nt,rows)}},
- async markRead(slot,uid,ids){const db=get(slot).db,b=writeBatch(db);ids.forEach(i=>b.update(doc(db,'notifications',uid,'items',i),{read:true}));await b.commit()},
  user:slot=>new Promise(res=>{const a=get(slot),un=onAuthStateChanged(a.auth,u=>{un();res(u)},()=>res(null))}),
  async add(){const slot='a'+Date.now().toString(36),a=get(slot),p=new GoogleAuthProvider();p.setCustomParameters({prompt:'select_account'});
   try{const c=await signInWithPopup(a.auth,p);return{slot,user:c.user}}catch(e){await FB.drop(slot,false);throw e}},
