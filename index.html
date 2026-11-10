@@ -317,8 +317,8 @@ function banner(kind,title,desc,act){const c={RUN:'var(--pr)',INFO:'var(--pr)',E
 const btn=(a,label,o={})=>'<button class="btn '+(o.p?'p':'')+(o.d?'d':'')+'" data-a="'+a+'"'+(o.dis?' disabled':'')+'>'+(o.load?'<span class="spin"></span>':o.icon?ic(o.icon):'')+'<span class="t">'+esc(label)+'</span></button>';
 const copyBtn=v=>'<button class="ib" data-a="copy" data-v="'+v+'" title="'+esc(t('copy_total'))+'" aria-label="'+esc(t('copy_total'))+'">'+ic('Copy')+'</button>';
 // ── views ──
-function header(){const back=(S.screen==1&&S.entries.length)||S.screen==2||S.screen==3,cd=curDoc();
- return '<header>'+(back?'<button class="ib" data-a="back" aria-label="'+esc(t('back'))+'" title="'+esc(t('back'))+'">'+ic('Back')+'</button>':'')+'<div class="logo">'+ic('Calc')+'</div><div class="grow"><h1 class="t">'+esc(S.screen==3?t('sp_title'):S.screen==2?t('f_title'):back&&cd?cd.name:t('name'))+'</h1><div class="mu sm t">'+esc(S.screen==3?t('sp_sub'):S.screen==2?t('f_sub'):back?t('results'):t('tagline'))+'</div></div><button class="ib" data-a="theme" aria-label="'+esc(t(isDark()?'theme_light':'theme_dark'))+'" title="'+esc(t(isDark()?'theme_light':'theme_dark'))+'">'+ic(isDark()?'Sun':'Moon')+'</button><button class="ib" data-a="lang" aria-label="'+esc(t('language'))+'" title="'+esc(t('language'))+'">'+ic('Globe')+'</button>'+acctBtn()+'</header>'}
+function header(){const back=(S.screen==1&&S.entries.length)||S.screen==2||S.screen==3||S.screen==4,cd=curDoc();
+ return '<header>'+(back?'<button class="ib" data-a="back" aria-label="'+esc(t('back'))+'" title="'+esc(t('back'))+'">'+ic('Back')+'</button>':'')+'<div class="logo">'+ic('Calc')+'</div><div class="grow"><h1 class="t">'+esc(S.screen==4?t('ac_title'):S.screen==3?t('sp_title'):S.screen==2?t('f_title'):back&&cd?cd.name:t('name'))+'</h1><div class="mu sm t">'+esc(S.screen==4?t('ac_sub'):S.screen==3?t('sp_sub'):S.screen==2?t('f_sub'):back?t('results'):t('tagline'))+'</div></div><button class="ib" data-a="theme" aria-label="'+esc(t(isDark()?'theme_light':'theme_dark'))+'" title="'+esc(t(isDark()?'theme_light':'theme_dark'))+'">'+ic(isDark()?'Sun':'Moon')+'</button><button class="ib" data-a="lang" aria-label="'+esc(t('language'))+'" title="'+esc(t('language'))+'">'+ic('Globe')+'</button>'+acctBtn()+'</header>'}
 function acctBtn(){if(!S.fb)return'';if(!S.user)return'<button class="chip on" data-a="login">'+esc(t('signin'))+'</button>';
  const u=S.user;return'<button class="ib av" data-a="acct" aria-label="'+esc(t('account'))+'" title="'+esc(u.email)+'">'+(u.photo?'<img src="'+esc(u.photo)+'" alt="" referrerpolicy="no-referrer">':esc((u.name||u.email||'?').charAt(0).toUpperCase()))+'</button>'}
 const fid=d=>S.folders.some(f=>f.id===d.folder)?d.folder:null;
@@ -339,7 +339,7 @@ function home(){if(S.fol&&!S.folders.some(f=>f.id===S.fol))S.fol=null;const has=
  else if(S.homeInfo)h+=banner('OK',t('imported',{n:S.homeInfo.ok}),S.homeInfo.skipped.length?t('skipped',{names:S.homeInfo.skipped.join(', ')}):'');
  h+='<div class="card"><div class="row"><div class="tile">'+ic('Upload')+'</div><div class="grow t"><h2>'+esc(t('import_title'))+'</h2><div class="mu sm">'+esc(t('import_desc'))+'</div></div></div>'+
  '<div class="drop t" id="drop">'+esc(t('drop'))+btn('pick',t('choose_file'),{p:1,icon:'Upload',dis:S.busy,load:S.busy})+'</div></div>';
- h+=(typeof finCard=='function'?finCard():'')+(window.stmCard?stmCard():'')+toolsCard();if(has)h+='<section class="card">'+secHead()+
+ h+=(typeof finCard=='function'?finCard():'')+(window.stmCard?stmCard():'')+(window.accCard?accCard():'')+toolsCard();if(has)h+='<section class="card">'+secHead()+
   '<label class="field" style="margin-top:14px">'+ic('Search')+'<input id="dq" type="search" value="'+esc(S.dq)+'" placeholder="'+esc(t('docs_search'))+'" aria-label="'+esc(t('docs_search'))+'"></label><div class="list" id="dlist" style="margin-top:14px"></div></section>';
  return h+'</div>'+selBar()}
 function docCard(d){const s=summarize(d.entries),dt=new Date(d.ts).toLocaleString(S.lang=='ar'?'ar-u-nu-latn':S.lang,{dateStyle:'medium',timeStyle:'short'}),id=esc(d.id),on=S.ids.has(d.id),fo=S.folders.find(f=>f.id===fid(d)),tc=fo?col(fo.color):'var(--pr)';
@@ -370,7 +370,7 @@ function list(){const q=S.q.trim(),sh=S.entries.map((e,i)=>[e,i]).filter(([e])=>
  $('#list').innerHTML=sh.length?sh.map(([e,i])=>entry(e,i)).join(''):'<div class="card empty t"><p class="mu" style="margin-top:0">'+esc(t('empty_filter'))+'</p>'+btn('clear',t('clear_filters'))+'</div>'}
 function render(){document.documentElement.lang=S.lang;document.title=t('name');
  const res=S.screen==1&&S.entries.length;
- $('#app').innerHTML=header()+(res?results():S.screen==3&&window.stmPage?stmPage():S.screen==2&&typeof finPage=='function'?finPage():home());
+ $('#app').innerHTML=header()+(res?results():S.screen==4&&window.accPage?accPage():S.screen==3&&window.stmPage?stmPage():S.screen==2&&typeof finPage=='function'?finPage():home());
  if(res){filters();list()}else dlist();
  const L=$('#layer');
  if(S.sheet=='lang')L.innerHTML='<div class="ov" data-a="close"><div class="sheet" role="dialog" aria-modal="true"><h2 class="t" style="margin:0">'+esc(t('language'))+'</h2>'+LANGS.map(([c,n])=>'<button class="lang '+(c==S.lang?'on':'')+'" data-a="setlang" data-v="'+c+'"><span>'+n+'</span>'+(c==S.lang?ic('Check'):'')+'</button>').join('')+'</div></div>';
@@ -452,7 +452,7 @@ function act2(a,el){const d=el.dataset;
  if(a=='mv'){moveSel(d.v||null);return 1}
  if(a=='bdel'){S.sheet='bdel';render();return 1}
  if(a=='confirmbdel'){delSel();return 1}
- if(act3(a,el)||(typeof actF=='function'&&actF(a,el))||(window.actP&&actP(a,el)))return 1
+ if(act3(a,el)||(typeof actF=='function'&&actF(a,el))||(window.actP&&actP(a,el))||(window.actA&&actA(a,el)))return 1
  return 0}
 // long-press on a document starts selection
 let lp,lpF=false;
@@ -1170,6 +1170,89 @@ window.actP=function(a,el){if(a.slice(0,3)!='sp_')return 0;const d=el.dataset,g=
 document.addEventListener('input',ev=>{const el=ev.target,c=el.classList;if(c.contains('spq')||c.contains('spo')){el.value=el.value.replace(/\D/g,'').slice(0,7);if(c.contains('spq'))pv()}else if(el.id=='spd')pv()});
 document.addEventListener('change',ev=>{const el=ev.target;if(el.id=='spdt'&&el.value){S.sd=el.value<G().start?G().start:el.value;render()}else if(el.id=='spm'&&el.value){S.sm=el.value;render()}});
 document.addEventListener('keydown',ev=>{if(ev.key!='Enter'||S.sheet!='sp_tx'||!ev.target.classList.contains('spq'))return;ev.preventDefault();const l=[...document.querySelectorAll('#layer .spq')],i=l.indexOf(ev.target);if(i<l.length-1)l[i+1].focus();else txSave()});
+render();
+})();
+</script>
+<style>
+.ac{width:104px;min-width:0;border:1px solid transparent;background:var(--in);border-radius:8px;padding:6px 8px;text-align:end;font:inherit;color:inherit;font-variant-numeric:tabular-nums}
+.ac:focus{outline:0;border-color:var(--pr)}.ac::placeholder{color:var(--mu);opacity:.55}
+.tb tr.ft td{background:var(--in);font-weight:700}
+</style>
+<script>
+// ════════ Office accounting: monthly books (recettes / dépenses / CH60 / DAB), local storage ════════
+(function(){
+DK.push('acc');
+Object.assign(D.ar,{ac_title:'محاسبة المكتب',ac_sub:'الإيرادات والمصاريف وCH60 والموزع',ac_card:'دفاتر شهرية للإيرادات والمصاريف (الميزانية والسلاسل A وB وC) وحركة CH60 والموزع الآلي، بمجاميع نصف الشهر والتراكم.',ac_go:'فتح المحاسبة',ac_rec:'الإيرادات',ac_dep:'المصاريف',ac_ch:'CH60',ac_gab:'الموزع الآلي',ac_bud:'الميزانية',ac_ser:'السلسلة',ac_recap:'الملخص',ac_day:'اليوم',ac_q1:'مجموع النصف الأول',ac_q2:'مجموع النصف الثاني',ac_mt:'مجموع الشهر',ac_ant:'السابق',ac_cum:'التراكم',ac_exc:'فائض محاسبي',ac_trec:'مجموع الإيرادات',ac_cr:'دائن',ac_db:'مدين',ac_bil:'الحصيلة',ac_san:'الرصيد السابق',ac_rest:'الباقي',ac_chq:'شيك مصدّق',ac_ext:'الكشف',ac_chg:'تعبئة',ac_dec:'سحب',ac_gcr:'استهلاك الموزع',ac_ops:'عدد العمليات',ac_adv:'الرصيد',ac_open:'رصيد بداية الشهر',ac_xl:'تصدير Excel',ac_hint:'اكتب الأرقام مباشرة، ويمكن الجمع هكذا: 3478300+1605000. الخانات الفارغة في «السابق» و«رصيد بداية الشهر» تؤخذ تلقائيًا من الشهر السابق. البيانات محفوظة على هذا الجهاز فقط.'});
+Object.assign(D.fr,{ac_title:'Comptabilité du bureau',ac_sub:'Recettes, dépenses, CH60 et DAB',ac_card:'Registres mensuels des recettes et dépenses (budgétaires, séries A, B, C), mouvement CH60 et DAB, avec totaux par quinzaine et cumul.',ac_go:'Ouvrir la comptabilité',ac_rec:'Recettes',ac_dep:'Dépenses',ac_ch:'CH60',ac_gab:'DAB',ac_bud:'Budgétaires',ac_ser:'Série',ac_recap:'Récapitulatif',ac_day:'Jour',ac_q1:'Total 1re quinzaine',ac_q2:'Total 2e quinzaine',ac_mt:'Total du mois',ac_ant:'Antérieur',ac_cum:'Cumul',ac_exc:'Excédent comptable',ac_trec:'Total recettes',ac_cr:'Crédit',ac_db:'Débit',ac_bil:'Bilan',ac_san:'Solde antérieur',ac_rest:'Reste',ac_chq:'Chèque certifié',ac_ext:'Extrait',ac_chg:'Chargement',ac_dec:'Décaissement',ac_gcr:'Crédit GAB',ac_ops:"N° d'opérations",ac_adv:'Avance GAB',ac_open:'Solde de début de mois',ac_xl:'Exporter Excel',ac_hint:'Saisissez les montants directement ; les sommes sont permises : 3478300+1605000. Les cases vides de « Antérieur » et du solde de début de mois reprennent le mois précédent. Données enregistrées sur cet appareil uniquement.'});
+Object.assign(D.en,{ac_title:'Office accounting',ac_sub:'Receipts, expenses, CH60 and ATM',ac_card:'Monthly books for receipts and expenses (budget, series A, B, C), CH60 movement and ATM, with half-month totals and running totals.',ac_go:'Open accounting',ac_rec:'Receipts',ac_dep:'Expenses',ac_ch:'CH60',ac_gab:'ATM',ac_bud:'Budget',ac_ser:'Series',ac_recap:'Summary',ac_day:'Day',ac_q1:'1st half total',ac_q2:'2nd half total',ac_mt:'Month total',ac_ant:'Previous',ac_cum:'Cumulative',ac_exc:'Accounting surplus',ac_trec:'Total receipts',ac_cr:'Credit',ac_db:'Debit',ac_bil:'Balance',ac_san:'Previous balance',ac_rest:'Remaining',ac_chq:'Certified cheque',ac_ext:'Statement',ac_chg:'Loading',ac_dec:'Withdrawal',ac_gcr:'ATM credit',ac_ops:'Operations',ac_adv:'ATM advance',ac_open:'Opening balance of the month',ac_xl:'Export Excel',ac_hint:'Type amounts directly; sums are allowed: 3478300+1605000. Empty “Previous” and opening cells are taken from the previous month. Data is stored on this device only.'});
+const BC=[['tp','TP','700.11'],['bp','BP','700.3'],['tel','TELEGRAMME','702.6'],['a21','ART 21','704.11'],['a23','ART 23','704.3'],['col','COLIS','704,11,1'],['h','','700,12,6'],['i','','700,12,5']];
+const SCH={rec:{BUD:BC,A:[['cnep','versement cnep','4106,6,2'],['afs','Paiement AFS','4154.1']],
+B:[['tef','tef','4140.1'],['haw','hawalatic','4140.4'],['dec','apr deces','4154.3'],['afs','afs','4154.1'],['car','carte auto','4140.4'],['hp','haw pay','4140.5']],
+C:[['grp','group','5742'],['tft','tf/ta','428.56'],['cc','ch60 credit','0960,9,0'],['cd','ch60 debit','0960,9,1'],['tfr','tf/ta recu','0960,7,0'],['tax','taxe recu','0560,0,1'],['fig','figurine recu','428.52'],['vig','vignette recu','0960,5,0'],['vv','vente vignette','428.55'],['ex','exedent','4157']]},
+dep:{BUD:BC,A:[['cnep','rmb cnep','4003,3,1'],['afs','afs','4154.1']],
+B:[['tef','tef','4140.2'],['vig','vignette','0560,5,2'],['tft','tf/ta','0560,7,2'],['tp','tp/tt','0560,0,3'],['vr','vgnt retoure','0960,5,1'],['dec','apres deces','4154.3'],['grp','groupe','5742.1'],['app','app','5742'],['rem','remis','4159.22']],
+C:[['chc','ch certifier','428.52'],['rv','remise vignette','4159.21'],['rt','remise tf/ta','4159.22'],['app','appurment','5742'],['cr','credit','0960,9,0'],['db','debit','0960,9,1']]}};
+const RC={rec:['BUD','A','B','C'],dep:['A','B','C']},SL={L:'l',A:'a',C:'c',G:'g',O:'o'};
+const CR=['pav','afs','gab'],DB=['onfd','car','vac','seal','son','app'],CI=[...CR,...DB,'cs'],CH=['pav','afs','gab','onfd','carte auto','vac','seal','sonelgaz','appurment'],GI=['chg','dec','crd','remo','ops'];
+const pad=n=>String(n).padStart(2,'0'),curM=()=>{const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)};
+const dim=m=>new Date(+m.slice(0,4),+m.slice(5,7),0).getDate(),pm=m=>{const k=+m.slice(5,7);return k>1?m.slice(0,4)+'-'+pad(k-1):null};
+const pv=s=>s==null||s===''?0:String(s).split('+').reduce((a,p)=>a+(parseFloat(p.replace(',','.'))||0),0);
+let X=null,XN=null;const G=()=>{if(!X||XN!==NS){XN=NS;try{X=JSON.parse(sget('acc'))||{}}catch(e){X={}}X.m=X.m||{}}return X};
+const E={l:{},a:{},c:{},g:{},o:{}},R=m=>G().m[m]||E,W=m=>G().m[m]||(G().m[m]={l:{},a:{},c:{},g:{},o:{}}),sv=()=>sset('acc',JSON.stringify(G()));
+const dayV=(m,b,s,c,d)=>pv(R(m).l[b+'|'+s+'|'+c+'|'+d]);
+const tot=(m,b,s,c,a,z)=>{let q=0;for(let d=a;d<=z;d++)q+=dayV(m,b,s,c,d);return q};
+const ant=(m,b,s,c)=>{const o=R(m).a[b+'|'+s+'|'+c];if(o!=null&&o!=='')return pv(o);const p=pm(m);return p?cum(p,b,s,c):0};
+const cum=(m,b,s,c)=>ant(m,b,s,c)+tot(m,b,s,c,1,dim(m));
+function chRows(m){const r=R(m),n=dim(m),o=[];let p=chOpen(m),cs=0;for(let d=1;d<=n;d++){const g=c=>pv(r.c[d+'|'+c]),cr=CR.reduce((a,c)=>a+g(c),0),db=DB.reduce((a,c)=>a+g(c),0),rs=p+cr-db;cs+=g('cs');o.push({d,cr,db,b:cr-db,a:p,r:rs,x:rs+cs});p=rs}return o}
+const chOpen=m=>{const v=R(m).o.ch;if(v!=null&&v!=='')return pv(v);const q=pm(m);return q?chRows(q)[dim(q)-1].r:0};
+function gRows(m){const r=R(m),n=dim(m),o=[];let p=gOpen(m);for(let d=1;d<=n;d++){const g=c=>pv(r.g[d+'|'+c]),rs=p+g('chg')-g('dec')-g('crd')+g('remo');o.push({d,a:p,r:rs});p=rs}return o}
+const gOpen=m=>{const v=R(m).o.gab;if(v!=null&&v!=='')return pv(v);const q=pm(m);return q?gRows(q)[dim(q)-1].r:0};
+let MAP={};
+const fm=(v,z)=>v||z?amt(v):'',cell=(k,v,z)=>{MAP[k]=v;return '<td data-c="'+k+'" data-z="'+(z?1:0)+'">'+fm(v,z)+'</td>'};
+const ib=(ty,k,v,ph)=>'<input class="ac" data-t="'+ty+'" data-k="'+k+'" inputmode="decimal" value="'+esc(v==null?'':v)+'"'+(ph!=null&&ph!==''?' placeholder="'+esc(ph)+'"':'')+'>';
+const inp=(ty,k,v,ph)=>'<td>'+ib(ty,k,v,ph)+'</td>',tr=(c,cls)=>'<tr'+(cls?' class="'+cls+'"':'')+'>'+c+'</tr>',lb=l=>'<td style="text-align:start">'+esc(l)+'</td>';
+const th=(a,top)=>a.map(x=>'<th'+(top?' style="top:38px"':'')+'>'+esc(x)+'</th>').join('');
+const sl=s=>s=='BUD'?t('ac_bud'):s=='R'?t('ac_recap'):t('ac_ser')+' '+s;
+function ledV(b,s,m){const cs=SCH[b][s],n=dim(m),r=R(m),K=c=>b+'|'+s+'|'+c;
+ const sub=(l,a,z,k)=>tr(lb(l)+cs.map(c=>cell(k+'|'+c[0],tot(m,b,s,c[0],a,z),1)).join('')+cell(k+'|T',cs.reduce((q,c)=>q+tot(m,b,s,c[0],a,z),0),1),'ft');
+ let h='<thead>'+tr(th(['',...cs.map(c=>c[2]),''])+'')+tr(th([t('ac_day'),...cs.map(c=>c[1]),t('tot')],1))+'</thead><tbody>';
+ for(let d=1;d<=n;d++){h+=tr('<td>'+d+'</td>'+cs.map(c=>inp('L',K(c[0])+'|'+d,r.l[K(c[0])+'|'+d])).join('')+cell('r|'+d,cs.reduce((q,c)=>q+dayV(m,b,s,c[0],d),0)));if(d==15)h+=sub(t('ac_q1'),1,15,'q1')}
+ h+=sub(t('ac_q2'),16,n,'q2')+sub(t('ac_mt'),1,n,'mt')+tr(lb(t('ac_ant'))+cs.map(c=>inp('A',K(c[0]),r.a[K(c[0])],amt(ant(m,b,s,c[0])))).join('')+cell('an|T',cs.reduce((q,c)=>q+ant(m,b,s,c[0]),0),1))+
+ tr(lb(t('ac_cum'))+cs.map(c=>cell('cu|'+c[0],cum(m,b,s,c[0]),1)).join('')+cell('cu|T',cs.reduce((q,c)=>q+cum(m,b,s,c[0]),0),1),'ft');
+ return h+'</tbody>'}
+function recV(b,m){const ss=RC[b],r=R(m),n=dim(m),sT=(s,a,z)=>SCH[b][s].reduce((q,c)=>q+tot(m,b,s,c[0],a,z),0),sA=s=>SCH[b][s].reduce((q,c)=>q+ant(m,b,s,c[0]),0),sd=(s,d)=>SCH[b][s].reduce((q,c)=>q+dayV(m,b,s,c[0],d),0);
+ const sub=(l,k,f,cl)=>tr(lb(l)+ss.map(s=>cell(k+'|'+s,f(s),1)).join('')+cell(k+'|T',ss.reduce((q,s)=>q+f(s),0),1),cl);
+ let h='<thead>'+tr(th([t('ac_day'),...ss.map(sl),t('tot')]))+'</thead><tbody>';
+ for(let d=1;d<=n;d++){h+=tr('<td>'+d+'</td>'+ss.map(s=>cell('d|'+s+'|'+d,sd(s,d))).join('')+cell('d|T|'+d,ss.reduce((q,s)=>q+sd(s,d),0)));if(d==15)h+=sub(t('ac_q1'),'q1',s=>sT(s,1,15),'ft')}
+ h+=sub(t('ac_q2'),'q2',s=>sT(s,16,n),'ft')+sub(t('ac_mt'),'mt',s=>sT(s,1,n),'ft')+sub(t('ac_ant'),'an',sA)+sub(t('ac_cum'),'cu',s=>sA(s)+sT(s,1,n),'ft');
+ if(b=='rec'){const c=ss.reduce((q,s)=>q+sA(s)+sT(s,1,n),0);h+=tr(lb(t('ac_exc'))+'<td colspan="'+(ss.length+1)+'" style="text-align:start">'+ib('O','ex',r.o.ex)+'</td>')+tr(lb(t('ac_trec'))+ss.map(()=>'<td></td>').join('')+cell('tr|T',c+pv(r.o.ex),1),'ft')}
+ return h+'</tbody>'}
+function chV(m){const r=R(m),rows=chRows(m),n=dim(m),sc=c=>{let q=0;for(let d=1;d<=n;d++)q+=pv(r.c[d+'|'+c]);return q},L=rows[n-1],S_=f=>rows.reduce((q,x)=>q+x[f],0);
+ let h='<thead>'+tr(th([t('ac_day'),...CH,t('ac_chq'),t('ac_cr'),t('ac_db'),t('ac_bil'),t('ac_san'),t('ac_rest'),t('ac_ext')]))+'</thead><tbody>'+tr(lb(t('ac_open'))+'<td colspan="16" style="text-align:start">'+ib('O','ch',r.o.ch,amt(chOpen(m)))+'</td>');
+ rows.forEach(x=>{h+=tr('<td>'+x.d+'</td>'+CI.map(c=>inp('C',x.d+'|'+c,r.c[x.d+'|'+c])).join('')+cell('cr|'+x.d,x.cr)+cell('db|'+x.d,x.db)+cell('bi|'+x.d,x.b)+cell('an|'+x.d,x.a)+cell('re|'+x.d,x.r)+cell('ex|'+x.d,x.x))});
+ return h+tr(lb(t('ac_mt'))+CI.map(c=>cell('s|'+c,sc(c),1)).join('')+cell('cr|T',S_('cr'),1)+cell('db|T',S_('db'),1)+cell('bi|T',S_('b'),1)+'<td></td>'+cell('re|T',L.r,1)+cell('ex|T',L.x,1),'ft')+'</tbody>'}
+function gV(m){const r=R(m),rows=gRows(m),n=dim(m),sc=c=>{let q=0;for(let d=1;d<=n;d++)q+=pv(r.g[d+'|'+c]);return q};
+ let h='<thead>'+tr(th([t('ac_day'),t('ac_chg'),t('ac_dec'),t('ac_gcr'),'REMO',t('ac_ops'),t('ac_san'),t('ac_adv')]))+'</thead><tbody>'+tr(lb(t('ac_open'))+'<td colspan="7" style="text-align:start">'+ib('O','gab',r.o.gab,amt(gOpen(m)))+'</td>');
+ rows.forEach(x=>{h+=tr('<td>'+x.d+'</td>'+GI.map(c=>inp('G',x.d+'|'+c,r.g[x.d+'|'+c])).join('')+cell('an|'+x.d,x.a)+cell('re|'+x.d,x.r))});
+ return h+tr(lb(t('ac_mt'))+GI.map(c=>cell('s|'+c,sc(c),1)).join('')+'<td></td>'+cell('re|T',rows[n-1].r,1),'ft')+'</tbody>'}
+function view(){MAP={};const m=S.am,b=S.at;return b=='ch'?chV(m):b=='gab'?gV(m):S.as=='R'?recV(b,m):ledV(b,S.as,m)}
+const chip=(a,v,l,on)=>'<button class="chip'+(on?' on':'')+'" data-a="'+a+'" data-v="'+v+'">'+esc(l)+'</button>';
+window.accCard=()=>'<section class="card"><div class="row"><div class="tile" style="--c:var(--ok)">'+ic('Table')+'</div><div class="grow t"><h2>'+esc(t('ac_title'))+'</h2><div class="mu sm">'+esc(t('ac_card'))+'</div></div></div><div style="margin-top:14px">'+btn('ac_go',t('ac_go'),{p:1,icon:'Table'})+'</div></section>';
+window.accPage=()=>{S.at=S.at||'rec';S.as=S.as||'A';S.am=S.am||curM();const b=S.at,led=b=='rec'||b=='dep';
+ return '<div class="home" style="max-width:1160px"><div class="chips tabs">'+['rec','dep','ch','gab'].map(k=>chip('ac_tab',k,t('ac_'+k),b==k)).join('')+'</div><div class="card"><div class="g2"><label><span class="mu xs t">'+esc(t('sp_month'))+'</span><div class="field"><input type="month" id="acm" value="'+S.am+'"></div></label><div style="align-self:end">'+btn('ac_xl',t('ac_xl'),{icon:'Download'})+'</div></div>'+
+ (led?'<div class="chips tabs" style="margin-top:12px">'+['BUD','A','B','C','R'].map(s=>chip('ac_ser',s,sl(s),S.as==s)).join('')+'</div>':'')+'</div><div class="card" style="padding:12px"><div class="tw" style="max-height:72vh"><table class="tb" id="actbl">'+view()+'</table></div><div class="mu xs t" style="margin-top:10px">'+esc(t('ac_hint'))+'</div></div></div>'};
+async function xl(){view();const tb=document.getElementById('actbl'),rows=[...tb.rows].map(r=>{const bold=r.parentNode.tagName=='THEAD'||r.className=='ft',o=[];[...r.cells].forEach(c=>{const i=c.querySelector('input');let v=i?(i.value!==''?pv(i.value):pv(i.placeholder.replace(/,/g,''))):c.textContent.trim();if(!i&&/^-?[\d,]+(\.\d+)?$/.test(v))v=+v.replace(/,/g,'');if(v===0&&i)v='';o.push({v,s:bold?1:0});for(let k=1;k<(c.colSpan||1);k++)o.push({v:'',s:0})});return o}),
+ w=rows.reduce((q,r)=>Math.max(q,r.length),1),nm=t('ac_'+S.at)+(S.at=='rec'||S.at=='dep'?' '+sl(S.as):'');
+ const ok=await deliver(xlsxBook([{name:nm,rows,w:Array.from({length:w},(_,i)=>i?15:24)}]),'compta-'+S.at+(S.as&&(S.at=='rec'||S.at=='dep')?'-'+S.as:'')+'-'+S.am+'.xlsx');toast(ok?'saved':'err_save')}
+window.actA=function(a,el){if(a.slice(0,3)!='ac_')return 0;const d=el.dataset;
+ if(a=='ac_go'){S.at='rec';S.as='A';S.am=curM();go(4);return 1}
+ if(a=='ac_tab'){S.at=d.v;S.as=d.v=='rec'||d.v=='dep'?'A':'';render();return 1}
+ if(a=='ac_ser'){S.as=d.v;render();return 1}
+ if(a=='ac_xl'){xl();return 1}return 0};
+document.addEventListener('input',ev=>{const el=ev.target;if(!el.classList||!el.classList.contains('ac'))return;
+ el.value=el.value.replace(/[^\d.,+]/g,'');const o=W(S.am)[SL[el.dataset.t]];if(el.value==='')delete o[el.dataset.k];else o[el.dataset.k]=el.value;sv();view();
+ document.querySelectorAll('#actbl [data-c]').forEach(c=>{c.textContent=fm(MAP[c.dataset.c],+c.dataset.z)})});
+document.addEventListener('change',ev=>{if(ev.target.id=='acm'&&ev.target.value){S.am=ev.target.value;render()}});
 render();
 })();
 </script>
