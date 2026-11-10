@@ -317,8 +317,8 @@ function banner(kind,title,desc,act){const c={RUN:'var(--pr)',INFO:'var(--pr)',E
 const btn=(a,label,o={})=>'<button class="btn '+(o.p?'p':'')+(o.d?'d':'')+'" data-a="'+a+'"'+(o.dis?' disabled':'')+'>'+(o.load?'<span class="spin"></span>':o.icon?ic(o.icon):'')+'<span class="t">'+esc(label)+'</span></button>';
 const copyBtn=v=>'<button class="ib" data-a="copy" data-v="'+v+'" title="'+esc(t('copy_total'))+'" aria-label="'+esc(t('copy_total'))+'">'+ic('Copy')+'</button>';
 // ── views ──
-function header(){const back=(S.screen==1&&S.entries.length)||S.screen==2,cd=curDoc();
- return '<header>'+(back?'<button class="ib" data-a="back" aria-label="'+esc(t('back'))+'" title="'+esc(t('back'))+'">'+ic('Back')+'</button>':'')+'<div class="logo">'+ic('Calc')+'</div><div class="grow"><h1 class="t">'+esc(S.screen==2?t('f_title'):back&&cd?cd.name:t('name'))+'</h1><div class="mu sm t">'+esc(S.screen==2?t('f_sub'):back?t('results'):t('tagline'))+'</div></div><button class="ib" data-a="theme" aria-label="'+esc(t(isDark()?'theme_light':'theme_dark'))+'" title="'+esc(t(isDark()?'theme_light':'theme_dark'))+'">'+ic(isDark()?'Sun':'Moon')+'</button><button class="ib" data-a="lang" aria-label="'+esc(t('language'))+'" title="'+esc(t('language'))+'">'+ic('Globe')+'</button>'+acctBtn()+'</header>'}
+function header(){const back=(S.screen==1&&S.entries.length)||S.screen==2||S.screen==3,cd=curDoc();
+ return '<header>'+(back?'<button class="ib" data-a="back" aria-label="'+esc(t('back'))+'" title="'+esc(t('back'))+'">'+ic('Back')+'</button>':'')+'<div class="logo">'+ic('Calc')+'</div><div class="grow"><h1 class="t">'+esc(S.screen==3?t('sp_title'):S.screen==2?t('f_title'):back&&cd?cd.name:t('name'))+'</h1><div class="mu sm t">'+esc(S.screen==3?t('sp_sub'):S.screen==2?t('f_sub'):back?t('results'):t('tagline'))+'</div></div><button class="ib" data-a="theme" aria-label="'+esc(t(isDark()?'theme_light':'theme_dark'))+'" title="'+esc(t(isDark()?'theme_light':'theme_dark'))+'">'+ic(isDark()?'Sun':'Moon')+'</button><button class="ib" data-a="lang" aria-label="'+esc(t('language'))+'" title="'+esc(t('language'))+'">'+ic('Globe')+'</button>'+acctBtn()+'</header>'}
 function acctBtn(){if(!S.fb)return'';if(!S.user)return'<button class="chip on" data-a="login">'+esc(t('signin'))+'</button>';
  const u=S.user;return'<button class="ib av" data-a="acct" aria-label="'+esc(t('account'))+'" title="'+esc(u.email)+'">'+(u.photo?'<img src="'+esc(u.photo)+'" alt="" referrerpolicy="no-referrer">':esc((u.name||u.email||'?').charAt(0).toUpperCase()))+'</button>'}
 const fid=d=>S.folders.some(f=>f.id===d.folder)?d.folder:null;
@@ -339,7 +339,7 @@ function home(){if(S.fol&&!S.folders.some(f=>f.id===S.fol))S.fol=null;const has=
  else if(S.homeInfo)h+=banner('OK',t('imported',{n:S.homeInfo.ok}),S.homeInfo.skipped.length?t('skipped',{names:S.homeInfo.skipped.join(', ')}):'');
  h+='<div class="card"><div class="row"><div class="tile">'+ic('Upload')+'</div><div class="grow t"><h2>'+esc(t('import_title'))+'</h2><div class="mu sm">'+esc(t('import_desc'))+'</div></div></div>'+
  '<div class="drop t" id="drop">'+esc(t('drop'))+btn('pick',t('choose_file'),{p:1,icon:'Upload',dis:S.busy,load:S.busy})+'</div></div>';
- h+=(typeof finCard=='function'?finCard():'')+toolsCard();if(has)h+='<section class="card">'+secHead()+
+ h+=(typeof finCard=='function'?finCard():'')+(window.stmCard?stmCard():'')+toolsCard();if(has)h+='<section class="card">'+secHead()+
   '<label class="field" style="margin-top:14px">'+ic('Search')+'<input id="dq" type="search" value="'+esc(S.dq)+'" placeholder="'+esc(t('docs_search'))+'" aria-label="'+esc(t('docs_search'))+'"></label><div class="list" id="dlist" style="margin-top:14px"></div></section>';
  return h+'</div>'+selBar()}
 function docCard(d){const s=summarize(d.entries),dt=new Date(d.ts).toLocaleString(S.lang=='ar'?'ar-u-nu-latn':S.lang,{dateStyle:'medium',timeStyle:'short'}),id=esc(d.id),on=S.ids.has(d.id),fo=S.folders.find(f=>f.id===fid(d)),tc=fo?col(fo.color):'var(--pr)';
@@ -370,7 +370,7 @@ function list(){const q=S.q.trim(),sh=S.entries.map((e,i)=>[e,i]).filter(([e])=>
  $('#list').innerHTML=sh.length?sh.map(([e,i])=>entry(e,i)).join(''):'<div class="card empty t"><p class="mu" style="margin-top:0">'+esc(t('empty_filter'))+'</p>'+btn('clear',t('clear_filters'))+'</div>'}
 function render(){document.documentElement.lang=S.lang;document.title=t('name');
  const res=S.screen==1&&S.entries.length;
- $('#app').innerHTML=header()+(res?results():S.screen==2&&typeof finPage=='function'?finPage():home());
+ $('#app').innerHTML=header()+(res?results():S.screen==3&&window.stmPage?stmPage():S.screen==2&&typeof finPage=='function'?finPage():home());
  if(res){filters();list()}else dlist();
  const L=$('#layer');
  if(S.sheet=='lang')L.innerHTML='<div class="ov" data-a="close"><div class="sheet" role="dialog" aria-modal="true"><h2 class="t" style="margin:0">'+esc(t('language'))+'</h2>'+LANGS.map(([c,n])=>'<button class="lang '+(c==S.lang?'on':'')+'" data-a="setlang" data-v="'+c+'"><span>'+n+'</span>'+(c==S.lang?ic('Check'):'')+'</button>').join('')+'</div></div>';
@@ -452,7 +452,7 @@ function act2(a,el){const d=el.dataset;
  if(a=='mv'){moveSel(d.v||null);return 1}
  if(a=='bdel'){S.sheet='bdel';render();return 1}
  if(a=='confirmbdel'){delSel();return 1}
- if(act3(a,el)||(typeof actF=='function'&&actF(a,el)))return 1
+ if(act3(a,el)||(typeof actF=='function'&&actF(a,el))||(window.actP&&actP(a,el)))return 1
  return 0}
 // long-press on a document starts selection
 let lp,lpF=false;
@@ -740,7 +740,7 @@ f_del_tx:"حذف الحركة؟",f_del_tx_d:"ستُحذف الحركة ويُس�
 f_p_new:"جهة جديدة",f_p_edit:"تعديل الجهة",f_p_name:"اسم الجهة",f_p_type:"النوع",f_p_cap:"حد أقصى للنقد بحوزتها (اختياري)",f_p_cap_h:"يظهر تنبيه عند تجاوزه.",f_p_err:"اكتب اسم الجهة.",f_p_saved:"تم حفظ الجهة",f_p_stop:"إيقاف الجهة",f_p_resume:"إعادة تفعيل",f_p_del:"حذف الجهة",f_p_stopped:"موقوفة",f_p_has:"لها حركات سابقة، لذلك تُوقَف ولا تُحذف.",f_over:"تجاوز الحد",f_no_parties:"لم تضف أي جهة بعد.",f_p_color:"اللون",
 f_c_title:"إقفال اليوم",f_c_desc:"عُدّ النقد الموجود فعليًا في الخزنة وأدخل عدد الأوراق من كل فئة.",f_c_count:"العدد",f_c_other:"قطع نقدية / مبلغ آخر (دج)",f_c_total:"المجموع المعدود",f_c_theo:"الرصيد النظري",f_c_ok:"مطابق",f_c_short:"عجز",f_c_over:"زيادة",f_c_hold:"لم يفرّغوا بعد: {names}",f_c_confirm:"تأكيد الإقفال",f_c_done:"تم إقفال اليوم",f_ro_title:"إعادة فتح اليوم؟",f_ro_desc:"سيُفتح اليوم للتعديل ويُسجَّل ذلك. أرصدة الأيام اللاحقة تُعاد حسابًا تلقائيًا.",f_ro_ok:"تم فتح اليوم",f_c_notes:"تفصيل الجرد",
 f_h_title:"سجل الأيام",f_h_from:"من",f_h_to:"إلى",f_col_date:"التاريخ",f_col_open:"الافتتاح",f_col_in:"داخل",f_col_out:"خارج",f_col_theo:"النظري",f_col_cnt:"الفعلي",f_col_diff:"الفرق",f_col_st:"الحالة",f_h_tot:"الإجمالي",f_h_print:"طباعة اليوم",f_h_csv:"تصدير CSV",f_h_party:"مجاميع الجهات في الفترة",f_h_empty:"لا توجد أيام في هذه الفترة.",f_print_day:"طباعة وضعية اليوم",
-f_s_office:"اسم المكتب",f_s_den:"فئات الأوراق النقدية",f_s_den_h:"افصل بينها بفاصلة، مثال: 2000,1000,500,200,100",f_s_start:"تاريخ بداية المتابعة",f_s_bal:"الرصيد الافتتاحي (دج)",f_s_warn:"تغيير تاريخ البداية أو الرصيد يعيد حساب كل الأيام.",f_s_save:"حفظ الإعدادات",f_s_saved:"تم حفظ الإعدادات",f_s_den_err:"أدخل فئات صحيحة.",
+f_s_office:"اسم المكتب",f_s_den:"فئات الأوراق النقدية",f_s_den_h:"افصل بينها بفاصلة، مثال: 2000,1000,500,200,100,50,20,10,5",f_s_start:"تاريخ بداية المتابعة",f_s_bal:"الرصيد الافتتاحي (دج)",f_s_warn:"تغيير تاريخ البداية أو الرصيد يعيد حساب كل الأيام.",f_s_save:"حفظ الإعدادات",f_s_saved:"تم حفظ الإعدادات",f_s_den_err:"أدخل فئات صحيحة.",
 f_bak:"نسخة احتياطية",f_bak_exp:"تصدير بيانات المالية",f_bak_imp:"استيراد نسخة",f_bak_note:"بياناتك محفوظة على هذا الجهاز فقط. خذ نسخة احتياطية بانتظام.",f_imp_ok:"تم استيراد بيانات المالية",f_imp_err:"الملف غير صالح",
 f_audit:"سجل العمليات",f_audit_empty:"لا توجد عمليات مسجّلة.",f_reset:"حذف كل بيانات المالية",f_reset_d:"سيُحذف كل شيء نهائيًا من هذا الجهاز. تأكد من أخذ نسخة احتياطية أولًا.",f_reset_ok:"تم الحذف",
 f_su_title:"إعداد المكتب",f_su_desc:"ابدأ بإدخال بيانات مكتبك. يمكنك تغيير كل شيء لاحقًا من الإعدادات.",f_su_n:"عدد الشبابيك (العمال)",f_su_central:"إضافة القباضة الرئيسية",f_su_atm:"إضافة الصرافة الآلية",f_su_go:"ابدأ",f_su_first:"المكتب لم يُعدّ بعد",
@@ -760,7 +760,7 @@ f_del_tx:"Delete this movement?",f_del_tx_d:"It will be removed and recorded in 
 f_p_new:"New party",f_p_edit:"Edit party",f_p_name:"Party name",f_p_type:"Type",f_p_cap:"Cash limit held by it (optional)",f_p_cap_h:"A warning shows when exceeded.",f_p_err:"Enter a party name.",f_p_saved:"Party saved",f_p_stop:"Deactivate",f_p_resume:"Reactivate",f_p_del:"Delete party",f_p_stopped:"inactive",f_p_has:"It has past movements, so it can only be deactivated.",f_over:"Over limit",f_no_parties:"No party added yet.",f_p_color:"Color",
 f_c_title:"Close the day",f_c_desc:"Count the cash actually in the vault and enter the number of notes of each denomination.",f_c_count:"Count",f_c_other:"Coins / other amount (DZD)",f_c_total:"Counted total",f_c_theo:"Expected balance",f_c_ok:"Matches",f_c_short:"Shortage",f_c_over:"Surplus",f_c_hold:"Not emptied yet: {names}",f_c_confirm:"Confirm close",f_c_done:"Day closed",f_ro_title:"Reopen this day?",f_ro_desc:"The day becomes editable and this is logged. Later days are recalculated automatically.",f_ro_ok:"Day reopened",f_c_notes:"Count details",
 f_h_title:"Daily history",f_h_from:"From",f_h_to:"To",f_col_date:"Date",f_col_open:"Opening",f_col_in:"In",f_col_out:"Out",f_col_theo:"Expected",f_col_cnt:"Counted",f_col_diff:"Diff",f_col_st:"Status",f_h_tot:"Total",f_h_print:"Print day",f_h_csv:"Export CSV",f_h_party:"Party totals in the period",f_h_empty:"No days in this period.",f_print_day:"Print the day's position",
-f_s_office:"Office name",f_s_den:"Banknote denominations",f_s_den_h:"Separate with commas, e.g. 2000,1000,500,200,100",f_s_start:"Tracking start date",f_s_bal:"Opening balance (DZD)",f_s_warn:"Changing the start date or balance recalculates every day.",f_s_save:"Save settings",f_s_saved:"Settings saved",f_s_den_err:"Enter valid denominations.",
+f_s_office:"Office name",f_s_den:"Banknote denominations",f_s_den_h:"Separate with commas, e.g. 2000,1000,500,200,100,50,20,10,5",f_s_start:"Tracking start date",f_s_bal:"Opening balance (DZD)",f_s_warn:"Changing the start date or balance recalculates every day.",f_s_save:"Save settings",f_s_saved:"Settings saved",f_s_den_err:"Enter valid denominations.",
 f_bak:"Backup",f_bak_exp:"Export cash data",f_bak_imp:"Import a backup",f_bak_note:"Your data is saved on this device only. Take a backup regularly.",f_imp_ok:"Cash data imported",f_imp_err:"Invalid file",
 f_audit:"Activity log",f_audit_empty:"No recorded activity.",f_reset:"Delete all cash data",f_reset_d:"Everything will be permanently deleted from this device. Take a backup first.",f_reset_ok:"Deleted",
 f_su_title:"Office setup",f_su_desc:"Start by entering your office details. You can change everything later in Settings.",f_su_n:"Number of counters (staff)",f_su_central:"Add the main treasury",f_su_atm:"Add the ATM",f_su_go:"Start",f_su_first:"The office is not set up yet",
@@ -780,7 +780,7 @@ f_del_tx:"Supprimer ce mouvement ?",f_del_tx_d:"Il sera supprimé et noté dans 
 f_p_new:"Nouvelle partie",f_p_edit:"Modifier la partie",f_p_name:"Nom de la partie",f_p_type:"Type",f_p_cap:"Plafond d'espèces détenues (facultatif)",f_p_cap_h:"Une alerte s'affiche en cas de dépassement.",f_p_err:"Saisissez un nom.",f_p_saved:"Partie enregistrée",f_p_stop:"Désactiver",f_p_resume:"Réactiver",f_p_del:"Supprimer la partie",f_p_stopped:"inactive",f_p_has:"Elle a des mouvements passés : elle ne peut qu'être désactivée.",f_over:"Plafond dépassé",f_no_parties:"Aucune partie ajoutée.",f_p_color:"Couleur",
 f_c_title:"Clôturer le jour",f_c_desc:"Comptez les espèces réellement au coffre et saisissez le nombre de billets par valeur.",f_c_count:"Nombre",f_c_other:"Pièces / autre montant (DA)",f_c_total:"Total compté",f_c_theo:"Solde théorique",f_c_ok:"Conforme",f_c_short:"Manque",f_c_over:"Excédent",f_c_hold:"Pas encore versé : {names}",f_c_confirm:"Confirmer la clôture",f_c_done:"Jour clôturé",f_ro_title:"Rouvrir ce jour ?",f_ro_desc:"Le jour redevient modifiable et c'est noté. Les jours suivants sont recalculés automatiquement.",f_ro_ok:"Jour rouvert",f_c_notes:"Détail du comptage",
 f_h_title:"Historique des jours",f_h_from:"Du",f_h_to:"Au",f_col_date:"Date",f_col_open:"Ouverture",f_col_in:"Entrées",f_col_out:"Sorties",f_col_theo:"Théorique",f_col_cnt:"Compté",f_col_diff:"Écart",f_col_st:"Statut",f_h_tot:"Total",f_h_print:"Imprimer le jour",f_h_csv:"Exporter CSV",f_h_party:"Totaux des parties sur la période",f_h_empty:"Aucun jour sur cette période.",f_print_day:"Imprimer la position du jour",
-f_s_office:"Nom du bureau",f_s_den:"Valeurs des billets",f_s_den_h:"Séparez par des virgules, ex. 2000,1000,500,200,100",f_s_start:"Date de début du suivi",f_s_bal:"Solde initial (DA)",f_s_warn:"Changer la date de début ou le solde recalcule tous les jours.",f_s_save:"Enregistrer",f_s_saved:"Réglages enregistrés",f_s_den_err:"Saisissez des valeurs valides.",
+f_s_office:"Nom du bureau",f_s_den:"Valeurs des billets",f_s_den_h:"Séparez par des virgules, ex. 2000,1000,500,200,100,50,20,10,5",f_s_start:"Date de début du suivi",f_s_bal:"Solde initial (DA)",f_s_warn:"Changer la date de début ou le solde recalcule tous les jours.",f_s_save:"Enregistrer",f_s_saved:"Réglages enregistrés",f_s_den_err:"Saisissez des valeurs valides.",
 f_bak:"Sauvegarde",f_bak_exp:"Exporter les données de caisse",f_bak_imp:"Importer une sauvegarde",f_bak_note:"Vos données sont enregistrées sur cet appareil uniquement. Faites une sauvegarde régulièrement.",f_imp_ok:"Données de caisse importées",f_imp_err:"Fichier invalide",
 f_audit:"Journal d'activité",f_audit_empty:"Aucune activité enregistrée.",f_reset:"Supprimer toutes les données de caisse",f_reset_d:"Tout sera définitivement supprimé de cet appareil. Faites d'abord une sauvegarde.",f_reset_ok:"Supprimé",
 f_su_title:"Configuration du bureau",f_su_desc:"Commencez par saisir les informations de votre bureau. Tout reste modifiable dans les réglages.",f_su_n:"Nombre de guichets (agents)",f_su_central:"Ajouter la recette principale",f_su_atm:"Ajouter le DAB",f_su_go:"Commencer",f_su_first:"Le bureau n'est pas encore configuré",
@@ -789,10 +789,20 @@ for(const l in FT)Object.assign(D[l],FT[l]);
 Object.assign(P,{Plus:["M12 5v14","M5 12h14"],Lock:["M6 11h12v9H6z","M8 11V8a4 4 0 0 1 8 0v3"],Unlock:["M6 11h12v9H6z","M8 11V8a4 4 0 0 1 7-2.6"],Print:["M7 9V3h10v6","M7 17H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2","M7 14h10v7H7z"],ChevL:["M15 6l-6 6 6 6"],ChevR:["M9 6l6 6-6 6"],Wallet:["M3 7a2 2 0 0 1 2-2h13v4","M3 7v11a2 2 0 0 0 2 2h15V9H5a2 2 0 0 1-2-2z","M16 14.5h.01"]});
 DK.push('fin');
 
-// ── data ──
-const DEF=()=>({v:1,set:{office:'',den:[2000,1000,500,200,100],start:'',bal:0},parties:[],txs:[],days:{},audit:[]});
+Object.assign(D.ar,{f_den_title:"تفصيل الفئات",f_col_den:"الفئة",f_den_hint:"الأرقام = عدد الأوراق، وصف «أخرى» بالدينار.",f_other_row:"أخرى (دج)",f_tx_total:"إجمالي الحركة",f_short_den:"الفئة {d}: المتوفر في الخزنة {a} فقط.",f_short_o:"المبلغ الآخر المتوفر {a} فقط.",f_open_bal:"الرصيد الافتتاحي بالفئات",f_open_edit:"تعديل الرصيد الافتتاحي",f_expected:"المتوقع",f_c_diffs:"فئات فيها فرق",f_csv_mv:"تصدير الحركات (CSV)",f_held_by:"بحوزتها",f_col_type:"النوع",f_col_note:"ملاحظة",f_col_party2:"الجهة",f_col_time:"الوقت",f_den_in:"داخل الخزنة",f_den_out:"خارج الخزنة",f_neg_den:"فئات ناقصة في الخزنة (رصيد سالب)",f_total:"المجموع"});
+Object.assign(D.en,{f_den_title:"Breakdown by denomination",f_col_den:"Denomination",f_den_hint:"Figures = number of notes; the “Other” row is in dinars.",f_other_row:"Other (DZD)",f_tx_total:"Movement total",f_short_den:"Denomination {d}: only {a} available in the vault.",f_short_o:"Only {a} of other amount available.",f_open_bal:"Opening balance by denomination",f_open_edit:"Edit opening balance",f_expected:"Expected",f_c_diffs:"Denominations with a difference",f_csv_mv:"Export movements (CSV)",f_held_by:"held",f_col_type:"Type",f_col_note:"Note",f_col_party2:"Party",f_col_time:"Time",f_den_in:"Into the vault",f_den_out:"Out of the vault",f_neg_den:"Denominations short in the vault (negative)",f_total:"Total"});
+Object.assign(D.fr,{f_den_title:"Détail par valeur de billet",f_col_den:"Valeur",f_den_hint:"Chiffres = nombre de billets ; la ligne « Autre » est en dinars.",f_other_row:"Autre (DA)",f_tx_total:"Total du mouvement",f_short_den:"Valeur {d} : seulement {a} disponible(s) au coffre.",f_short_o:"Seulement {a} d'autre montant disponible.",f_open_bal:"Solde d'ouverture par valeur",f_open_edit:"Modifier le solde d'ouverture",f_expected:"Attendu",f_c_diffs:"Valeurs avec un écart",f_csv_mv:"Exporter les mouvements (CSV)",f_held_by:"détenu",f_col_type:"Type",f_col_note:"Note",f_col_party2:"Partie",f_col_time:"Heure",f_den_in:"Entrée au coffre",f_den_out:"Sortie du coffre",f_neg_den:"Valeurs manquantes au coffre (négatif)",f_total:"Total"});
+
+// ── data (every amount is kept as a count per denomination; key "o" = coins / other amount in DZD) ──
+const DEF=()=>({v:2,set:{office:'',den:[2000,1000,500,200,100,50,20,10,5],start:'',bal:0,balv:{}},parties:[],txs:[],days:{},audit:[]});
+const vt=v=>Object.keys(v||{}).reduce((a,k)=>a+(k=='o'?(+v[k]||0):(+k)*(+v[k]||0)),0);
+const vadd=(a,b,m)=>{m=m||1;const r={...a};for(const k in b)r[k]=(+r[k]||0)+m*(+b[k]||0);return r};
+const vclean=v=>{const r={};for(const k in v)if(+v[k])r[k]=+v[k];return r};
+function mig(j){if(j.set&&j.set.den&&j.set.den.join()=='2000,1000,500,200,100')j.set.den=[2000,1000,500,200,100,50,20,10,5];j.txs.forEach(x=>{if(!x.v||typeof x.v!='object')x.v=x.amt?{o:x.amt}:{};x.amt=vt(x.v)});
+ Object.values(j.days||{}).forEach(c=>{if(!c.v){c.v={...(c.cnt||{})};if(c.other)c.v.o=c.other}c.counted=vt(c.v);delete c.cnt;delete c.other});
+ if(!j.set.balv)j.set.balv=j.set.bal?{o:j.set.bal}:{};j.set.bal=vt(j.set.balv);j.v=2;j.days=j.days||{};j.audit=j.audit||[];return j}
 let FC=null,FN=null;
-const F=()=>{if(!FC||FN!==NS){FN=NS;try{const j=JSON.parse(sget('fin'));FC=j&&j.v&&j.set?j:DEF()}catch(e){FC=DEF()}}return FC};
+const F=()=>{if(!FC||FN!==NS){FN=NS;try{const j=JSON.parse(sget('fin'));FC=j&&j.v&&j.set&&Array.isArray(j.txs)?mig(j):DEF()}catch(e){FC=DEF()}}return FC};
 const save=()=>{sset('fin',JSON.stringify(F()))};
 const log=m=>{const a=F().audit;a.unshift({at:Date.now(),m});if(a.length>300)a.length=300};
 const pad=n=>String(n).padStart(2,'0');
@@ -803,29 +813,43 @@ const wday=s=>new Date(s+'T12:00:00').toLocaleDateString(loc(),{weekday:'long'})
 const dz=n=>'<span class="ltr">'+num(Math.round(n))+'</span> '+esc(t('f_cur'));
 const dzt=n=>num(Math.round(n))+' '+t('f_cur');
 const col2=n=>n<0?'var(--er)':n>0?'var(--ok)':'inherit';
+const dirS=()=>S.lang=='ar'?'rtl':'ltr';
 const P_=id=>F().parties.find(p=>p.id==id);
 const txsOn=d=>F().txs.filter(x=>x.date===d);
-const net=T=>T.reduce((a,x)=>a+(x.dir=='in'?x.amt:-x.amt),0);
+const vtx=T=>T.reduce((a,x)=>vadd(a,x.v,x.dir=='in'?1:-1),{});
+const vsum=(T,dir)=>T.filter(x=>x.dir==dir).reduce((a,x)=>vadd(a,x.v),{});
 const dayDates=()=>{const s=new Set(F().txs.map(x=>x.date));Object.keys(F().days).forEach(k=>s.add(k));return [...s].sort()};
-function openOf(d){const f=F();let bal=+f.set.bal||0;
- for(const k of dayDates()){if(k>=d)break;if(f.set.start&&k<f.set.start)continue;const c=f.days[k];bal+=net(txsOn(k));if(c&&c.closed)bal=c.counted}
- return bal}
-function stat(d){const f=F(),o=openOf(d),T=txsOn(d),inn=T.filter(x=>x.dir=='in').reduce((a,x)=>a+x.amt,0),out=T.filter(x=>x.dir=='out').reduce((a,x)=>a+x.amt,0),theo=o+inn-out,c=f.days[d],closed=!!(c&&c.closed);
- return{o,inn,out,theo,T,c,closed,counted:closed?c.counted:null,diff:closed?c.counted-theo:null}}
-const held=(pid,upTo)=>F().txs.filter(x=>x.pid==pid&&x.date<=upTo).reduce((a,x)=>a+(x.dir=='out'?x.amt:-x.amt),0);
+function dens(){const f=F(),s=new Set(f.set.den);const add=v=>Object.keys(v||{}).forEach(k=>{if(k!='o')s.add(+k)});f.txs.forEach(x=>add(x.v));Object.values(f.days).forEach(c=>add(c.v));add(f.set.balv);return [...s].sort((a,b)=>b-a)}
+function openV(d){const f=F();let v={...f.set.balv};for(const k of dayDates()){if(k>=d)break;if(f.set.start&&k<f.set.start)continue;const c=f.days[k];v=vadd(v,vtx(txsOn(k)));if(c&&c.closed)v={...c.v}}return v}
+function stat(d){const f=F(),ov=openV(d),T=txsOn(d),iv=vsum(T,'in'),xv=vsum(T,'out'),tv=vadd(vadd(ov,iv),xv,-1),c=f.days[d],closed=!!(c&&c.closed);
+ return{ov,iv,xv,tv,o:vt(ov),inn:vt(iv),out:vt(xv),theo:vt(tv),T,c,closed,cv:closed?c.v:null,counted:closed?vt(c.v):null,diff:closed?vt(c.v)-vt(tv):null}}
+const heldV=(pid,upTo)=>F().txs.filter(x=>x.pid==pid&&x.date<=upTo).reduce((a,x)=>vadd(a,x.v,x.dir=='out'?1:-1),{});
+const held=(pid,upTo)=>vt(heldV(pid,upTo));
+const vb=v=>{const k=Object.keys(v||{}).filter(x=>x!='o'&&+v[x]).sort((a,b)=>b-a).map(x=>num(+x)+'×'+num(+v[x]));if(v&&+v.o)k.push(t('f_other_row').replace(/ \(.*\)/,'')+' '+num(+v.o));return k.join(' · ')};
 function dispensed(day){const seen=new Set();let tot=0;S.docs.forEach(d=>d.entries.forEach(x=>{if(x.date!==day||x.status!='VALID')return;const k=[x.ref,x.date,x.time,x.req].join('|');if(seen.has(k))return;seen.add(k);tot+=x.req}));return tot}
 const unclosed=d=>dayDates().filter(k=>k<d&&!(F().days[k]&&F().days[k].closed)&&(!F().set.start||k>=F().set.start)&&F().txs.some(x=>x.date==k));
 const verb=(p,dir)=>t('f_v_'+(p?p.type:'other')+'_'+dir);
+
+// ── denomination inputs (shared by movements, closing and opening balance) ──
+function denBlock(v,hint){return '<div class="stack" style="gap:8px">'+dens().map(k=>'<div class="row"><b class="ltr" style="min-width:64px">'+num(k)+'</b><div class="field grow"><input class="fcn" data-v="'+k+'" inputmode="numeric" maxlength="6" placeholder="0" aria-label="'+k+'" value="'+(v[k]||'')+'"></div><span class="mu xs t" style="min-width:90px;text-align:end">'+(hint?esc(t('f_expected'))+': <b class="ltr">'+num(hint[k]||0)+'</b>':'<span class="ltr" id="fcs'+k+'">'+(v[k]?num(v[k]*k):'')+'</span>')+'</span></div>').join('')+
+ '<label><span class="mu sm t">'+esc(t('f_c_other'))+'</span><div class="field"><input id="fco" class="fm" inputmode="numeric" maxlength="12" placeholder="0" value="'+esc(v.o||'')+'"></div></label></div>'}
+function denRead(){const v={};document.querySelectorAll('#layer .fcn').forEach(i=>{const n=Math.round(+i.value||0);if(n)v[i.dataset.v]=n;const e=document.getElementById('fcs'+i.dataset.v);if(e)e.textContent=n?num(n*(+i.dataset.v)):''});const o=document.getElementById('fco');if(o&&+o.value)v.o=Math.round(+o.value);return v}
 
 // ── views ──
 const kp=(l,v,c)=>'<div class="kp"><span class="mu xs t">'+esc(t(l))+'</span><b style="color:'+(c||'inherit')+'">'+v+'</b></div>';
 const hdr=(ic_,k,sub)=>'<div class="row"><div class="tile">'+ic(ic_)+'</div><div class="grow t"><h2>'+esc(t(k))+'</h2>'+(sub?'<div class="mu sm">'+sub+'</div>':'')+'</div></div>';
 window.finCard=function(){return '<section class="card"><div class="row"><div class="tile" style="--c:var(--ok)">'+ic('Wallet')+'</div><div class="grow t"><h2>'+esc(t('f_title'))+'</h2><div class="mu sm">'+esc(t('f_card_desc'))+'</div></div></div><div style="margin-top:14px">'+btn('fin',t('f_open_btn'),{p:1,icon:'Wallet'})+'</div></section>'};
-window.finTitle=()=>t('f_title');
 function tabs(){return '<div class="chips tabs">'+[['day','f_tab_day'],['parties','f_tab_parties'],['hist','f_tab_hist'],['set','f_tab_set']].map(([k,l])=>'<button class="chip'+(S.fp==k?' on':'')+'" data-a="ftab" data-v="'+k+'">'+esc(t(l))+'</button>').join('')+'</div>'}
 window.finPage=function(){const f=F();S.fp=S.fp||'day';S.fd=S.fd||today();
  if(!f.set.start)return '<div class="home"><div class="card"><div class="row"><div class="tile" style="--c:var(--ok)">'+ic('Wallet')+'</div><div class="grow t"><h2>'+esc(t('f_su_first'))+'</h2><div class="mu sm">'+esc(t('f_su_desc'))+'</div></div></div><div style="margin-top:14px">'+btn('fsetup',t('f_su_title'),{p:1})+'</div></div></div>';
  return '<div class="home">'+tabs()+({day:dayView,parties:partiesView,hist:histView,set:setView}[S.fp]||dayView)()+'</div>'};
+const cl=n=>n?num(n):'';
+function denTable(s){const ds=dens(),rows=ds.map(k=>[num(k),s.ov[k],s.iv[k],s.xv[k],s.tv[k],s.cv?s.cv[k]:null,s.cv?(s.cv[k]||0)-(s.tv[k]||0):null,s.tv[k]<0]);
+ rows.push([esc(t('f_other_row')),s.ov.o,s.iv.o,s.xv.o,s.tv.o,s.cv?s.cv.o:null,s.cv?(s.cv.o||0)-(s.tv.o||0):null,s.tv.o<0]);
+ const heads=['f_col_den','f_col_open','f_col_in','f_col_out','f_col_theo'].concat(s.closed?['f_col_cnt','f_col_diff']:[]);
+ return '<div class="tw sm0 fz" style="margin-top:12px;direction:'+dirS()+'"><table class="tb"><thead><tr>'+heads.map(k=>'<th>'+esc(t(k))+'</th>').join('')+'</tr></thead><tbody>'+
+ rows.map(r=>'<tr><td style="text-align:start;font-weight:700">'+r[0]+'</td><td>'+cl(r[1])+'</td><td style="color:var(--ok)">'+cl(r[2])+'</td><td style="color:var(--er)">'+cl(r[3])+'</td><td style="font-weight:700;color:'+(r[7]?'var(--er)':'inherit')+'">'+(r[4]?num(r[4]):'0')+'</td>'+(s.closed?'<td>'+(r[5]?num(r[5]):'0')+'</td><td style="color:'+(r[6]?'var(--er)':'inherit')+'">'+(r[6]?(r[6]>0?'+':'')+num(r[6]):'')+'</td>':'')+'</tr>').join('')+
+ '</tbody><tfoot><tr><td style="text-align:start">'+esc(t('f_total'))+'</td><td>'+num(s.o)+'</td><td>'+num(s.inn)+'</td><td>'+num(s.out)+'</td><td>'+num(s.theo)+'</td>'+(s.closed?'<td>'+num(s.counted)+'</td><td>'+(s.diff>0?'+':'')+num(s.diff)+'</td>':'')+'</tr></tfoot></table></div><div class="mu xs t" style="margin-top:8px">'+esc(t('f_den_hint'))+'</div>'}
 
 function dayView(){const f=F(),d=S.fd,s=stat(d),act=f.parties.filter(p=>!p.arch),prev=S.lang=='ar'?'ChevR':'ChevL',nxt=S.lang=='ar'?'ChevL':'ChevR',un=unclosed(d);
  let h='<div class="card"><div class="row"><button class="ib" data-a="fprev" title="'+esc(t('f_prev'))+'" aria-label="'+esc(t('f_prev'))+'"'+(d<=f.set.start?' disabled':'')+'>'+ic(prev)+'</button><div class="grow"><div class="field"><input type="date" id="fdate" value="'+d+'" min="'+f.set.start+'"></div></div><button class="ib" data-a="fnext" title="'+esc(t('f_next'))+'" aria-label="'+esc(t('f_next'))+'">'+ic(nxt)+'</button></div>'+
@@ -836,24 +860,21 @@ function dayView(){const f=F(),d=S.fd,s=stat(d),act=f.parties.filter(p=>!p.arch)
  '<div class="g2" style="margin-top:14px">'+btn('ftxnew',t('f_in'),{p:1,icon:'Down',dis:s.closed||!act.length}).replace('data-a="ftxnew"','data-a="ftxnew" data-dir="in"')+btn('ftxnew',t('f_out'),{icon:'Up',dis:s.closed||!act.length}).replace('data-a="ftxnew"','data-a="ftxnew" data-dir="out"')+'</div>'+
  (s.closed?'<div class="mu sm t" style="margin-top:10px">'+esc(t('f_locked'))+'</div>':!act.length?'<div class="mu sm t" style="margin-top:10px">'+esc(t('f_no_party'))+'</div>':'')+
  '<div style="margin-top:10px">'+(s.closed?btn('freopen',t('f_reopen'),{icon:'Unlock'}):btn('fclose',t('f_close_day'),{icon:'Lock'}))+'</div></div>';
- // parties position
+ h+='<div class="card">'+hdr('Table','f_den_title')+denTable(s)+'</div>';
  const rows=f.parties.filter(p=>!p.arch||held(p.id,d)||s.T.some(x=>x.pid==p.id));
  if(rows.length){const dsp=dispensed(d),hasAtm=rows.some(p=>p.type=='atm');
-  h+='<div class="card">'+hdr('Table','f_pos')+'<div class="tw sm0 fz" style="margin-top:12px;direction:'+(S.lang=='ar'?'rtl':'ltr')+'"><table class="tb"><thead><tr>'+['f_col_party','f_col_given','f_col_recv','f_col_net'].map(k=>'<th>'+esc(t(k))+'</th>').join('')+'</tr></thead><tbody>'+
+  h+='<div class="card">'+hdr('User','f_pos')+'<div class="tw sm0 fz" style="margin-top:12px;direction:'+dirS()+'"><table class="tb"><thead><tr>'+['f_col_party','f_col_given','f_col_recv','f_col_net'].map(k=>'<th>'+esc(t(k))+'</th>').join('')+'</tr></thead><tbody>'+
   rows.map(p=>{const g=s.T.filter(x=>x.pid==p.id&&x.dir=='out').reduce((a,x)=>a+x.amt,0),r=s.T.filter(x=>x.pid==p.id&&x.dir=='in').reduce((a,x)=>a+x.amt,0),hd=held(p.id,d),over=p.cap&&hd>p.cap;
    return '<tr><td style="text-align:start"><span class="dot" style="--c:'+col(p.color)+'"></span> '+esc(p.name)+(over?' <span class="badge" style="--c:var(--er)">'+esc(t('f_over'))+'</span>':'')+'</td><td>'+(g?num(g):'')+'</td><td>'+(r?num(r):'')+'</td><td style="font-weight:700;color:'+col2(hd)+'">'+num(hd)+'</td></tr>'}).join('')+'</tbody></table></div><div class="mu xs t" style="margin-top:8px">'+esc(t('f_pos_hint'))+'</div>'+
   (hasAtm||dsp?'<div class="row t" style="margin-top:10px"><span class="grow mu sm">'+esc(t('f_atm_log'))+'</span><b>'+dz(dsp)+'</b></div>':'')+'</div>'}
- // transactions
  h+='<div class="card">'+hdr('File','f_txs')+'<div class="stack" style="gap:10px;margin-top:12px">'+(s.T.length?[...s.T].sort((a,b)=>a.ts-b.ts).map(x=>{const p=P_(x.pid),inn=x.dir=='in';
-  return '<div class="card ent" style="padding:12px;--c:'+(inn?'var(--ok)':'var(--er)')+'"><div class="row" style="align-items:flex-start"><div class="grow t" style="min-width:0"><div class="dn" style="overflow-wrap:anywhere;word-break:normal">'+esc(verb(p,x.dir))+' '+esc(p?p.name:'?')+'</div><b style="display:block;margin-top:2px;white-space:nowrap;color:'+(inn?'var(--ok)':'var(--er)')+'">'+(inn?'+':'−')+' '+dz(x.amt)+'</b>'+(x.note?'<div class="mu sm" style="overflow-wrap:anywhere">'+esc(x.note)+'</div>':'')+'<div class="mu xs">'+esc(new Date(x.ts).toLocaleTimeString(loc(),{hour:'2-digit',minute:'2-digit'}))+'</div></div>'+
-  (s.closed?'':'<button class="ib" data-a="ftxedit" data-id="'+esc(x.id)+'" aria-label="'+esc(t('f_edit'))+'" title="'+esc(t('f_edit'))+'">'+ic('Edit')+'</button><button class="ib" data-a="ftxdel" data-id="'+esc(x.id)+'" aria-label="'+esc(t('f_del'))+'" title="'+esc(t('f_del'))+'">'+ic('Trash')+'</button>')+'</div></div>'
- }).join(''):'<div class="mu t">'+esc(t('f_no_tx'))+'</div>')+'</div>'+
-  (s.closed&&s.c.cnt?'<div class="mu sm t" style="margin-top:12px"><b>'+esc(t('f_c_notes'))+':</b> '+Object.keys(s.c.cnt).filter(k=>s.c.cnt[k]).sort((a,b)=>b-a).map(k=>num(+k)+'×'+s.c.cnt[k]).join(' · ')+(s.c.other?' · '+esc(t('f_c_other').split(' (')[0])+' '+num(s.c.other):'')+'</div>':'')+'</div>';
+  return '<div class="card ent" style="padding:12px;--c:'+(inn?'var(--ok)':'var(--er)')+'"><div class="row" style="align-items:flex-start"><div class="grow t" style="min-width:0"><div class="dn" style="overflow-wrap:anywhere;word-break:normal">'+esc(verb(p,x.dir))+' '+esc(p?p.name:'?')+'</div><b style="display:block;margin-top:2px;white-space:nowrap;color:'+(inn?'var(--ok)':'var(--er)')+'">'+(inn?'+':'−')+' '+dz(x.amt)+'</b><div class="mu sm ltr" style="overflow-wrap:anywhere;text-align:start">'+esc(vb(x.v))+'</div>'+(x.note?'<div class="mu sm" style="overflow-wrap:anywhere">'+esc(x.note)+'</div>':'')+'<div class="mu xs">'+esc(new Date(x.ts).toLocaleTimeString(loc(),{hour:'2-digit',minute:'2-digit'}))+'</div></div>'+
+  (s.closed?'':'<button class="ib" data-a="ftxedit" data-id="'+esc(x.id)+'" aria-label="'+esc(t('f_edit'))+'" title="'+esc(t('f_edit'))+'">'+ic('Edit')+'</button><button class="ib" data-a="ftxdel" data-id="'+esc(x.id)+'" aria-label="'+esc(t('f_del'))+'" title="'+esc(t('f_del'))+'">'+ic('Trash')+'</button>')+'</div></div>'}).join(''):'<div class="mu t">'+esc(t('f_no_tx'))+'</div>')+'</div></div>';
  return h}
 
-function partiesView(){const f=F();
- return '<div class="card">'+hdr('User','f_tab_parties')+'<div class="stack" style="gap:10px;margin-top:12px">'+(f.parties.length?f.parties.map(p=>{const hd=held(p.id,today());
-  return '<div class="card ent fc" style="padding:12px;--c:'+col(p.color)+(p.arch?';opacity:.6':'')+'"><div class="row"><div class="grow t"><div class="dn">'+esc(p.name)+'</div><div class="mu sm">'+esc(t('f_t_'+p.type))+(p.arch?' · '+esc(t('f_p_stopped')):'')+'</div></div><b style="color:'+col2(hd)+'">'+dz(hd)+'</b><button class="ib" data-a="fpedit" data-id="'+esc(p.id)+'" aria-label="'+esc(t('f_edit'))+'">'+ic('Edit')+'</button></div></div>'}).join(''):'<div class="mu t">'+esc(t('f_no_parties'))+'</div>')+'</div><div style="margin-top:14px">'+btn('fpnew',t('f_p_new'),{p:1,icon:'Plus'})+'</div></div>'}
+function partiesView(){const f=F(),td=today();
+ return '<div class="card">'+hdr('User','f_tab_parties')+'<div class="stack" style="gap:10px;margin-top:12px">'+(f.parties.length?f.parties.map(p=>{const hv=heldV(p.id,td),hd=vt(hv);
+  return '<div class="card ent fc" style="padding:12px;--c:'+col(p.color)+(p.arch?';opacity:.6':'')+'"><div class="row" style="align-items:flex-start"><div class="grow t" style="min-width:0"><div class="dn">'+esc(p.name)+'</div><div class="mu sm">'+esc(t('f_t_'+p.type))+(p.arch?' · '+esc(t('f_p_stopped')):'')+'</div>'+(hd?'<div class="mu xs ltr" style="text-align:start;overflow-wrap:anywhere">'+esc(vb(hv))+'</div>':'')+'</div><b style="color:'+col2(hd)+';white-space:nowrap">'+dz(hd)+'</b><button class="ib" data-a="fpedit" data-id="'+esc(p.id)+'" aria-label="'+esc(t('f_edit'))+'">'+ic('Edit')+'</button></div></div>'}).join(''):'<div class="mu t">'+esc(t('f_no_parties'))+'</div>')+'</div><div style="margin-top:14px">'+btn('fpnew',t('f_p_new'),{p:1,icon:'Plus'})+'</div></div>'}
 
 function range(){const f=F();if(!S.fh){const n=today();S.fh={from:n.slice(0,8)+'01',to:n}}
  if(S.fh.from<f.set.start&&f.set.start)S.fh.from=f.set.start;return S.fh}
@@ -861,14 +882,16 @@ function histView(){const f=F(),r=range(),ds=[];for(let k=r.from;k<=r.to&&ds.len
  const R=ds.map(k=>({k,...stat(k)})),T={inn:0,out:0,diff:0};R.forEach(x=>{T.inn+=x.inn;T.out+=x.out;T.diff+=x.diff||0});
  const lb=(k,id,v)=>'<label><span class="mu xs t">'+esc(t(k))+'</span><div class="field"><input type="date" id="'+id+'" value="'+v+'"></div></label>';
  const pt=f.parties.map(p=>({p,g:f.txs.filter(x=>x.pid==p.id&&x.dir=='out'&&x.date>=r.from&&x.date<=r.to).reduce((a,x)=>a+x.amt,0),r:f.txs.filter(x=>x.pid==p.id&&x.dir=='in'&&x.date>=r.from&&x.date<=r.to).reduce((a,x)=>a+x.amt,0)})).filter(x=>x.g||x.r);
- return '<div class="card">'+hdr('Table','f_h_title')+'<div class="g2" style="margin-top:12px">'+lb('f_h_from','fhf',r.from)+lb('f_h_to','fht',r.to)+'</div><div class="g2" style="margin-top:12px">'+btn('fhprint',t('f_h_print'),{icon:'Print'})+btn('fcsv',t('f_h_csv'),{icon:'Download',dis:!R.length})+'</div></div>'+
- '<div class="card">'+(R.length?'<div class="tw sm0 fz" style="direction:'+(S.lang=='ar'?'rtl':'ltr')+'"><table class="tb"><thead><tr>'+['f_col_date','f_col_open','f_col_in','f_col_out','f_col_theo','f_col_cnt','f_col_diff','f_col_st'].map(k=>'<th>'+esc(t(k))+'</th>').join('')+'</tr></thead><tbody>'+
+ return '<div class="card">'+hdr('Table','f_h_title')+'<div class="g2" style="margin-top:12px">'+lb('f_h_from','fhf',r.from)+lb('f_h_to','fht',r.to)+'</div><div class="g2" style="margin-top:12px">'+btn('fhprint',t('f_h_print'),{icon:'Print'})+btn('fcsv',t('f_h_csv'),{icon:'Download',dis:!R.length})+'</div><div style="margin-top:10px">'+btn('fcsv2',t('f_csv_mv'),{icon:'Download',dis:!R.length})+'</div></div>'+
+ '<div class="card">'+(R.length?'<div class="tw sm0 fz" style="direction:'+dirS()+'"><table class="tb"><thead><tr>'+['f_col_date','f_col_open','f_col_in','f_col_out','f_col_theo','f_col_cnt','f_col_diff','f_col_st'].map(k=>'<th>'+esc(t(k))+'</th>').join('')+'</tr></thead><tbody>'+
   R.map(x=>'<tr style="cursor:pointer" data-a="fgo" data-d="'+x.k+'"><td>'+esc(fmtDate(x.k))+'</td><td>'+num(x.o)+'</td><td style="color:var(--ok)">'+num(x.inn)+'</td><td style="color:var(--er)">'+num(x.out)+'</td><td>'+num(x.theo)+'</td><td>'+(x.closed?num(x.counted):'')+'</td><td style="color:'+(x.diff?'var(--er)':'inherit')+'">'+(x.closed?(x.diff>0?'+':'')+num(x.diff):'')+'</td><td>'+esc(t(x.closed?'f_st_closed':'f_st_open'))+'</td></tr>').join('')+
   '</tbody><tfoot><tr><td>'+esc(t('f_h_tot'))+'</td><td></td><td>'+num(T.inn)+'</td><td>'+num(T.out)+'</td><td></td><td></td><td>'+(T.diff>0?'+':'')+num(T.diff)+'</td><td></td></tr></tfoot></table></div>':'<div class="mu t">'+esc(t('f_h_empty'))+'</div>')+'</div>'+
- (pt.length?'<div class="card">'+hdr('User','f_h_party')+'<div class="tw sm0 fz" style="margin-top:12px;direction:'+(S.lang=='ar'?'rtl':'ltr')+'"><table class="tb"><thead><tr>'+['f_col_party','f_col_given','f_col_recv'].map(k=>'<th>'+esc(t(k))+'</th>').join('')+'</tr></thead><tbody>'+pt.map(x=>'<tr><td style="text-align:start">'+esc(x.p.name)+'</td><td>'+num(x.g)+'</td><td>'+num(x.r)+'</td></tr>').join('')+'</tbody></table></div></div>':'')}
+ (pt.length?'<div class="card">'+hdr('User','f_h_party')+'<div class="tw sm0 fz" style="margin-top:12px;direction:'+dirS()+'"><table class="tb"><thead><tr>'+['f_col_party','f_col_given','f_col_recv'].map(k=>'<th>'+esc(t(k))+'</th>').join('')+'</tr></thead><tbody>'+pt.map(x=>'<tr><td style="text-align:start">'+esc(x.p.name)+'</td><td>'+num(x.g)+'</td><td>'+num(x.r)+'</td></tr>').join('')+'</tbody></table></div></div>':'')}
 
 function setView(){const f=F(),s=f.set,fl=(k,id,v,ty,ex)=>'<label><span class="mu sm t">'+esc(t(k))+'</span><div class="field"><input id="'+id+'" type="'+(ty||'text')+'" value="'+esc(v)+'" '+(ex||'')+'></div></label>';
- return '<div class="card"><div class="stack" style="gap:12px">'+fl('f_s_office','sfo',s.office)+fl('f_s_den','sfd',s.den.join(','),'text','inputmode="numeric"')+'<div class="mu xs t" style="margin-top:-6px">'+esc(t('f_s_den_h'))+'</div>'+fl('f_s_start','sfs',s.start,'date')+fl('f_s_bal','sfb',s.bal,'text','inputmode="numeric" class="fm"')+'<div class="mu xs t">'+esc(t('f_s_warn'))+'</div><div class="sm t" id="err" style="color:var(--er)" hidden></div>'+btn('fsetsave',t('f_s_save'),{p:1})+'</div></div>'+
+ return '<div class="card"><div class="stack" style="gap:12px">'+fl('f_s_office','sfo',s.office)+fl('f_s_den','sfd',s.den.join(','),'text','inputmode="numeric"')+'<div class="mu xs t" style="margin-top:-6px">'+esc(t('f_s_den_h'))+'</div>'+fl('f_s_start','sfs',s.start,'date')+
+ '<div class="card" style="padding:12px;background:var(--in)"><div class="mu sm t">'+esc(t('f_open_bal'))+'</div><b style="display:block;margin:4px 0">'+dz(s.bal)+'</b><div class="mu xs ltr" style="text-align:start;overflow-wrap:anywhere;margin-bottom:8px">'+esc(vb(s.balv))+'</div>'+btn('fopen',t('f_open_edit'),{icon:'Edit'})+'</div>'+
+ '<div class="mu xs t">'+esc(t('f_s_warn'))+'</div><div class="sm t" id="err" style="color:var(--er)" hidden></div>'+btn('fsetsave',t('f_s_save'),{p:1})+'</div></div>'+
  '<div class="card">'+hdr('Download','f_bak')+'<div class="mu sm t" style="margin:10px 0">'+esc(t('f_bak_note'))+'</div><div class="g2">'+btn('fbak',t('f_bak_exp'),{icon:'Download'})+btn('frest',t('f_bak_imp'),{icon:'Upload'})+'</div></div>'+
  '<div class="card"><div class="chips">'+'<button class="chip" data-a="faudit">'+esc(t('f_audit'))+'</button><button class="chip" data-a="freset" style="color:var(--er)">'+esc(t('f_reset'))+'</button></div></div>'}
 
@@ -877,15 +900,16 @@ const partyOpts=sel=>F().parties.filter(p=>!p.arch||p.id==sel).map(p=>'<option v
 function txSheet(){const x=S.fx,f=F(),inn=x.dir=='in';
  return OV('<h2 class="t" style="margin:0">'+esc(t(x.id?'f_tx_edit':inn?'f_tx_in':'f_tx_out'))+'</h2><div class="chips"><button class="chip'+(inn?' on':'')+'" data-a="fdir" data-v="in">'+esc(t('f_dir_in'))+'</button><button class="chip'+(!inn?' on':'')+'" data-a="fdir" data-v="out">'+esc(t('f_dir_out'))+'</button></div>'+
  '<label><span class="mu sm t">'+esc(t('f_party'))+'</span><div class="row" style="gap:8px"><div class="field grow"><select id="fxp">'+partyOpts(x.pid)+'</select></div><button class="chip" data-a="fnewp">'+esc(t('f_add_party'))+'</button></div></label>'+
- '<label><span class="mu sm t">'+esc(t('f_amount'))+'</span><div class="field"><input id="fxa" class="fm" inputmode="numeric" maxlength="12" placeholder="0" value="'+esc(x.amt)+'"></div></label><div class="sm t" id="fxprev"></div>'+
+ '<div class="mu sm t">'+esc(t('f_den_title'))+' ('+esc(t('f_c_count'))+')</div>'+denBlock(x.v)+'<div class="sm t" id="fxprev"></div>'+
  '<label><span class="mu sm t">'+esc(t('f_note'))+'</span><div class="field"><input id="fxn" maxlength="80" value="'+esc(x.note)+'"></div></label>'+
  '<label><span class="mu sm t">'+esc(t('f_date'))+'</span><div class="field"><input id="fxd" type="date" min="'+f.set.start+'" value="'+x.date+'"></div></label>'+
  '<div class="sm t" id="err" style="color:var(--er)" hidden></div><div class="g2">'+btn('close',t('f_cancel'))+btn('ftxsave',t('f_save'),{p:1})+'</div>')}
 function fxRead(){const x=S.fx;if(!x)return;const g=id=>document.getElementById(id);
- if(g('fxp'))x.pid=g('fxp').value;if(g('fxa'))x.amt=g('fxa').value;if(g('fxn'))x.note=g('fxn').value;if(g('fxd'))x.date=g('fxd').value}
-function fxPrev(){const x=S.fx,e=document.getElementById('fxprev');if(!x||!e||S.sheet!='ftx')return;fxRead();const a=+x.amt||0,d=x.date||S.fd;
- const others=txsOn(d).filter(y=>y.id!=x.id),base=openOf(d)+net(others),th=base+(x.dir=='in'?a:-a);
- e.innerHTML=a?esc(t('f_after'))+': <b style="color:'+(th<0?'var(--er)':'inherit')+'">'+dz(th)+'</b>'+(th<0?'<div style="color:var(--er)">'+esc(t('f_neg'))+'</div>':''):''}
+ if(g('fxp'))x.pid=g('fxp').value;if(g('fxn'))x.note=g('fxn').value;if(g('fxd'))x.date=g('fxd').value;x.v=denRead()}
+function fxPrev(){const x=S.fx,e=document.getElementById('fxprev');if(!x||!e||S.sheet!='ftx')return;fxRead();const a=vt(x.v),d=x.date||S.fd;
+ const base=vadd(openV(d),vtx(txsOn(d).filter(y=>y.id!=x.id))),nv=vadd(base,x.v,x.dir=='in'?1:-1),th=vt(nv),w=[];
+ if(x.dir=='out')for(const k in x.v)if((+base[k]||0)<+x.v[k])w.push(k=='o'?t('f_short_o',{a:num(+base.o||0)}):t('f_short_den',{d:num(+k),a:num(+base[k]||0)}));
+ e.innerHTML=a?esc(t('f_tx_total'))+': <b>'+dz(a)+'</b><br>'+esc(t('f_after'))+': <b style="color:'+(th<0?'var(--er)':'inherit')+'">'+dz(th)+'</b>'+(th<0?'<div style="color:var(--er)">'+esc(t('f_neg'))+'</div>':'')+w.map(m=>'<div style="color:var(--er)">'+esc(m)+'</div>').join(''):''}
 function partySheet(){const p=S.fp2,f=F(),has=p.id&&f.txs.some(x=>x.pid==p.id);
  return OV('<h2 class="t" style="margin:0">'+esc(t(p.id?'f_p_edit':'f_p_new'))+'</h2><label><span class="mu sm t">'+esc(t('f_p_name'))+'</span><div class="field"><input id="fpn" maxlength="40" value="'+esc(p.name)+'"></div></label>'+
  '<div class="mu sm t">'+esc(t('f_p_type'))+'</div><div class="chips">'+['worker','atm','central','other'].map(k=>'<button class="chip'+(p.type==k?' on':'')+'" data-a="fptype" data-v="'+k+'">'+esc(t('f_t_'+k))+'</button>').join('')+'</div>'+
@@ -895,26 +919,28 @@ function partySheet(){const p=S.fp2,f=F(),has=p.id&&f.txs.some(x=>x.pid==p.id);
  (p.id?'<div class="g2">'+btn('fparch',t(p.arch?'f_p_resume':'f_p_stop'))+(has?'':btn('fpdel',t('f_p_del'),{d:1,icon:'Trash'}))+'</div>'+(has?'<div class="mu xs t">'+esc(t('f_p_has'))+'</div>':''):''))}
 function closeSheet(){const f=F(),d=S.fd,s=stat(d),x=S.fx,hold=f.parties.filter(p=>p.type=='worker'&&!p.arch&&held(p.id,d)>0).map(p=>p.name);
  return OV('<h2 class="t" style="margin:0">'+esc(t('f_c_title'))+' · '+esc(fmtDate(d))+'</h2><div class="mu sm t">'+esc(t('f_c_desc'))+'</div>'+(hold.length?'<div class="ban" style="--c:var(--er)"><div class="t sm">'+esc(t('f_c_hold',{names:hold.join('، ')}))+'</div></div>':'')+
- '<div class="stack" style="gap:8px">'+[...f.set.den].sort((a,b)=>b-a).map(v=>'<div class="row"><b class="ltr" style="min-width:70px">'+num(v)+'</b><div class="field grow"><input class="fcn" data-v="'+v+'" inputmode="numeric" maxlength="6" placeholder="0" aria-label="'+esc(t('f_c_count'))+' '+v+'" value="'+(x.cnt[v]||'')+'"></div><span class="mu sm ltr" id="fcs'+v+'" style="min-width:90px;text-align:end">'+(x.cnt[v]?num(x.cnt[v]*v):'')+'</span></div>').join('')+
- '<label><span class="mu sm t">'+esc(t('f_c_other'))+'</span><div class="field"><input id="fco" class="fm" inputmode="numeric" maxlength="12" placeholder="0" value="'+esc(x.other||'')+'"></div></label></div>'+
- '<div class="kp"><div class="row t"><span class="grow mu sm">'+esc(t('f_c_total'))+'</span><b id="fct"></b></div><div class="row t"><span class="grow mu sm">'+esc(t('f_c_theo'))+'</span><b>'+dz(s.theo)+'</b></div><div class="row t"><span class="grow mu sm">'+esc(t('f_diff'))+'</span><b id="fcd"></b></div></div>'+
+ denBlock(x.v,s.tv)+
+ '<div class="kp"><div class="row t"><span class="grow mu sm">'+esc(t('f_c_total'))+'</span><b id="fct"></b></div><div class="row t"><span class="grow mu sm">'+esc(t('f_c_theo'))+'</span><b>'+dz(s.theo)+'</b></div><div class="row t"><span class="grow mu sm">'+esc(t('f_diff'))+'</span><b id="fcd"></b></div><div class="mu xs ltr t" id="fcx" style="text-align:start"></div></div>'+
  '<div class="g2">'+btn('close',t('f_cancel'))+btn('fclosesave',t('f_c_confirm'),{p:1,icon:'Lock'})+'</div>')}
-function closeSum(){const x=S.fx,s=stat(S.fd);let tot=0;document.querySelectorAll('#layer .fcn').forEach(i=>{const v=+i.dataset.v,n=+i.value||0;x.cnt[v]=n;tot+=n*v;const e=document.getElementById('fcs'+v);if(e)e.textContent=n?num(n*v):''});
- const o=document.getElementById('fco');x.other=o?o.value:'';tot+=+x.other||0;x.total=tot;const d=tot-s.theo;
- const a=document.getElementById('fct'),b=document.getElementById('fcd');if(a)a.innerHTML=dz(tot);
- if(b)b.innerHTML='<span style="color:'+(d?'var(--er)':'var(--ok)')+'">'+(d?(d>0?'+':'')+dz(d)+' · '+esc(t(d>0?'f_c_over':'f_c_short')):esc(t('f_c_ok')))+'</span>'}
+function closeSum(){const x=S.fx,s=stat(S.fd);x.v=denRead();const tot=vt(x.v);x.total=tot;const d=tot-s.theo;
+ const a=document.getElementById('fct'),b=document.getElementById('fcd'),c=document.getElementById('fcx');if(a)a.innerHTML=dz(tot);
+ if(b)b.innerHTML='<span style="color:'+(d?'var(--er)':'var(--ok)')+'">'+(d?(d>0?'+':'')+dz(d)+' · '+esc(t(d>0?'f_c_over':'f_c_short')):esc(t('f_c_ok')))+'</span>';
+ if(c){const df=dens().filter(k=>(+x.v[k]||0)!=(+s.tv[k]||0)).map(k=>num(k)+': '+((+x.v[k]||0)-(+s.tv[k]||0)>0?'+':'')+num((+x.v[k]||0)-(+s.tv[k]||0)));if((+x.v.o||0)!=(+s.tv.o||0))df.push(t('f_other_row').replace(/ \(.*\)/,'')+': '+(((+x.v.o||0)-(+s.tv.o||0))>0?'+':'')+num((+x.v.o||0)-(+s.tv.o||0)));c.innerHTML=df.length?'<span style="color:var(--er)">'+esc(t('f_c_diffs'))+' — '+esc(df.join(' · '))+'</span>':''}}
 const sheetBox=(k,body,ok,okLabel,danger)=>OV('<h2 class="t" style="margin:0">'+esc(t(k))+'</h2>'+body+'<div class="g2">'+btn('close',t('f_cancel'))+btn(ok,t(okLabel),{d:danger,p:!danger})+'</div>');
+const totBox=()=>'<div class="kp"><div class="row t"><span class="grow mu sm">'+esc(t('f_total'))+'</span><b id="fct"></b></div></div>';
 function setupSheet(){const x=S.fx;
  return OV('<h2 class="t" style="margin:0">'+esc(t('f_su_title'))+'</h2><div class="mu sm t">'+esc(t('f_su_desc'))+'</div>'+
  '<label><span class="mu sm t">'+esc(t('f_s_office'))+'</span><div class="field"><input id="suo" maxlength="60" value="'+esc(x.office)+'"></div></label>'+
  '<label><span class="mu sm t">'+esc(t('f_s_start'))+'</span><div class="field"><input id="sus" type="date" value="'+x.start+'"></div></label>'+
- '<label><span class="mu sm t">'+esc(t('f_s_bal'))+'</span><div class="field"><input id="sub" class="fm" inputmode="numeric" maxlength="12" placeholder="0" value="'+esc(x.bal)+'"></div></label>'+
  '<label><span class="mu sm t">'+esc(t('f_s_den'))+'</span><div class="field"><input id="sud" inputmode="numeric" value="'+esc(x.den)+'"></div><span class="mu xs t">'+esc(t('f_s_den_h'))+'</span></label>'+
+ '<div class="mu sm t">'+esc(t('f_open_bal'))+'</div>'+denBlock(x.v)+totBox()+
  '<label><span class="mu sm t">'+esc(t('f_su_n'))+'</span><div class="field"><input id="sun" class="fm" inputmode="numeric" maxlength="2" value="'+esc(x.n)+'"></div></label>'+
  '<label class="row" style="gap:10px"><input type="checkbox" id="suc"'+(x.central?' checked':'')+'><span class="t">'+esc(t('f_su_central'))+'</span></label><label class="row" style="gap:10px"><input type="checkbox" id="sua"'+(x.atm?' checked':'')+'><span class="t">'+esc(t('f_su_atm'))+'</span></label>'+
  '<div class="sm t" id="err" style="color:var(--er)" hidden></div>'+btn('fsugo',t('f_su_go'),{p:1}))}
+function suRead(){const x=S.fx,g=id=>document.getElementById(id);if(!g('suo'))return;x.office=g('suo').value;x.start=g('sus').value;x.den=g('sud').value;x.v=denRead();x.n=g('sun').value;x.central=g('suc').checked;x.atm=g('sua').checked}
+function openSheet(){return OV('<h2 class="t" style="margin:0">'+esc(t('f_open_bal'))+'</h2><div class="mu sm t">'+esc(t('f_s_warn'))+'</div>'+denBlock(S.fx.v)+totBox()+'<div class="g2">'+btn('close',t('f_cancel'))+btn('fopensave',t('f_save'),{p:1})+'</div>')}
 function auditSheet(){return OV('<h2 class="t" style="margin:0">'+esc(t('f_audit'))+'</h2>'+(F().audit.length?'<div class="stack" style="gap:8px">'+F().audit.slice(0,60).map(a=>'<div class="t sm"><span class="mu xs">'+esc(new Date(a.at).toLocaleString(loc(),{dateStyle:'short',timeStyle:'short'}))+'</span><br>'+esc(a.m)+'</div>').join('')+'</div>':'<div class="mu t">'+esc(t('f_audit_empty'))+'</div>')+btn('close',t('f_done')))}
-Object.assign(SH3,{ftx:txSheet,fparty:partySheet,fclose:closeSheet,fsetup:setupSheet,faudit:auditSheet,
+Object.assign(SH3,{ftx:txSheet,fparty:partySheet,fclose:closeSheet,fsetup:setupSheet,fopen:openSheet,faudit:auditSheet,
  ftdel:()=>sheetBox('f_del_tx','<div class="mu sm t">'+esc(t('f_del_tx_d'))+'</div>','ftxdelok','f_del',1),
  freopen:()=>sheetBox('f_ro_title','<div class="mu sm t">'+esc(t('f_ro_desc'))+'</div>','freopenok','f_reopen'),
  freset:()=>sheetBox('f_reset','<div class="mu sm t">'+esc(t('f_reset_d'))+'</div>','fresetok','f_del',1)});
@@ -923,61 +949,68 @@ Object.assign(SH3,{ftx:txSheet,fparty:partySheet,fclose:closeSheet,fsetup:setupS
 const open_=(sheet,ex)=>{S.sheet=sheet;render();if(ex)ex();};
 const showErr=m=>{const e=document.getElementById('err');if(e){e.textContent=t(m);e.hidden=false}};
 const goDay=d=>{S.fd=d;S.fp='day';render()};
-function newTx(dir,pid){const f=F(),a=f.parties.filter(p=>!p.arch);if(!a.length)return;S.fx={id:null,dir,pid:pid||a[0].id,amt:'',note:'',date:S.fd};open_('ftx',()=>{fxPrev();const i=document.getElementById('fxa');i&&i.focus()})}
-function txSave(){fxRead();const x=S.fx,f=F(),a=Math.round(+x.amt||0);
+const denChanged=()=>{if(S.sheet=='ftx')fxPrev();else if(S.sheet=='fclose')closeSum();else{const e=document.getElementById('fct');if(e)e.innerHTML=dz(vt(denRead()))}};
+function newTx(dir,pid){const f=F(),a=f.parties.filter(p=>!p.arch);if(!a.length)return;S.fx={id:null,dir,pid:pid||a[0].id,v:{},note:'',date:S.fd};open_('ftx',()=>{fxPrev();const i=document.querySelector('#layer .fcn');i&&i.focus()})}
+function txSave(){fxRead();const x=S.fx,f=F(),v=vclean(x.v),a=vt(v);
  if(!x.pid||!P_(x.pid))return showErr('f_err_party');if(!(a>0))return showErr('f_err_amt');if(!x.date||x.date<f.set.start)return showErr('f_err_date');
  const dc=f.days[x.date];if(dc&&dc.closed)return showErr('f_err_closed');
- const p=P_(x.pid),m=verb(p,x.dir)+' '+p.name+' '+dzt(a)+' ('+fmtDate(x.date)+')';
- if(x.id){const o=f.txs.find(y=>y.id==x.id);if(o){Object.assign(o,{pid:x.pid,dir:x.dir,amt:a,note:x.note.trim(),date:x.date});log(t('f_log_tx_edit')+': '+m)}}
- else{f.txs.push({id:uid(),ts:Date.now(),date:x.date,pid:x.pid,dir:x.dir,amt:a,note:x.note.trim()});log(t('f_log_tx_add')+': '+m)}
+ const p=P_(x.pid),m=verb(p,x.dir)+' '+p.name+' '+dzt(a)+' ['+vb(v)+'] ('+fmtDate(x.date)+')';
+ if(x.id){const o=f.txs.find(y=>y.id==x.id);if(o){Object.assign(o,{pid:x.pid,dir:x.dir,v,amt:a,note:x.note.trim(),date:x.date});log(t('f_log_tx_edit')+': '+m)}}
+ else{f.txs.push({id:uid(),ts:Date.now(),date:x.date,pid:x.pid,dir:x.dir,v,amt:a,note:x.note.trim()});log(t('f_log_tx_add')+': '+m)}
  save();S.fd=x.date;S.sheet=null;S.fx=null;render();toast('f_tx_saved')}
 function partySave(){const p=S.fp2,n=(document.getElementById('fpn').value||'').trim().slice(0,40),c=Math.round(+document.getElementById('fpc').value||0);if(!n)return showErr('f_p_err');
  const f=F();let id=p.id;if(id){const o=P_(id);Object.assign(o,{name:n,type:p.type,color:p.color,cap:c||0})}else{id=uid();f.parties.push({id,name:n,type:p.type,color:p.color,cap:c||0,arch:false})}
  log(t('f_log_p')+': '+n);save();toast('f_p_saved');
  if(p.back&&S.fx){S.fx.pid=id;S.sheet='ftx';render();fxPrev()}else{S.sheet=null;render()}}
-function closeSave(){closeSum();const x=S.fx,f=F(),d=S.fd,s=stat(d);const cnt={};Object.keys(x.cnt).forEach(k=>{if(x.cnt[k])cnt[k]=x.cnt[k]});
- f.days[d]={closed:true,counted:x.total||0,cnt,other:+x.other||0,at:Date.now()};log(t('f_log_close')+': '+fmtDate(d)+' · '+dzt(x.total||0)+' / '+dzt(s.theo));save();S.sheet=null;S.fx=null;render();toast('f_c_done')}
+function closeSave(){closeSum();const x=S.fx,f=F(),d=S.fd,s=stat(d),v=vclean(x.v);
+ f.days[d]={closed:true,v,counted:vt(v),at:Date.now()};log(t('f_log_close')+': '+fmtDate(d)+' · '+dzt(vt(v))+' / '+dzt(s.theo));save();S.sheet=null;S.fx=null;render();toast('f_c_done')}
 function setSave(){const f=F(),g=id=>document.getElementById(id).value,den=g('sfd').split(/[,\s;،]+/).map(v=>+v).filter(v=>v>0);
  if(!den.length||den.some(v=>!Number.isInteger(v)))return showErr('f_s_den_err');const st=g('sfs');if(!st)return showErr('f_err_date');
- f.set.office=g('sfo').trim();f.set.den=[...new Set(den)].sort((a,b)=>b-a);f.set.start=st;f.set.bal=Math.round(+g('sfb')||0);log(t('f_log_set'));save();render();toast('f_s_saved')}
-function suGo(){const g=id=>document.getElementById(id),den=g('sud').value.split(/[,\s;،]+/).map(v=>+v).filter(v=>v>0);
- if(!den.length)return showErr('f_s_den_err');if(!g('sus').value)return showErr('f_err_date');
- const f=F();f.set={office:g('suo').value.trim(),den:[...new Set(den)].sort((a,b)=>b-a),start:g('sus').value,bal:Math.round(+g('sub').value||0)};
- f.parties=[];const n=Math.min(20,+g('sun').value||0);let i=0;
- if(g('suc').checked)f.parties.push({id:uid(),name:t('f_n_central'),type:'central',color:COLORS[0],cap:0,arch:false});
- if(g('sua').checked)f.parties.push({id:uid(),name:t('f_n_atm'),type:'atm',color:COLORS[4],cap:0,arch:false});
+ f.set.office=g('sfo').trim();f.set.den=[...new Set(den)].sort((a,b)=>b-a);f.set.start=st;log(t('f_log_set'));save();render();toast('f_s_saved')}
+function suGo(){suRead();const x=S.fx,den=x.den.split(/[,\s;،]+/).map(v=>+v).filter(v=>v>0);
+ if(!den.length||den.some(v=>!Number.isInteger(v)))return showErr('f_s_den_err');if(!x.start)return showErr('f_err_date');
+ const f=F(),bv=vclean(x.v);f.set={office:x.office.trim(),den:[...new Set(den)].sort((a,b)=>b-a),start:x.start,bal:vt(bv),balv:bv};
+ f.parties=[];const n=Math.min(20,Math.round(+x.n)||0);let i=0;
+ if(x.central)f.parties.push({id:uid(),name:t('f_n_central'),type:'central',color:COLORS[0],cap:0,arch:false});
+ if(x.atm)f.parties.push({id:uid(),name:t('f_n_atm'),type:'atm',color:COLORS[4],cap:0,arch:false});
  for(i=1;i<=n;i++)f.parties.push({id:uid(),name:t('f_n_worker',{n:i}),type:'worker',color:COLORS[(i+1)%COLORS.length],cap:0,arch:false});
  log(t('f_log_set'));save();S.fd=today()<f.set.start?f.set.start:today();S.sheet=null;S.fx=null;render();toast('f_s_saved')}
 function csvOut(){const f=F(),r=range(),q=v=>'"'+String(v).replace(/"/g,'""')+'"',rows=[['f_col_date','f_col_open','f_col_in','f_col_out','f_col_theo','f_col_cnt','f_col_diff','f_col_st'].map(k=>q(t(k))).join(';')];
  for(let k=r.from;k<=r.to;k=addD(k,1)){if(!(f.txs.some(x=>x.date==k)||(f.days[k]&&f.days[k].closed)))continue;const s=stat(k);rows.push([fmtDate(k),s.o,s.inn,s.out,s.theo,s.closed?s.counted:'',s.closed?s.diff:'',t(s.closed?'f_st_closed':'f_st_open')].join(';'))}
  deliver(new Blob(['﻿'+rows.join('\n')],{type:'text/csv'}),'caisse-'+r.from+'_'+r.to+'.csv').then(ok=>toast(ok?'saved':'err_save'))}
-function printDay(d){const f=F(),s=stat(d),th=k=>'<th>'+esc(t(k))+'</th>',P=document.getElementById('prt');P.dir=S.lang=='ar'?'rtl':'ltr';
+function csvMoves(){const f=F(),r=range(),q=v=>'"'+String(v).replace(/"/g,'""')+'"',ds=dens(),rows=[[t('f_col_date'),t('f_col_time'),t('f_col_party2'),t('f_col_type'),...ds,t('f_other_row'),t('f_tx_total'),t('f_col_note')].map(q).join(';')];
+ [...f.txs].filter(x=>x.date>=r.from&&x.date<=r.to).sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:a.ts-b.ts).forEach(x=>{const p=P_(x.pid),sg=x.dir=='in'?1:-1;
+  rows.push([fmtDate(x.date),new Date(x.ts).toLocaleTimeString(loc(),{hour:'2-digit',minute:'2-digit'}),q(p?p.name:''),q(verb(p,x.dir)),...ds.map(k=>x.v[k]?sg*x.v[k]:''),x.v.o?sg*x.v.o:'',sg*x.amt,q(x.note||'')].join(';'))});
+ deliver(new Blob(['﻿'+rows.join('\n')],{type:'text/csv'}),'mouvements-'+r.from+'_'+r.to+'.csv').then(ok=>toast(ok?'saved':'err_save'))}
+function printDay(d){const f=F(),s=stat(d),th=k=>'<th>'+esc(t(k))+'</th>',P=document.getElementById('prt');P.dir=dirS();
  const rows=f.parties.filter(p=>!p.arch||s.T.some(x=>x.pid==p.id)).map(p=>{const g=s.T.filter(x=>x.pid==p.id&&x.dir=='out').reduce((a,x)=>a+x.amt,0),r=s.T.filter(x=>x.pid==p.id&&x.dir=='in').reduce((a,x)=>a+x.amt,0);return '<tr><td style="text-align:start">'+esc(p.name)+'</td><td>'+(g?num(g):'')+'</td><td>'+(r?num(r):'')+'</td><td>'+num(held(p.id,d))+'</td></tr>'}).join('');
  const kv=[[t('f_opening'),dzt(s.o)],[t('f_recv'),dzt(s.inn)],[t('f_given'),dzt(s.out)],[t('f_theo'),dzt(s.theo)]].concat(s.closed?[[t('f_counted'),dzt(s.counted)],[t('f_diff'),(s.diff>0?'+':'')+dzt(s.diff)]]:[]);
  P.innerHTML='<h1>'+esc(f.set.office||t('f_title'))+'</h1><div class="pm">'+esc(t('f_pr_title'))+' — '+esc(wday(d))+' '+esc(fmtDate(d))+' · '+esc(t(s.closed?'f_st_closed':'f_st_open'))+'</div>'+
- '<div class="tw sm0 fz" style="margin-top:12px;direction:'+(S.lang=='ar'?'rtl':'ltr')+'"><table class="tb"><tbody>'+kv.map(([k,v])=>'<tr><td style="text-align:start">'+esc(k)+'</td><td>'+esc(v)+'</td></tr>').join('')+'</tbody></table></div>'+
+ '<div class="tw sm0" style="margin-top:12px"><table class="tb"><tbody>'+kv.map(([k,v])=>'<tr><td style="text-align:start">'+esc(k)+'</td><td>'+esc(v)+'</td></tr>').join('')+'</tbody></table></div>'+
+ '<h2 style="margin:16px 0 6px;font-size:15px">'+esc(t('f_den_title'))+'</h2>'+denTable(s).replace(/ class="tw sm0 fz" style="[^"]*"/,' class="tw sm0"')+
  '<h2 style="margin:16px 0 6px;font-size:15px">'+esc(t('f_pos'))+'</h2><div class="tw sm0"><table class="tb"><thead><tr>'+['f_col_party','f_col_given','f_col_recv','f_col_net'].map(th).join('')+'</tr></thead><tbody>'+rows+'</tbody></table></div>'+
- '<h2 style="margin:16px 0 6px;font-size:15px">'+esc(t('f_txs'))+'</h2><div class="tw sm0"><table class="tb"><tbody>'+[...s.T].sort((a,b)=>a.ts-b.ts).map(x=>{const p=P_(x.pid);return '<tr><td style="text-align:start">'+esc(verb(p,x.dir)+' '+(p?p.name:'?'))+(x.note?' — '+esc(x.note):'')+'</td><td>'+(x.dir=='in'?'+':'−')+' '+num(x.amt)+'</td></tr>'}).join('')+'</tbody></table></div>'+
- (s.closed&&s.c.cnt?'<div style="margin-top:10px">'+esc(t('f_c_notes'))+': '+Object.keys(s.c.cnt).sort((a,b)=>b-a).map(k=>num(+k)+'×'+s.c.cnt[k]).join(' · ')+(s.c.other?' · '+num(s.c.other):'')+'</div>':'')+
+ '<h2 style="margin:16px 0 6px;font-size:15px">'+esc(t('f_txs'))+'</h2><div class="tw sm0"><table class="tb"><tbody>'+[...s.T].sort((a,b)=>a.ts-b.ts).map(x=>{const p=P_(x.pid);return '<tr><td style="text-align:start">'+esc(verb(p,x.dir)+' '+(p?p.name:'?'))+' <span dir="ltr">['+esc(vb(x.v))+']</span>'+(x.note?' — '+esc(x.note):'')+'</td><td>'+(x.dir=='in'?'+':'−')+' '+num(x.amt)+'</td></tr>'}).join('')+'</tbody></table></div>'+
  '<div style="display:flex;justify-content:space-between;margin-top:50px"><div>'+esc(t('f_pr_sign'))+'<br><br>________________</div><div class="pm">'+esc(t('f_pr_gen'))+' '+esc(new Date().toLocaleString(loc()))+'</div></div>';
  setTimeout(()=>window.print(),80)}
 function backupOut(){deliver(new Blob([JSON.stringify({app:'req-fin',...F()})],{type:'application/json'}),'cash-backup-'+today()+'.json').then(ok=>toast(ok?'saved':'err_save'))}
 const ff=document.createElement('input');ff.type='file';ff.accept='.json,application/json';ff.hidden=true;document.body.appendChild(ff);
-ff.addEventListener('change',async e=>{const fl=e.target.files[0];e.target.value='';if(!fl)return;try{const j=JSON.parse(await fl.text());if(!j||!j.set||!Array.isArray(j.txs)||!Array.isArray(j.parties))throw 0;delete j.app;FC=j;FN=NS;log(t('f_log_imp'));save();render();toast('f_imp_ok')}catch(err){toast('f_imp_err')}});
+ff.addEventListener('change',async e=>{const fl=e.target.files[0];e.target.value='';if(!fl)return;try{const j=JSON.parse(await fl.text());if(!j||!j.set||!Array.isArray(j.txs)||!Array.isArray(j.parties))throw 0;delete j.app;FC=mig(j);FN=NS;log(t('f_log_imp'));save();render();toast('f_imp_ok')}catch(err){toast('f_imp_err')}});
 
 window.actF=function(a,el){const d=el.dataset;if(a[0]!='f')return 0;
  switch(a){
  case'fin':S.fp='day';S.fd=today();go(2);return 1;
  case'ftab':S.fp=d.v;render();return 1;
  case'fprev':goDay(addD(S.fd,-1));return 1;case'fnext':goDay(addD(S.fd,1));return 1;case'ftoday':goDay(today());return 1;case'fgo':goDay(d.d);return 1;
- case'fsetup':S.fx={office:'',start:today(),bal:'',den:F().set.den.join(','),n:'2',central:true,atm:true};open_('fsetup');return 1;
+ case'fsetup':S.fx={office:'',start:today(),v:{},den:F().set.den.join(','),n:'2',central:true,atm:true};open_('fsetup');return 1;
  case'fsugo':suGo();return 1;
+ case'fopen':S.fx={v:{...F().set.balv}};open_('fopen',denChanged);return 1;
+ case'fopensave':{const f=F(),v=vclean(denRead());f.set.balv=v;f.set.bal=vt(v);log(t('f_log_set'));save();S.sheet=null;S.fx=null;render();toast('f_s_saved');return 1}
  case'ftxnew':newTx(d.dir);return 1;
- case'ftxedit':{const x=F().txs.find(y=>y.id==d.id);if(x){S.fx={id:x.id,dir:x.dir,pid:x.pid,amt:String(x.amt),note:x.note||'',date:x.date};open_('ftx',fxPrev)}return 1}
+ case'ftxedit':{const x=F().txs.find(y=>y.id==d.id);if(x){S.fx={id:x.id,dir:x.dir,pid:x.pid,v:{...x.v},note:x.note||'',date:x.date};open_('ftx',fxPrev)}return 1}
  case'fdir':fxRead();S.fx.dir=d.v;render();fxPrev();return 1;
  case'ftxsave':txSave();return 1;
  case'ftxdel':S.fx={id:d.id};open_('ftdel');return 1;
- case'ftxdelok':{const f=F(),x=f.txs.find(y=>y.id==S.fx.id);if(x){const p=P_(x.pid);log(t('f_log_tx_del')+': '+verb(p,x.dir)+' '+(p?p.name:'')+' '+dzt(x.amt)+' ('+fmtDate(x.date)+')');f.txs=f.txs.filter(y=>y!==x);save()}S.sheet=null;S.fx=null;render();toast('f_deleted');return 1}
+ case'ftxdelok':{const f=F(),x=f.txs.find(y=>y.id==S.fx.id);if(x){const p=P_(x.pid);log(t('f_log_tx_del')+': '+verb(p,x.dir)+' '+(p?p.name:'')+' '+dzt(x.amt)+' ['+vb(x.v)+'] ('+fmtDate(x.date)+')');f.txs=f.txs.filter(y=>y!==x);save()}S.sheet=null;S.fx=null;render();toast('f_deleted');return 1}
  case'fpnew':S.fp2={id:null,name:'',type:'worker',color:COLORS[F().parties.length%COLORS.length],cap:0};open_('fparty');return 1;
  case'fnewp':fxRead();S.fp2={id:null,name:'',type:'worker',color:COLORS[F().parties.length%COLORS.length],cap:0,back:1};open_('fparty');return 1;
  case'fpedit':{const p=P_(d.id);if(p){S.fp2={...p};open_('fparty')}return 1}
@@ -986,11 +1019,11 @@ window.actF=function(a,el){const d=el.dataset;if(a[0]!='f')return 0;
  case'fpsave':partySave();return 1;
  case'fparch':{const p=P_(S.fp2.id);if(p){p.arch=!p.arch;log(t('f_log_p')+': '+p.name);save()}S.sheet=null;render();return 1}
  case'fpdel':{const f=F();f.parties=f.parties.filter(p=>p.id!=S.fp2.id);save();S.sheet=null;render();toast('f_deleted');return 1}
- case'fclose':S.fx={cnt:{},other:'',total:0};open_('fclose',closeSum);return 1;
+ case'fclose':S.fx={v:{},total:0};open_('fclose',closeSum);return 1;
  case'fclosesave':closeSave();return 1;
  case'freopen':open_('freopen');return 1;
  case'freopenok':{const f=F();if(f.days[S.fd]){f.days[S.fd].closed=false;log(t('f_log_reopen')+': '+fmtDate(S.fd));save()}S.sheet=null;render();toast('f_ro_ok');return 1}
- case'fhprint':printDay(S.fd);return 1;case'fcsv':csvOut();return 1;
+ case'fhprint':printDay(S.fd);return 1;case'fcsv':csvOut();return 1;case'fcsv2':csvMoves();return 1;
  case'fsetsave':setSave();return 1;case'fbak':backupOut();return 1;case'frest':ff.click();return 1;
  case'faudit':open_('faudit');return 1;case'freset':open_('freset');return 1;
  case'fresetok':FC=DEF();FN=NS;save();S.sheet=null;S.fd=today();render();toast('f_reset_ok');return 1}
@@ -998,15 +1031,145 @@ window.actF=function(a,el){const d=el.dataset;if(a[0]!='f')return 0;
 
 // ── inputs ──
 document.addEventListener('input',ev=>{const el=ev.target;
- if(el.classList.contains('fm')){el.value=el.value.replace(/\D/g,'').slice(0,12);if(el.id=='fxa')fxPrev();if(el.id=='fco')closeSum()}
- else if(el.classList.contains('fcn')){el.value=el.value.replace(/\D/g,'').slice(0,6);closeSum()}
- else if(el.id=='fxd')fxPrev();else if(el.id=='fxp')fxPrev();
+ if(el.classList.contains('fcn')){el.value=el.value.replace(/\D/g,'').slice(0,6);denChanged()}
+ else if(el.classList.contains('fm')){el.value=el.value.replace(/\D/g,'').slice(0,12);if(el.id=='fco')denChanged()}
+ else if(el.id=='fxd'||el.id=='fxp')fxPrev();
  const e=document.getElementById('err');if(e&&S.sheet)e.hidden=true});
 document.addEventListener('change',ev=>{const el=ev.target;
  if(el.id=='fdate'&&el.value){S.fd=el.value<F().set.start?F().set.start:el.value;render()}
+ else if(el.id=='sud'&&S.sheet=='fsetup'){suRead();render()}
  else if(el.id=='fhf'||el.id=='fht'){const r=range();if(el.value){r[el.id=='fhf'?'from':'to']=el.value;if(r.from>r.to){if(el.id=='fhf')r.to=r.from;else r.from=r.to}render()}}});
 document.addEventListener('keydown',ev=>{if(ev.key!='Enter')return;const el=ev.target;
- if(S.sheet=='ftx'&&(el.id=='fxa'||el.id=='fxn'))txSave();else if(S.sheet=='fparty'&&el.id=='fpn')partySave();else if(S.sheet=='fclose'&&(el.classList.contains('fcn')||el.id=='fco'))closeSave()});
+ if((el.classList.contains('fcn')||el.id=='fco')&&['ftx','fclose','fopen','fsetup'].includes(S.sheet)){ev.preventDefault();const l=[...document.querySelectorAll('#layer .fcn,#layer #fco')],i=l.indexOf(el);
+  if(i>=0&&i<l.length-1)l[i+1].focus();else if(S.sheet=='ftx')txSave();else if(S.sheet=='fclose')closeSave()}
+ else if(S.sheet=='ftx'&&el.id=='fxn')txSave();else if(S.sheet=='fparty'&&el.id=='fpn')partySave()});
+render();
+})();
+</script>
+<script>
+// ════════ Stamps portfolio (Portefeuille): vault, employees, main treasury (local storage) ════════
+(function(){
+DK.push('stm');
+Object.assign(D.ar,{sp_title:"Portefeuille الطوابع",sp_sub:"تسيير الطوابع البريدية",sp_card:"تتبّع الطوابع بين المكتب والقباضة الرئيسية والموظفين. ما يأخذه الموظف ويرجعه في اليوم يُعدّ مبيعًا.",sp_go:"فتح الصفحة",sp_day:"اليوم",sp_mon:"الوضعية",sp_emp:"الموظفون",sp_set:"الإعدادات",
+sp_k_take:"أخذ موظف",sp_k_ret:"إرجاع موظف",sp_k_recv:"استلام من القباضة",sp_k_rev:"Reversement للقباضة",
+sp_f_tt:"طوابع التاكسة (TT)",sp_f_tp:"الطوابع البريدية (TP)",sp_f_ta:"طوابع الغرامة (TA)",sp_f_tf:"الطوابع الجبائية (TF)",sp_f_vg:"القسيمة (Vignette)",
+sp_stock:"المخزون آخر اليوم",sp_sold:"المبيع",sp_took:"أخذ",sp_ret:"أرجع",sp_recv:"المستلم",sp_rev:"Reversement",sp_neg:"أرجع أكثر مما أخذ",
+sp_emp1:"الموظف",sp_add:"+ موظف",sp_emp_new:"موظف جديد",sp_emp_edit:"تعديل الموظف",sp_ename:"اسم الموظف",sp_amt:"قيمة الحركة",sp_short:"الفئة {d}: المتوفر في المكتب {a} فقط.",sp_note:"ملاحظة (اختياري)",sp_date:"التاريخ",
+sp_e_amt:"أدخل عددًا واحدًا على الأقل.",sp_e_emp:"اختر الموظف أو أضف موظفًا.",sp_e_date:"التاريخ قبل بداية المتابعة.",sp_e_name:"اكتب الاسم.",sp_e_den:"أدخل فئات صحيحة لكل نوع.",
+sp_saved:"تم الحفظ",sp_deleted:"تم الحذف",sp_edit:"تعديل الحركة",sp_dl_t:"حذف الحركة؟",sp_notx:"لا توجد حركات في هذا اليوم.",sp_noemp:"لم تضف موظفين بعد.",sp_stop:"إيقاف",sp_resume:"إعادة تفعيل",sp_off:"موقوف",
+sp_month:"الشهر",sp_cat:"الفئة",sp_prev:"السابق",sp_total:"المجموع",sp_rest:"المتبقي",sp_mt:"المبلغ",sp_mvs:"الحركة",sp_famn:"النوع",sp_det:"التفصيل",sp_xl:"تصدير Excel",sp_start:"تاريخ بداية المتابعة",sp_den_h:"فئات كل نوع، مفصولة بفاصلة.",sp_open_t:"الرصيد الافتتاحي",sp_open_d:"أدخل عدد الطوابع الموجودة في المكتب عند تاريخ البداية، لكل فئة.",sp_sum:"ملخص الشهر",sp_emp_t:"مبيع الموظفين في الشهر"});
+Object.assign(D.en,{sp_title:"Stamps portfolio",sp_sub:"Postage stamp management",sp_card:"Track stamps between the office, the main treasury and staff. What a staff member takes minus what they return in the day counts as sold.",sp_go:"Open page",sp_day:"Day",sp_mon:"Situation",sp_emp:"Staff",sp_set:"Settings",
+sp_k_take:"Staff takes",sp_k_ret:"Staff returns",sp_k_recv:"Received from treasury",sp_k_rev:"Reversement to treasury",
+sp_f_tt:"Postage-due (TT)",sp_f_tp:"Postage (TP)",sp_f_ta:"Fine stamps (TA)",sp_f_tf:"Fiscal stamps (TF)",sp_f_vg:"Vignette",
+sp_stock:"Office stock at day end",sp_sold:"Sold",sp_took:"Took",sp_ret:"Returned",sp_recv:"Received",sp_rev:"Reversement",sp_neg:"Returned more than taken",
+sp_emp1:"Staff member",sp_add:"+ Staff",sp_emp_new:"New staff member",sp_emp_edit:"Edit staff member",sp_ename:"Name",sp_amt:"Movement value",sp_short:"Denomination {d}: only {a} in the office.",sp_note:"Note (optional)",sp_date:"Date",
+sp_e_amt:"Enter at least one quantity.",sp_e_emp:"Choose or add a staff member.",sp_e_date:"Date is before tracking start.",sp_e_name:"Enter a name.",sp_e_den:"Enter valid denominations for every type.",
+sp_saved:"Saved",sp_deleted:"Deleted",sp_edit:"Edit movement",sp_dl_t:"Delete this movement?",sp_notx:"No movements on this day.",sp_noemp:"No staff added yet.",sp_stop:"Deactivate",sp_resume:"Reactivate",sp_off:"inactive",
+sp_month:"Month",sp_cat:"Denom.",sp_prev:"Previous",sp_total:"Total",sp_rest:"Remaining",sp_mt:"Amount",sp_mvs:"Movement",sp_famn:"Type",sp_det:"Details",sp_xl:"Export Excel",sp_start:"Tracking start date",sp_den_h:"Denominations of each type, comma-separated.",sp_open_t:"Opening stock",sp_open_d:"Enter the number of stamps in the office at the start date, per denomination.",sp_sum:"Month summary",sp_emp_t:"Staff sales this month"});
+Object.assign(D.fr,{sp_title:"Portefeuille timbres",sp_sub:"Gestion des timbres-poste",sp_go:"Ouvrir la page",sp_day:"Jour",sp_mon:"Situation",sp_emp:"Agents",sp_set:"Réglages",sp_k_take:"Prise par agent",sp_k_ret:"Retour d'agent",sp_k_recv:"Reçu de la recette",sp_k_rev:"Reversement à la recette",
+sp_f_tt:"Timbre taxe (TT)",sp_f_tp:"Timbre poste (TP)",sp_f_ta:"Timbre amende (TA)",sp_f_tf:"Timbre fiscal (TF)",sp_f_vg:"Vignette",sp_sold:"Vente",sp_recv:"Reçu",sp_rev:"Reversement",sp_prev:"Précédent",sp_total:"Total",sp_rest:"Reste",sp_mt:"Montant",sp_cat:"Catégorie",sp_month:"Mois",sp_emp1:"Agent",sp_took:"Pris",sp_ret:"Rendu",sp_stock:"Stock du bureau en fin de jour"});
+const FAM=[['tt',[5,10]],['tp',[25,30,50]],['ta',[500,1000,2000]],['tf',[10,15,20,30,50,100,200,300,400,500,1000]],['vg',[500,1000,1500,2000,3000,4000,5000,6000,8000,10000,12000,18000]]],KS=['take','ret','recv','rev'],SG={take:-1,ret:1,recv:1,rev:-1};
+const pad=n=>String(n).padStart(2,'0'),today=()=>{const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())};
+const addD=(s,n)=>{const d=new Date(s+'T12:00:00');d.setDate(d.getDate()+n);return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())};
+// data: open = {"fam:den":count}; tx = {id,ts,date,k,pid,fam,q:{den:count},note}; stock = open + Σ sign·q
+const DEF=()=>({v:1,start:today().slice(0,8)+'01',den:Object.fromEntries(FAM),emp:[],open:{},tx:[]});
+let C=null,CN=null;
+const G=()=>{if(!C||CN!==NS){CN=NS;try{const j=JSON.parse(sget('stm'));C=j&&j.den&&Array.isArray(j.tx)?j:DEF()}catch(e){C=DEF()}}return C};
+const sv=()=>sset('stm',JSON.stringify(G()));
+const amt=x=>{let s=0;for(const d in x.q)s+=d*x.q[d];return s},dz=n=>'<span class="ltr">'+num(Math.round(n))+'</span> '+esc(t('f_cur')),dr=()=>S.lang=='ar'?'rtl':'ltr';
+const nmE=id=>(G().emp.find(e=>e.id==id)||{}).n||'';
+function ds(f){const s=new Set(G().den[f]||[]),g=k=>{const a=k.split(':');if(a[0]==f)s.add(+a[1])};Object.keys(G().open).forEach(g);G().tx.forEach(x=>x.fam==f&&Object.keys(x.q).forEach(k=>s.add(+k)));return[...s].sort((a,b)=>a-b)}
+function stk(d,incl,skip){const r={...G().open};G().tx.forEach(x=>{if(x.id==skip||(incl?x.date>d:x.date>=d))return;for(const k in x.q){const i=x.fam+':'+k;r[i]=(r[i]||0)+SG[x.k]*x.q[k]}});return r}
+function mon(m){const a=m+'-01',b=m+'-31',p=stk(a,0),R={};G().tx.forEach(x=>{if(x.date<a||x.date>b)return;for(const k in x.q){const i=x.fam+':'+k,o=R[i]||(R[i]={rc:0,sd:0,rv:0}),n=x.q[k];if(x.k=='recv')o.rc+=n;else if(x.k=='rev')o.rv+=n;else o.sd+=x.k=='take'?n:-n}});return{p,R}}
+const kp=(l,v,c)=>'<div class="kp"><span class="mu xs t">'+esc(t(l))+'</span><b style="color:'+(c||'inherit')+'">'+v+'</b></div>';
+const ng=v=>v<0?'<span style="color:var(--er)">'+num(v)+'</span>':num(v);
+const tbl=(h,rows,foot)=>'<div class="tw sm0 fz" style="margin-top:12px;direction:'+dr()+'"><table class="tb"><thead><tr>'+h.map(x=>'<th>'+esc(x)+'</th>').join('')+'</tr></thead><tbody>'+rows.map(r=>'<tr>'+r.map(c=>'<td>'+c+'</td>').join('')+'</tr>').join('')+'</tbody>'+(foot?'<tfoot><tr>'+foot.map(c=>'<td>'+c+'</td>').join('')+'</tr></tfoot>':'')+'</table></div>';
+const ttl=k=>'<h2 class="t" style="margin:0">'+esc(t(k))+'</h2>',op=(s,f)=>{S.sheet=s;render();f&&f()};
+const er=m=>{const e=document.getElementById('err');if(e){e.textContent=t(m);e.hidden=false}};
+const nb=(k,p)=>'<button class="btn'+(p?' p':'')+'" data-a="sp_new" data-k="'+k+'"><span class="t">'+esc(t('sp_k_'+k))+'</span></button>';
+const monSel=()=>'<div class="card"><label><span class="mu xs t">'+esc(t('sp_month'))+'</span><div class="field"><input type="month" id="spm" value="'+S.sm+'"></div></label></div>';
+const tabs=()=>'<div class="chips tabs">'+[['day','sp_day'],['mon','sp_mon'],['emp','sp_emp'],['set','sp_set']].map(([k,l])=>'<button class="chip'+(S.sp==k?' on':'')+'" data-a="sp_tab" data-v="'+k+'">'+esc(t(l))+'</button>').join('')+'</div>';
+window.stmCard=()=>'<section class="card"><div class="row"><div class="tile" style="--c:var(--pr2)">'+ic('File')+'</div><div class="grow t"><h2>'+esc(t('sp_title'))+'</h2><div class="mu sm">'+esc(t('sp_card'))+'</div></div></div><div style="margin-top:14px">'+btn('sp_go',t('sp_go'),{p:1,icon:'File'})+'</div></section>';
+window.stmPage=()=>{S.sp=S.sp||'day';S.sd=S.sd||today();S.sm=S.sm||today().slice(0,7);return '<div class="home">'+tabs()+({day:dayV,mon:monV,emp:empV,set:setV}[S.sp]||dayV)()+'</div>'};
+// ── day ──
+function dayV(){const g=G(),d=S.sd,T=g.tx.filter(x=>x.date==d).sort((a,b)=>a.ts-b.ts),st=stk(d,1),sa=Object.keys(st).reduce((a,k)=>a+k.split(':')[1]*st[k],0),s=k=>T.filter(x=>x.k==k).reduce((a,x)=>a+amt(x),0),pv_=S.lang=='ar'?'ChevR':'ChevL',nx=S.lang=='ar'?'ChevL':'ChevR',
+ es=g.emp.filter(e=>!e.a||T.some(x=>x.pid==e.id)).map(e=>{const a=T.filter(x=>x.pid==e.id&&x.k=='take').reduce((q,x)=>q+amt(x),0),b=T.filter(x=>x.pid==e.id&&x.k=='ret').reduce((q,x)=>q+amt(x),0);return[e,a,b,a-b]});
+ let h='<div class="card"><div class="row"><button class="ib" data-a="sp_prev"'+(d<=g.start?' disabled':'')+' aria-label="-1">'+ic(pv_)+'</button><div class="grow"><div class="field"><input type="date" id="spdt" value="'+d+'" min="'+g.start+'"></div></div><button class="ib" data-a="sp_next" aria-label="+1">'+ic(nx)+'</button></div>'+(d!==today()?'<div style="margin-top:10px"><button class="chip" data-a="sp_today">'+esc(t('f_today'))+'</button></div>':'')+'</div>';
+ h+='<div class="card"><div class="fk">'+kp('sp_sold',dz(s('take')-s('ret')),'var(--ok)')+kp('sp_stock',dz(sa))+kp('sp_recv','+ '+dz(s('recv')))+kp('sp_rev','− '+dz(s('rev')),'var(--er)')+'</div><div class="g2" style="margin-top:14px">'+nb('take',1)+nb('ret')+'</div><div class="g2" style="margin-top:10px">'+nb('recv')+nb('rev')+'</div></div>';
+ h+='<div class="card">'+ttl('sp_emp')+(es.length?tbl([t('sp_emp1'),t('sp_took'),t('sp_ret'),t('sp_sold')],es.map(([e,a,b,c])=>[esc(e.n),num(a),num(b),'<b style="color:'+(c<0?'var(--er)':'var(--ok)')+'">'+num(c)+'</b>'+(c<0?'<div class="xs" style="color:var(--er)">'+esc(t('sp_neg'))+'</div>':'')])):'<div class="mu sm t" style="margin-top:10px">'+esc(t('sp_noemp'))+'</div>')+'</div>';
+ h+='<div class="card">'+ttl('sp_mvs')+'<div class="stack" style="gap:10px;margin-top:12px">'+(T.length?T.map(x=>{const inn=SG[x.k]>0,q=Object.keys(x.q).sort((a,b)=>a-b).map(k=>num(+k)+'×'+num(x.q[k])).join(' · ');
+  return '<div class="card ent" style="padding:12px;--c:'+(inn?'var(--ok)':'var(--er)')+'"><div class="row" style="align-items:flex-start"><div class="grow t" style="min-width:0"><div class="dn">'+esc(t('sp_k_'+x.k)+(x.pid?' · '+nmE(x.pid):''))+'</div><div class="mu sm">'+esc(t('sp_f_'+x.fam))+'</div><div class="mu sm ltr" style="text-align:start;overflow-wrap:anywhere">'+esc(q)+'</div>'+(x.note?'<div class="mu sm" style="overflow-wrap:anywhere">'+esc(x.note)+'</div>':'')+'</div><b style="white-space:nowrap">'+dz(amt(x))+'</b><button class="ib" data-a="sp_edit" data-id="'+esc(x.id)+'" aria-label="'+esc(t('f_edit'))+'">'+ic('Edit')+'</button><button class="ib" data-a="sp_del" data-id="'+esc(x.id)+'" aria-label="'+esc(t('f_del'))+'">'+ic('Trash')+'</button></div></div>'}).join(''):'<div class="mu t">'+esc(t('sp_notx'))+'</div>')+'</div></div>';
+ return h}
+// ── month situation (same layout as the Excel "sit vente": previous / received / total / sold / reversement / remaining) ──
+function monV(){const m=S.sm,{p,R}=mon(m),rw=(f,d)=>{const i=f+':'+d,o=R[i]||{rc:0,sd:0,rv:0},a=p[i]||0;return[a,o.rc,a+o.rc,o.sd,o.rv,a+o.rc-o.sd-o.rv]},
+ H=['sp_cat','sp_prev','sp_recv','sp_total','sp_sold','sp_rev','sp_rest'].map(k=>t(k)),
+ fm=FAM.map(([f])=>{const rs=ds(f).map(d=>[d,...rw(f,d)]);return{f,rs,T:[1,2,3,4,5,6].map(j=>rs.reduce((a,r)=>a+r[0]*r[j],0))}});
+ let h=monSel()+'<div class="card">'+ttl('sp_sum')+'<div class="mu xs t">'+esc(t('f_cur'))+'</div>'+tbl(H,fm.map(x=>[esc(t('sp_f_'+x.f).replace(/ \(.*\)/,''))].concat(x.T.slice(0,5).map(num),[ng(x.T[5])])),[esc(t('sp_total'))].concat([0,1,2,3,4].map(j=>num(fm.reduce((a,x)=>a+x.T[j],0))),[ng(fm.reduce((a,x)=>a+x.T[5],0))]))+'<div style="margin-top:12px"><button class="btn" data-a="sp_xl">'+ic('Download')+'<span class="t">'+esc(t('sp_xl'))+'</span></button></div></div>';
+ fm.forEach(x=>{h+='<div class="card">'+ttl('sp_f_'+x.f)+tbl(H,x.rs.map(r=>[num(r[0])].concat(r.slice(1,6).map(num),[ng(r[6])])),[esc(t('sp_mt'))].concat(x.T.slice(0,5).map(num),[ng(x.T[5])]))+'</div>'});
+ return h}
+async function xl(){const m=S.sm,{p,R}=mon(m),g=G(),hd=r=>r.map(v=>({v,s:1})),c=' ('+t('f_cur')+')',rows=[hd([t('sp_famn'),...['sp_cat','sp_prev','sp_recv','sp_total','sp_sold','sp_rev','sp_rest'].map(k=>t(k)),t('sp_sold')+c,t('sp_rest')+c])];let T=[0,0];
+ FAM.forEach(([f])=>ds(f).forEach(d=>{const i=f+':'+d,o=R[i]||{rc:0,sd:0,rv:0},a=p[i]||0,r=a+o.rc-o.sd-o.rv;rows.push([t('sp_f_'+f),d,a,o.rc,a+o.rc,o.sd,o.rv,r,o.sd*d,r*d].map(v=>({v,s:0})));T[0]+=o.sd*d;T[1]+=r*d}));
+ rows.push(hd([t('sp_total'),'','','','','','','',T[0],T[1]]));
+ const mv=[hd([t('sp_date'),t('sp_mvs'),t('sp_emp1'),t('sp_famn'),t('sp_det'),t('sp_mt')])];
+ g.tx.filter(x=>x.date>=m+'-01'&&x.date<=m+'-31').sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:a.ts-b.ts).forEach(x=>mv.push([fmtDate(x.date),t('sp_k_'+x.k),nmE(x.pid),t('sp_f_'+x.fam),Object.keys(x.q).sort((a,b)=>a-b).map(k=>k+'×'+x.q[k]).join(' · '),amt(x)].map(v=>({v,s:0}))));
+ const ok=await deliver(xlsxBook([{name:'Situation',rows,w:[26,10,12,10,10,10,12,10,16,16]},{name:'Mouvements',rows:mv,w:[12,24,18,26,40,14]}]),'timbres-'+m+'.xlsx');toast(ok?'saved':'err_save')}
+// ── staff ──
+function empV(){const g=G(),a=S.sm+'-01',b=S.sm+'-31',tt=(id,k)=>g.tx.filter(x=>x.pid==id&&x.k==k&&x.date>=a&&x.date<=b).reduce((s,x)=>s+amt(x),0);
+ return monSel()+'<div class="card">'+ttl('sp_emp_t')+'<div class="stack" style="gap:10px;margin-top:12px">'+(g.emp.length?g.emp.map(e=>{const p=tt(e.id,'take'),q=tt(e.id,'ret');return '<div class="card ent fc" style="padding:12px;--c:var(--pr)'+(e.a?';opacity:.6':'')+'"><div class="row"><div class="grow t"><div class="dn">'+esc(e.n)+(e.a?' · '+esc(t('sp_off')):'')+'</div><div class="mu sm">'+esc(t('sp_took')+' '+num(p)+' · '+t('sp_ret')+' '+num(q))+'</div></div><b style="color:var(--ok);white-space:nowrap">'+dz(p-q)+'</b><button class="ib" data-a="sp_eedit" data-id="'+esc(e.id)+'" aria-label="'+esc(t('f_edit'))+'">'+ic('Edit')+'</button></div></div>'}).join(''):'<div class="mu t">'+esc(t('sp_noemp'))+'</div>')+'</div><div style="margin-top:14px">'+btn('sp_enew',t('sp_emp_new'),{p:1,icon:'Plus'})+'</div></div>'}
+function empSheet(){const e=S.se,has=e.id&&G().tx.some(x=>x.pid==e.id);
+ return OV(ttl(e.id?'sp_emp_edit':'sp_emp_new')+'<label><span class="mu sm t">'+esc(t('sp_ename'))+'</span><div class="field"><input id="spen" maxlength="40" value="'+esc(e.n)+'"></div></label><div class="sm t" id="err" style="color:var(--er)" hidden></div><div class="g2">'+btn('close',t('f_cancel'))+btn('sp_esave',t('f_save'),{p:1})+'</div>'+(e.id?'<div class="g2">'+btn('sp_earch',t(e.a?'sp_resume':'sp_stop'))+(has?'':btn('sp_edel',t('f_del'),{d:1,icon:'Trash'}))+'</div>':''))}
+function empSave(){const e=S.se,n=(document.getElementById('spen').value||'').trim().slice(0,40);if(!n)return er('sp_e_name');const g=G();let id=e.id;
+ if(id){const o=g.emp.find(y=>y.id==id);if(o)o.n=n}else{id=uid();g.emp.push({id,n,a:0})}
+ sv();toast('sp_saved');if(e.back&&S.sx){S.sx.pid=id;S.sheet='sp_tx';render();pv()}else{S.sheet=null;render()}}
+// ── movement form ──
+function txSheet(){const x=S.sx,g=G(),em=g.emp.filter(e=>!e.a||e.id==x.pid),isE=x.k=='take'||x.k=='ret';
+ return OV(ttl(x.id?'sp_edit':'sp_k_'+x.k)+'<div class="chips">'+KS.map(k=>'<button class="chip'+(x.k==k?' on':'')+'" data-a="sp_k" data-v="'+k+'">'+esc(t('sp_k_'+k))+'</button>').join('')+'</div>'+
+ (isE?'<label><span class="mu sm t">'+esc(t('sp_emp1'))+'</span><div class="row" style="gap:8px"><div class="field grow"><select id="spe">'+em.map(e=>'<option value="'+esc(e.id)+'"'+(e.id==x.pid?' selected':'')+'>'+esc(e.n)+'</option>').join('')+'</select></div><button class="chip" data-a="sp_newemp">'+esc(t('sp_add'))+'</button></div></label>':'')+
+ '<div class="chips">'+FAM.map(([f])=>'<button class="chip'+(x.fam==f?' on':'')+'" data-a="sp_fam" data-v="'+f+'">'+esc(t('sp_f_'+f).replace(/ \(.*\)/,''))+'</button>').join('')+'</div>'+
+ '<div class="stack" style="gap:8px">'+ds(x.fam).map(d=>'<div class="row"><b class="ltr" style="min-width:64px">'+num(d)+'</b><div class="field grow"><input class="spq" data-d="'+d+'" inputmode="numeric" maxlength="7" placeholder="0" value="'+(x.q[d]||'')+'"></div></div>').join('')+'</div><div class="sm t" id="spp"></div>'+
+ '<label><span class="mu sm t">'+esc(t('sp_note'))+'</span><div class="field"><input id="spn" maxlength="80" value="'+esc(x.note||'')+'"></div></label><label><span class="mu sm t">'+esc(t('sp_date'))+'</span><div class="field"><input id="spd" type="date" min="'+g.start+'" value="'+x.date+'"></div></label>'+
+ '<div class="sm t" id="err" style="color:var(--er)" hidden></div><div class="g2">'+btn('close',t('f_cancel'))+btn('sp_save',t('f_save'),{p:1})+'</div>')}
+function rd(){const x=S.sx,g=id=>document.getElementById(id);if(!x)return;if(g('spe'))x.pid=g('spe').value;if(g('spn'))x.note=g('spn').value;if(g('spd'))x.date=g('spd').value;const q={};document.querySelectorAll('#layer .spq').forEach(i=>{const n=Math.round(+i.value||0);if(n>0)q[i.dataset.d]=n});x.q=q}
+function pv(){const x=S.sx,e=document.getElementById('spp');if(!x||!e||S.sheet!='sp_tx')return;rd();const a=amt(x),w=[];
+ if(a&&(x.k=='take'||x.k=='rev')){const b=stk(x.date||S.sd,1,x.id);for(const d in x.q){const v=b[x.fam+':'+d]||0;if(v<x.q[d])w.push(t('sp_short',{d:num(+d),a:num(v)}))}}
+ e.innerHTML=a?esc(t('sp_amt'))+': <b>'+dz(a)+'</b>'+w.map(m=>'<div style="color:var(--er)">'+esc(m)+'</div>').join(''):''}
+function txSave(){rd();const x=S.sx,g=G(),isE=x.k=='take'||x.k=='ret';if(!(amt(x)>0))return er('sp_e_amt');if(isE&&!g.emp.some(e=>e.id==x.pid))return er('sp_e_emp');if(!x.date||x.date<g.start)return er('sp_e_date');
+ const o={id:x.id||uid(),ts:x.ts||Date.now(),date:x.date,k:x.k,pid:isE?x.pid:'',fam:x.fam,q:x.q,note:(x.note||'').trim()},i=g.tx.findIndex(y=>y.id==o.id);
+ if(i<0)g.tx.push(o);else g.tx[i]=o;sv();S.sd=x.date;S.sheet=null;S.sx=null;render();toast('sp_saved')}
+// ── settings & opening stock ──
+function setV(){const g=G();return '<div class="card"><div class="stack" style="gap:12px"><label><span class="mu sm t">'+esc(t('sp_start'))+'</span><div class="field"><input id="sps" type="date" value="'+g.start+'"></div></label>'+FAM.map(([f])=>'<label><span class="mu sm t">'+esc(t('sp_f_'+f))+'</span><div class="field"><input id="spd_'+f+'" inputmode="numeric" value="'+esc(g.den[f].join(','))+'"></div></label>').join('')+'<div class="mu xs t">'+esc(t('sp_den_h'))+'</div><div class="sm t" id="err" style="color:var(--er)" hidden></div>'+btn('sp_setsave',t('f_save'),{p:1})+btn('sp_open',t('sp_open_t'))+'</div></div>'}
+function setSave(){const g=G(),st=document.getElementById('sps').value;if(!st)return er('sp_e_date');const nd={};
+ for(const[f]of FAM){const a=document.getElementById('spd_'+f).value.split(/[,\s;،]+/).map(Number).filter(v=>v>0);if(!a.length||a.some(v=>!Number.isInteger(v)))return er('sp_e_den');nd[f]=[...new Set(a)].sort((x,y)=>x-y)}
+ g.start=st;g.den=nd;sv();render();toast('sp_saved')}
+function openSheet(){const x=S.so;return OV(ttl('sp_open_t')+'<div class="mu sm t">'+esc(t('sp_open_d'))+'</div><div class="chips">'+FAM.map(([f])=>'<button class="chip'+(x.fam==f?' on':'')+'" data-a="sp_ofam" data-v="'+f+'">'+esc(t('sp_f_'+f).replace(/ \(.*\)/,''))+'</button>').join('')+'</div><div class="stack" style="gap:8px">'+ds(x.fam).map(d=>'<div class="row"><b class="ltr" style="min-width:64px">'+num(d)+'</b><div class="field grow"><input class="spo" data-d="'+d+'" inputmode="numeric" maxlength="7" placeholder="0" value="'+(x.o[x.fam+':'+d]||'')+'"></div></div>').join('')+'</div><div class="g2">'+btn('close',t('f_cancel'))+btn('sp_osave',t('f_save'),{p:1})+'</div>')}
+function rdO(){const x=S.so;document.querySelectorAll('#layer .spo').forEach(i=>{const n=Math.round(+i.value||0),k=x.fam+':'+i.dataset.d;if(n>0)x.o[k]=n;else delete x.o[k]})}
+Object.assign(SH3,{sp_tx:txSheet,sp_em:empSheet,sp_op:openSheet,sp_dl:()=>OV(ttl('sp_dl_t')+'<div class="g2">'+btn('close',t('f_cancel'))+btn('sp_delok',t('f_del'),{d:1,icon:'Trash'})+'</div>')});
+// ── actions ──
+window.actP=function(a,el){if(a.slice(0,3)!='sp_')return 0;const d=el.dataset,g=G();switch(a){
+ case'sp_go':S.sp='day';S.sd=today();go(3);return 1;
+ case'sp_tab':S.sp=d.v;render();return 1;
+ case'sp_prev':S.sd=addD(S.sd,-1);render();return 1;case'sp_next':S.sd=addD(S.sd,1);render();return 1;case'sp_today':S.sd=today();render();return 1;
+ case'sp_new':{const e=g.emp.filter(y=>!y.a)[0];S.sx={id:null,k:d.k,pid:e?e.id:'',fam:'tp',q:{},note:'',date:S.sd};op('sp_tx',pv);return 1}
+ case'sp_k':rd();S.sx.k=d.v;render();pv();return 1;
+ case'sp_fam':rd();S.sx.fam=d.v;S.sx.q={};render();pv();return 1;
+ case'sp_save':txSave();return 1;
+ case'sp_edit':{const x=g.tx.find(y=>y.id==d.id);if(x){S.sx={...x,q:{...x.q}};op('sp_tx',pv)}return 1}
+ case'sp_del':S.sx={id:d.id};op('sp_dl');return 1;
+ case'sp_delok':g.tx=g.tx.filter(y=>y.id!=S.sx.id);sv();S.sheet=null;S.sx=null;render();toast('sp_deleted');return 1;
+ case'sp_newemp':rd();S.se={id:null,n:'',a:0,back:1};op('sp_em');return 1;
+ case'sp_enew':S.se={id:null,n:'',a:0};op('sp_em');return 1;
+ case'sp_eedit':{const e=g.emp.find(y=>y.id==d.id);if(e){S.se={...e};op('sp_em')}return 1}
+ case'sp_esave':empSave();return 1;
+ case'sp_earch':{const e=g.emp.find(y=>y.id==S.se.id);if(e){e.a=e.a?0:1;sv()}S.sheet=null;render();return 1}
+ case'sp_edel':g.emp=g.emp.filter(y=>y.id!=S.se.id);sv();S.sheet=null;render();toast('sp_deleted');return 1;
+ case'sp_open':S.so={fam:'tt',o:{...g.open}};op('sp_op');return 1;
+ case'sp_ofam':rdO();S.so.fam=d.v;render();return 1;
+ case'sp_osave':rdO();g.open=S.so.o;sv();S.sheet=null;S.so=null;render();toast('sp_saved');return 1;
+ case'sp_setsave':setSave();return 1;
+ case'sp_xl':xl();return 1}return 0};
+document.addEventListener('input',ev=>{const el=ev.target,c=el.classList;if(c.contains('spq')||c.contains('spo')){el.value=el.value.replace(/\D/g,'').slice(0,7);if(c.contains('spq'))pv()}else if(el.id=='spd')pv()});
+document.addEventListener('change',ev=>{const el=ev.target;if(el.id=='spdt'&&el.value){S.sd=el.value<G().start?G().start:el.value;render()}else if(el.id=='spm'&&el.value){S.sm=el.value;render()}});
+document.addEventListener('keydown',ev=>{if(ev.key!='Enter'||S.sheet!='sp_tx'||!ev.target.classList.contains('spq'))return;ev.preventDefault();const l=[...document.querySelectorAll('#layer .spq')],i=l.indexOf(ev.target);if(i<l.length-1)l[i+1].focus();else txSave()});
 render();
 })();
 </script>
