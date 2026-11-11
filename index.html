@@ -1201,11 +1201,12 @@ const dim=m=>new Date(+m.slice(0,4),+m.slice(5,7),0).getDate(),pm=m=>{const k=+m
 const pv=s=>s==null||s===''?0:String(s).split('+').reduce((a,p)=>a+(parseFloat(p.replace(',','.'))||0),0);
 let X=null,XN=null;const G=()=>{if(!X||XN!==NS){XN=NS;try{X=JSON.parse(sget('acc'))||{}}catch(e){X={}}X.m=X.m||{}}return X};
 const E={l:{},a:{},c:{},g:{},o:{}},R=m=>G().m[m]||E,W=m=>G().m[m]||(G().m[m]={l:{},a:{},c:{},g:{},o:{}}),sv=()=>sset('acc',JSON.stringify(G()));
+const xs=(r,d,q)=>(r.x||[]).filter(e=>e.d==d&&e.s==q).reduce((a,e)=>a+pv(e.a),0);
 const dayV=(m,b,s,c,d)=>pv(R(m).l[b+'|'+s+'|'+c+'|'+d]);
 const tot=(m,b,s,c,a,z)=>{let q=0;for(let d=a;d<=z;d++)q+=dayV(m,b,s,c,d);return q};
 const ant=(m,b,s,c)=>{const o=R(m).a[b+'|'+s+'|'+c];if(o!=null&&o!=='')return pv(o);const p=pm(m);return p?cum(p,b,s,c):0};
 const cum=(m,b,s,c)=>ant(m,b,s,c)+tot(m,b,s,c,1,dim(m));
-function chRows(m){const r=R(m),n=dim(m),o=[];let p=chOpen(m),cs=0;for(let d=1;d<=n;d++){const g=c=>pv(r.c[d+'|'+c]),cr=CR.reduce((a,c)=>a+g(c),0),db=DB.reduce((a,c)=>a+g(c),0),rs=p+cr-db;cs+=g('cs');o.push({d,cr,db,b:cr-db,a:p,r:rs,x:rs+cs});p=rs}return o}
+function chRows(m){const r=R(m),n=dim(m),o=[];let p=chOpen(m),cs=0;for(let d=1;d<=n;d++){const g=c=>pv(r.c[d+'|'+c]),cr=CR.reduce((a,c)=>a+g(c),0)+xs(r,d,1),db=DB.reduce((a,c)=>a+g(c),0)+xs(r,d,-1),rs=p+cr-db;cs+=g('cs');o.push({d,cr,db,b:cr-db,a:p,r:rs,x:rs+cs});p=rs}return o}
 const pb=m=>Object.keys(G().m).filter(k=>k<m).sort().pop()||null;
 const chOpen=m=>{const v=R(m).o.ch;if(v!=null&&v!=='')return pv(v);const q=pb(m);return q?chRows(q)[dim(q)-1].r:0};
 function gRows(m){const r=R(m),n=dim(m),o=[];let p=gOpen(m);for(let d=1;d<=n;d++){const g=c=>pv(r.g[d+'|'+c]),rs=p+g('chg')-g('dec')-g('crd')+g('remo')+g('exc');o.push({d,a:p,r:rs});p=rs}return o}
@@ -1238,15 +1239,15 @@ function gV(m){const r=R(m),rows=gRows(m),n=dim(m),sc=c=>{let q=0;for(let d=1;d<
  let h='<thead>'+tr(th([t('ac_day'),t('ac_chg'),t('ac_dec'),t('ac_gcr'),'REMO',t('ac_gex'),t('ac_ops'),t('ac_san'),t('ac_adv')]))+'</thead><tbody>'+tr(lb(t('ac_open'))+'<td colspan="8" style="text-align:start">'+ib('O','gab',r.o.gab,amt(gOpen(m)))+'</td>');
  rows.forEach(x=>{h+=tr('<td>'+x.d+'</td>'+GI.map(c=>inp('G',x.d+'|'+c,r.g[x.d+'|'+c])).join('')+cell('an|'+x.d,x.a)+cell('re|'+x.d,x.r))});
  return h+tr(lb(t('ac_mt'))+GI.map(c=>cell('s|'+c,sc(c),1)).join('')+'<td></td>'+cell('re|T',rows[n-1].r,1),'ft')+'</tbody>'}
-function view(){MAP={};const m=S.am,b=S.at;return b=='ch'?chV(m):b=='gab'?gV(m):S.as=='R'?recV(b,m):ledV(b,S.as,m)}
+function view(){MAP={};const m=S.am,b=S.at;return isT(b)&&ctT(b)?tV(b.slice(2),m):b=='ch'?chV(m):b=='gab'?gV(m):S.as=='R'?recV(b,m):ledV(b,S.as,m)}
 const chip=(a,v,l,on)=>'<button class="chip'+(on?' on':'')+'" data-a="'+a+'" data-v="'+v+'">'+esc(l)+'</button>';
 window.accCard=()=>'<section class="card"><div class="row"><div class="tile" style="--c:var(--ok)">'+ic('Table')+'</div><div class="grow t"><h2>'+esc(t('ac_title'))+'</h2><div class="mu sm">'+esc(t('ac_card'))+'</div></div></div><div style="margin-top:14px">'+btn('ac_go',t('ac_go'),{p:1,icon:'Table'})+'</div></section>';
-window.accPage=()=>{S.at=S.at||'rec';S.as=S.as||'A';S.am=S.am||curM();const b=S.at,led=b=='rec'||b=='dep';
- return '<div class="home" style="max-width:1160px"><div class="chips tabs">'+['rec','dep','ch','gab'].map(k=>chip('ac_tab',k,t('ac_'+k),b==k)).join('')+'</div><div class="card"><div class="g2"><label><span class="mu xs t">'+esc(t('sp_month'))+'</span><div class="field"><input type="month" id="acm" value="'+S.am+'"></div></label><div style="align-self:end" class="stack">'+btn('ac_xl',t('ac_xl'),{icon:'Download'})+(b=='gab'?btn('ac_req',t('ac_req'),{p:1,icon:'Download'}):'')+'</div></div>'+
- (led?'<div class="chips tabs" style="margin-top:12px">'+['BUD','A','B','C','R'].map(s=>chip('ac_ser',s,sl(s),S.as==s)).join('')+'</div>':'')+'</div><div class="card" style="padding:12px"><div class="tw" style="max-height:72vh"><table class="tb" id="actbl">'+view()+'</table></div><div class="mu xs t" style="margin-top:10px">'+esc(t('ac_hint'))+'</div></div></div>'};
-async function xl(){view();const tb=document.getElementById('actbl'),rows=[...tb.rows].map(r=>{const bold=r.parentNode.tagName=='THEAD'||r.className=='ft',o=[];[...r.cells].forEach(c=>{const i=c.querySelector('input');let v=i?(i.value!==''?pv(i.value):pv(i.placeholder.replace(/,/g,''))):c.textContent.trim();if(!i&&/^-?[\d,]+(\.\d+)?$/.test(v))v=+v.replace(/,/g,'');if(v===0&&i)v='';o.push({v,s:bold?1:0});for(let k=1;k<(c.colSpan||1);k++)o.push({v:'',s:0})});return o}),
- w=rows.reduce((q,r)=>Math.max(q,r.length),1),nm=t('ac_'+S.at)+(S.at=='rec'||S.at=='dep'?' '+sl(S.as):'');
- const ok=await deliver(xlsxBook([{name:nm,rows,w:Array.from({length:w},(_,i)=>i?15:24)}]),'compta-'+S.at+(S.as&&(S.at=='rec'||S.at=='dep')?'-'+S.as:'')+'-'+S.am+'.xlsx');toast(ok?'saved':'err_save')}
+window.accPage=()=>{S.at=S.at||'rec';if(isT(S.at)&&!ctT(S.at))S.at='rec';S.as=S.as||'A';S.am=S.am||curM();const b=S.at,led=b=='rec'||b=='dep';
+ return '<div class="home" style="max-width:1160px"><div class="chips tabs">'+[...['rec','dep','ch','gab'].map(k=>chip('ac_tab',k,t('ac_'+k),b==k)),...ctL().map(c=>chip('ac_tab','t:'+c.id,c.t,b=='t:'+c.id)),'<button class="chip" data-a="ac_nt">+ '+esc(t('ac_tbl'))+'</button>'].join('')+'</div><div class="card"><div class="g2"><label><span class="mu xs t">'+esc(t('sp_month'))+'</span><div class="field"><input type="month" id="acm" value="'+S.am+'"></div></label><div style="align-self:end" class="stack">'+btn('ac_xl',t('ac_xl'),{icon:'Download'})+(b=='gab'?btn('ac_req',t('ac_req'),{p:1,icon:'Download'}):'')+(isT(b)?btn('ac_et',t('ac_et'),{icon:'Edit'}):'')+'</div></div>'+
+ (led?'<div class="chips tabs" style="margin-top:12px">'+['BUD','A','B','C','R'].map(s=>chip('ac_ser',s,sl(s),S.as==s)).join('')+'</div>':'')+'</div><div class="card" style="padding:12px"><div class="tw" style="max-height:72vh"><table class="tb" id="actbl">'+view()+'</table></div><div class="mu xs t" style="margin-top:10px">'+esc(t('ac_hint'))+'</div></div>'+(b=='ch'?xCard():isT(b)?tAdd():'')+'</div>'};
+async function xl(){view();const tb=document.getElementById('actbl'),rows=[...tb.rows].map(r=>{const bold=r.parentNode.tagName=='THEAD'||r.className=='ft',o=[];[...r.cells].forEach(c=>{if(c.className=='nx')return;const i=c.querySelector('input');let v=i?(i.value!==''?pv(i.value):pv(i.placeholder.replace(/,/g,''))):c.textContent.trim();if(!i&&/^-?[\d,]+(\.\d+)?$/.test(v))v=+v.replace(/,/g,'');if(v===0&&i)v='';o.push({v,s:bold?1:0});for(let k=1;k<(c.colSpan||1);k++)o.push({v:'',s:0})});return o}),
+ w=rows.reduce((q,r)=>Math.max(q,r.length),1),nm=(isT(S.at)?ctT(S.at).t.slice(0,28):t('ac_'+S.at))+(S.at=='rec'||S.at=='dep'?' '+sl(S.as):'');
+ const ok=await deliver(xlsxBook([{name:nm,rows,w:Array.from({length:w},(_,i)=>i?15:24)}]),'compta-'+S.at.replace(/\W/g,'')+(S.as&&(S.at=='rec'||S.at=='dep')?'-'+S.as:'')+'-'+S.am+'.xlsx');toast(ok?'saved':'err_save')}
 function reqFill(){const m=S.am,up={};let n=0;for(let d=1;d<=dim(m);d++){const iso=m+'-'+pad(d),seen=new Set();let q=0,c=0;S.docs.forEach(doc=>doc.entries.forEach(x=>{if(x.date!==iso||x.status!='VALID')return;const k=[x.ref,x.date,x.time,x.req].join('|');if(seen.has(k))return;seen.add(k);q+=x.req;c++}));if(q||c){up[d+'|crd']=String(q);up[d+'|ops']=String(c);n++}}
  if(!n){toast('ac_req_no');return}Object.assign(W(m).g,up);sv();render();toast('ac_req_ok')}
 window.actA=function(a,el){if(a.slice(0,3)!='ac_')return 0;const d=el.dataset;
@@ -1254,11 +1255,74 @@ window.actA=function(a,el){if(a.slice(0,3)!='ac_')return 0;const d=el.dataset;
  if(a=='ac_tab'){S.at=d.v;S.as=d.v=='rec'||d.v=='dep'?'A':'';render();return 1}
  if(a=='ac_ser'){S.as=d.v;render();return 1}
  if(a=='ac_req'){reqFill();return 1}
+ if(actC(a,el))return 1
  if(a=='ac_xl'){xl();return 1}return 0};
 document.addEventListener('input',ev=>{const el=ev.target;if(!el.classList||!el.classList.contains('ac'))return;
  el.value=el.value.replace(/[^\d.,+]/g,'');const o=W(S.am)[SL[el.dataset.t]];if(el.value==='')delete o[el.dataset.k];else o[el.dataset.k]=el.value;sv();view();
  document.querySelectorAll('#actbl [data-c]').forEach(c=>{c.textContent=fm(MAP[c.dataset.c],+c.dataset.z)})});
 document.addEventListener('change',ev=>{if(ev.target.id=='acm'&&ev.target.value){S.am=ev.target.value;render()}});
+
+// ── user-made tables (long tables) and extra CH60 lines: every line asks credit / debit where a balance exists ──
+Object.assign(D.ar,{ac_tbl:'جدول',ac_nt:'جدول جديد',ac_et:'تعديل الجدول',ac_tn:'عنوان الجدول',ac_kb:'دفتر برصيد',ac_kbd:'كل سطر دائن أو مدين مع رصيد جارٍ، مثل CH60',ac_ks:'قائمة مبالغ',ac_ksd:'سطور بمبالغ مع مجاميع النصفين والشهر والتراكم',ac_addrow:'إضافة سطر',ac_ed2:'تعديل السطر',ac_lbl:'البيان',ac_dir:'النوع',ac_xt:'حركات إضافية',ac_xh:'تُضاف إلى دائن أو مدين اليوم المختار في CH60 وتدخل في الرصيد.',ac_e_t:'اكتب عنوان الجدول.',ac_e_a:'أدخل مبلغًا صحيحًا.',ac_e_d:'اختر تاريخًا داخل هذا الشهر.',ac_e_s:'اختر دائن أو مدين.',ac_del_t:'حذف الجدول؟',ac_del_d:'يُحذف الجدول مع كل سطوره في كل الأشهر.'});
+Object.assign(D.fr,{ac_tbl:'Tableau',ac_nt:'Nouveau tableau',ac_et:'Modifier le tableau',ac_tn:'Titre du tableau',ac_kb:'Registre avec solde',ac_kbd:'Chaque ligne est un crédit ou un débit, avec solde courant (comme CH60)',ac_ks:'Liste de montants',ac_ksd:'Lignes de montants avec totaux par quinzaine, mois et cumul',ac_addrow:'Ajouter une ligne',ac_ed2:'Modifier la ligne',ac_lbl:'Libellé',ac_dir:'Sens',ac_xt:'Mouvements supplémentaires',ac_xh:'Ajoutés au crédit ou au débit du jour choisi dans CH60 et pris en compte dans le solde.',ac_e_t:'Saisissez le titre.',ac_e_a:'Saisissez un montant valide.',ac_e_d:'Choisissez une date de ce mois.',ac_e_s:'Choisissez crédit ou débit.',ac_del_t:'Supprimer le tableau ?',ac_del_d:'Le tableau et toutes ses lignes seront supprimés, tous mois confondus.'});
+Object.assign(D.en,{ac_tbl:'Table',ac_nt:'New table',ac_et:'Edit table',ac_tn:'Table title',ac_kb:'Ledger with balance',ac_kbd:'Each line is a credit or a debit with a running balance, like CH60',ac_ks:'List of amounts',ac_ksd:'Amount lines with half-month, month and running totals',ac_addrow:'Add a line',ac_ed2:'Edit line',ac_lbl:'Description',ac_dir:'Type',ac_xt:'Extra movements',ac_xh:'Added to the credit or debit of the chosen CH60 day and included in the balance.',ac_e_t:'Enter a title.',ac_e_a:'Enter a valid amount.',ac_e_d:'Pick a date in this month.',ac_e_s:'Choose credit or debit.',ac_del_t:'Delete this table?',ac_del_d:'The table and all its lines are deleted, across all months.'});
+const isT=b=>String(b).slice(0,2)=='t:',ctL=()=>G().ct||(G().ct=[]),ctT=b=>ctL().find(c=>c.id==String(b).slice(2)),ents=(m,i)=>(R(m).e||{})[i]||[],srt=L=>L.slice().sort((a,b)=>a.d-b.d),ux=()=>Math.random().toString(36).slice(2,9);
+const guessK=s=>/ccp|ch\d|bank|banque|بنك|حساب|صندوق|خزنة|رصيد|compte|caisse|solde|dab|gab/i.test(s)?'bal':'sum';
+const guessDir=s=>/سحب|دفع|مصروف|فاتور|رسوم|كهرباء|ماء|غاز|إيجار|شراء|retrait|paiement|facture|achat|frais|seaal|sonelgaz|onfd|vac|apur|appur/i.test(s)?-1:/إيداع|قبض|إيراد|وارد|استلام|versement|d[ée]p[oô]t|recette|encaiss|pav|afs|re[cç]u/i.test(s)?1:0;
+const nx='<td class="nx"></td>',act=i=>'<td class="nx"><button class="ib" data-a="ac_ed" data-i="'+esc(i)+'" aria-label="'+esc(t('f_edit'))+'">'+ic('Edit')+'</button></td>',lb2=l=>'<td colspan="2" style="text-align:start">'+esc(l)+'</td>';
+const pT=(m,i)=>Object.keys(G().m).filter(k=>k<m&&(ents(k,i).length||(R(k).o['t:'+i]!=null&&R(k).o['t:'+i]!==''))).sort().pop()||null;
+const tOpen=(m,i)=>{const v=R(m).o['t:'+i];if(v!=null&&v!=='')return pv(v);const q=pT(m,i);return q?tRows(q,i).end:0};
+function tRows(m,i){let b=tOpen(m,i);const o=srt(ents(m,i)).map(e=>{const a=pv(e.a),cr=e.s>0?a:0,db=e.s<0?a:0;b+=cr-db;return{e,cr,db,b}});return{o,end:b}}
+const tTot=(m,i,a,z)=>ents(m,i).filter(e=>e.d>=a&&e.d<=z).reduce((q,e)=>q+pv(e.a),0);
+const tAnt=(m,i)=>{const o=R(m).a['T:'+i];if(o!=null&&o!=='')return pv(o);const p=pm(m);return p?tAnt(p,i)+tTot(p,i,1,31):0};
+function tV(i,m){const c=ctT('t:'+i),n=dim(m),r=R(m);
+ if(c.k=='bal'){const X=tRows(m,i);let h='<thead>'+tr(th([t('ac_day'),t('ac_lbl'),t('ac_cr'),t('ac_db'),t('ac_rest'),'']))+'</thead><tbody>'+tr(lb(t('ac_open'))+'<td colspan="5" style="text-align:start">'+ib('O','t:'+i,r.o['t:'+i],amt(tOpen(m,i)))+'</td>');
+  X.o.forEach(x=>{h+=tr('<td>'+x.e.d+'</td>'+lb(x.e.l)+cell('c|'+x.e.id,x.cr)+cell('q|'+x.e.id,x.db)+cell('b|'+x.e.id,x.b,1)+act(x.e.id))});
+  return h+tr(lb2(t('ac_mt'))+cell('t|c',X.o.reduce((q,x)=>q+x.cr,0),1)+cell('t|d',X.o.reduce((q,x)=>q+x.db,0),1)+cell('t|b',X.end,1)+nx,'ft')+'</tbody>'}
+ let h='<thead>'+tr(th([t('ac_day'),t('ac_lbl'),t('tot'),'']))+'</thead><tbody>';
+ srt(ents(m,i)).forEach(e=>{h+=tr('<td>'+e.d+'</td>'+lb(e.l)+cell('c|'+e.id,pv(e.a))+act(e.id))});
+ const f=(l,k,v)=>tr(lb2(l)+cell(k,v,1)+nx,'ft');
+ return h+f(t('ac_q1'),'q1',tTot(m,i,1,15))+f(t('ac_q2'),'q2',tTot(m,i,16,n))+f(t('ac_mt'),'mt',tTot(m,i,1,n))+tr(lb2(t('ac_ant'))+inp('A','T:'+i,r.a['T:'+i],amt(tAnt(m,i)))+nx)+f(t('ac_cum'),'cu',tAnt(m,i)+tTot(m,i,1,n))+'</tbody>'}
+const addBtn=()=>btn('ac_en',t('ac_addrow'),{p:1,icon:'Plus'});
+const tAdd=()=>'<div class="card" style="padding:12px">'+addBtn()+'</div>';
+function xCard(){const L=srt(R(S.am).x||[]);return '<div class="card" style="padding:12px"><h2 class="t" style="margin:0 0 4px">'+esc(t('ac_xt'))+'</h2><div class="mu xs t">'+esc(t('ac_xh'))+'</div>'+(L.length?'<div class="tw" style="margin-top:10px"><table class="tb"><thead>'+tr(th([t('ac_day'),t('ac_lbl'),t('ac_cr'),t('ac_db'),'']))+'</thead><tbody>'+L.map(e=>tr('<td>'+e.d+'</td>'+lb(e.l)+'<td>'+(e.s>0?amt(pv(e.a)):'')+'</td><td>'+(e.s<0?amt(pv(e.a)):'')+'</td>'+act(e.id))).join('')+'</tbody></table></div>':'')+'<div style="margin-top:12px">'+addBtn()+'</div></div>'}
+function tbSheet(){const k=S.xt,ed=!!k.id;return OV('<h2 class="t" style="margin:0">'+esc(t(ed?'ac_et':'ac_nt'))+'</h2><label><span class="mu sm t">'+esc(t('ac_tn'))+'</span><div class="field"><input id="atn" maxlength="40" value="'+esc(k.t)+'"></div></label>'+
+ (ed?'':'<div class="stack" style="gap:8px">'+[['bal','ac_kb','ac_kbd'],['sum','ac_ks','ac_ksd']].map(([v,a,b])=>'<button class="chip'+(k.k==v?' on':'')+'" data-a="ac_tk" data-v="'+v+'" style="text-align:start;height:auto;padding:10px 12px"><b>'+esc(t(a))+'</b><div class="mu xs">'+esc(t(b))+'</div></button>').join('')+'</div>')+
+ '<div class="sm t" id="err" style="color:var(--er)" hidden></div>'+(ed?btn('ac_tdel',t('f_del'),{d:1,icon:'Trash'}):'')+'<div class="g2">'+btn('close',t('f_cancel'))+btn('ac_tsave',t('f_save'),{p:1})+'</div>')}
+function enSheet(){const e=S.xe,m=S.am,dir=e.w=='x'||ctT(e.w).k=='bal';return OV('<h2 class="t" style="margin:0">'+esc(t(e.id?'ac_ed2':'ac_addrow'))+'</h2>'+
+ '<label><span class="mu sm t">'+esc(t('ac_day'))+'</span><div class="field"><input id="axd" type="date" min="'+m+'-01" max="'+m+'-'+pad(dim(m))+'" value="'+m+'-'+pad(e.d)+'"></div></label>'+
+ '<label><span class="mu sm t">'+esc(t('ac_lbl'))+'</span><div class="field"><input id="axl" maxlength="60" value="'+esc(e.l)+'"></div></label>'+
+ '<label><span class="mu sm t">'+esc(t('sp_mt'))+'</span><div class="field"><input id="axa" inputmode="decimal" placeholder="0" value="'+esc(e.a)+'"></div></label>'+
+ (dir?'<div><div class="mu sm t" style="margin-bottom:6px">'+esc(t('ac_dir'))+'</div><div class="chips">'+[[1,'ac_cr'],[-1,'ac_db']].map(([v,k])=>'<button class="chip'+(e.s==v?' on':'')+'" data-a="ac_dir" data-v="'+v+'">'+esc(t(k))+'</button>').join('')+'</div></div>':'')+
+ '<div class="sm t" id="err" style="color:var(--er)" hidden></div>'+(e.id?btn('ac_edel',t('f_del'),{d:1,icon:'Trash'}):'')+'<div class="g2">'+btn('close',t('f_cancel'))+btn('ac_esave',t('f_save'),{p:1})+'</div>')}
+const dlSheet=()=>OV('<h2 class="t" style="margin:0">'+esc(t('ac_del_t'))+'</h2><div class="mu sm t">'+esc(t('ac_del_d'))+'</div><div class="g2">'+btn('close',t('f_cancel'))+btn('ac_tdel2',t('f_del'),{d:1,icon:'Trash'})+'</div>');
+Object.assign(SH3,{ac_tb:tbSheet,ac_ee:enSheet,ac_dl:dlSheet});
+const erx=k=>{const el=document.getElementById('err');if(el){el.textContent=t(k);el.hidden=false}},
+ syncDir=()=>document.querySelectorAll('#layer [data-a="ac_dir"]').forEach(c=>c.classList.toggle('on',+c.dataset.v==S.xe.s)),
+ syncK=()=>document.querySelectorAll('#layer [data-a="ac_tk"]').forEach(c=>c.classList.toggle('on',c.dataset.v==S.xt.k)),
+ tgt=()=>S.at=='ch'?'x':S.at,
+ lst=(m,w,mk)=>{if(w=='x')return mk?(W(m).x=W(m).x||[]):(R(m).x||[]);const i=w.slice(2);if(!mk)return ents(m,i);const o=W(m);o.e=o.e||{};return o.e[i]=o.e[i]||[]};
+function actC(a,el){const d=el.dataset,m=S.am,g=id=>document.getElementById(id);switch(a){
+ case'ac_nt':S.xt={id:null,t:'',k:'sum',auto:1};S.sheet='ac_tb';render();return 1;
+ case'ac_et':{const c=ctT(S.at);S.xt={id:c.id,t:c.t,k:c.k};S.sheet='ac_tb';render();return 1}
+ case'ac_tk':S.xt.k=d.v;S.xt.auto=0;syncK();return 1;
+ case'ac_tsave':{const x=S.xt,v=g('atn').value.trim();if(!v){erx('ac_e_t');return 1}
+  if(x.id)ctT('t:'+x.id).t=v;else{const c={id:ux(),t:v,k:x.k};ctL().push(c);S.at='t:'+c.id;S.as=''}
+  sv();S.sheet=null;S.xt=null;render();toast('ac_saved');return 1}
+ case'ac_tdel':S.sheet='ac_dl';render();return 1;
+ case'ac_tdel2':{const i=S.xt.id;G().ct=ctL().filter(c=>c.id!=i);Object.keys(G().m).forEach(k=>{const o=G().m[k];if(o.e)delete o.e[i];if(o.o)delete o.o['t:'+i];if(o.a)delete o.a['T:'+i]});
+  S.at='rec';S.as='A';sv();S.sheet=null;S.xt=null;render();toast('sp_deleted');return 1}
+ case'ac_en':{const w=tgt();S.xe={w,id:null,d:m==curM()?new Date().getDate():1,l:'',a:'',s:0,auto:1};S.sheet='ac_ee';render();return 1}
+ case'ac_ed':{const w=tgt(),e=lst(m,w).find(x=>x.id==d.i);if(!e)return 1;S.xe={w,id:e.id,d:e.d,l:e.l,a:e.a,s:e.s,auto:0};S.sheet='ac_ee';render();return 1}
+ case'ac_dir':S.xe.s=+d.v;S.xe.auto=0;syncDir();return 1;
+ case'ac_esave':{const e=S.xe,dv=g('axd').value,v=g('axa').value.trim(),dir=e.w=='x'||ctT(e.w).k=='bal';
+  if(!dv||dv.slice(0,7)!=m){erx('ac_e_d');return 1}if(!/\d/.test(v)||!/^[\d.,+\s]+$/.test(v)){erx('ac_e_a');return 1}if(dir&&!e.s){erx('ac_e_s');return 1}
+  const o={id:e.id||ux(),d:+dv.slice(8),l:g('axl').value.trim(),a:v,s:dir?e.s:1},L=lst(m,e.w,1),i=L.findIndex(x=>x.id==o.id);
+  if(i<0)L.push(o);else L[i]=o;sv();S.sheet=null;S.xe=null;render();toast('ac_saved');return 1}
+ case'ac_edel':{const e=S.xe,L=lst(m,e.w,1),i=L.findIndex(x=>x.id==e.id);if(i>=0)L.splice(i,1);sv();S.sheet=null;S.xe=null;render();toast('sp_deleted');return 1}}return 0}
+document.addEventListener('input',ev=>{const el=ev.target,e=S.xe,k=S.xt;
+ if(el.id=='axl'&&e&&e.auto){const q=guessDir(el.value);if(q&&q!=e.s){e.s=q;syncDir()}}
+ else if(el.id=='atn'&&k&&k.auto){const q=guessK(el.value);if(q!=k.k){k.k=q;syncK()}}});
 render();
 })();
 </script>
