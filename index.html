@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>حاسبة REQ</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2048%2048%22%3E%3Cdefs%3E%3ClinearGradient%20id=%22g%22%20x1=%220%22%20y1=%220%22%20x2=%221%22%20y2=%221%22%3E%3Cstop%20offset=%220%22%20stop-color=%22%234f6bff%22/%3E%3Cstop%20offset=%221%22%20stop-color=%22%237c5cff%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width=%2248%22%20height=%2248%22%20rx=%2211%22%20fill=%22url%28%23g%29%22/%3E%3Cg%20transform=%22translate%288%208%29%20scale%281.333%29%22%20fill=%22none%22%20stroke=%22%23fff%22%20stroke-width=%221.8%22%20stroke-linecap=%22round%22%20stroke-linejoin=%22round%22%3E%3Cpath%20d=%22M7%203h10a2%202%200%200%201%202%202v14a2%202%200%200%201-2%202H7a2%202%200%200%201-2-2V5a2%202%200%200%201%202-2z%22/%3E%3Cpath%20d=%22M8%207.5h8%22/%3E%3Cpath%20d=%22M8.5%2012h.01%22/%3E%3Cpath%20d=%22M12%2012h.01%22/%3E%3Cpath%20d=%22M15.5%2012h.01%22/%3E%3Cpath%20d=%22M8.5%2016h.01%22/%3E%3Cpath%20d=%22M12%2016h.01%22/%3E%3Cpath%20d=%22M15.5%2016h.01%22/%3E%3C/g%3E%3C/svg%3E">
-<meta name="theme-color" content="#4f6bff">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2048%2048%22%3E%3Cdefs%3E%3ClinearGradient%20id=%22g%22%20x1=%220%22%20y1=%220%22%20x2=%221%22%20y2=%221%22%3E%3Cstop%20offset=%220%22%20stop-color=%22%23f59e0b%22/%3E%3Cstop%20offset=%221%22%20stop-color=%22%23dc2626%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width=%2248%22%20height=%2248%22%20rx=%2211%22%20fill=%22url%28%23g%29%22/%3E%3Cg%20transform=%22translate%288%208%29%20scale%281.333%29%22%20fill=%22none%22%20stroke=%22%23fff%22%20stroke-width=%221.8%22%20stroke-linecap=%22round%22%20stroke-linejoin=%22round%22%3E%3Cpath%20d=%22M7%203h10a2%202%200%200%201%202%202v14a2%202%200%200%201-2%202H7a2%202%200%200%201-2-2V5a2%202%200%200%201%202-2z%22/%3E%3Cpath%20d=%22M8%207.5h8%22/%3E%3Cpath%20d=%22M8.5%2012h.01%22/%3E%3Cpath%20d=%22M12%2012h.01%22/%3E%3Cpath%20d=%22M15.5%2012h.01%22/%3E%3Cpath%20d=%22M8.5%2016h.01%22/%3E%3Cpath%20d=%22M12%2016h.01%22/%3E%3Cpath%20d=%22M15.5%2016h.01%22/%3E%3C/g%3E%3C/svg%3E">
+<meta name="theme-color" content="#c2410c">
 <style>
 :root{--bg:#f4f5f8;--card:#fff;--tx:#12151c;--mu:#6a7282;--bd:#e5e8ee;--in:#f1f3f8;--pr:#4f6bff;--pr2:#7c5cff;--ok:#15803d;--er:#dc2626;--sh:0 1px 2px rgba(18,21,28,.04),0 6px 20px rgba(18,21,28,.05);color-scheme:light}
 @media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0b0d12;--card:#141821;--tx:#eceef3;--mu:#9aa3b5;--bd:#262c3a;--in:#1b2030;--pr:#6580ff;--pr2:#8e74ff;--ok:#34d399;--er:#f87171;--sh:none;color-scheme:dark}}
@@ -134,6 +134,28 @@ header .chip{white-space:nowrap;flex:none;min-height:40px;padding:0 14px}
 <input type="file" id="bfile" accept=".json,application/json" hidden>
 <div id="prt"></div>
 <script>
+// storage preload: IndexedDB holds the data (much larger quota than localStorage); the app starts once it is read.
+window.__KV={ok:false,db:null,mem:{}};
+window.__idbReady=new Promise(function(res){
+ var done=false;function fin(){if(!done){done=true;res()}}
+ setTimeout(fin,5000);
+ try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
+ try{
+  if(!window.indexedDB)return fin();
+  var rq=indexedDB.open('req_store',1);
+  rq.onupgradeneeded=function(){try{rq.result.createObjectStore('kv')}catch(e){}};
+  rq.onerror=rq.onblocked=function(){fin()};
+  rq.onsuccess=function(){var db=rq.result;
+   try{var c=db.transaction('kv','readonly').objectStore('kv').openCursor();
+    c.onsuccess=function(){var cur=c.result;
+     if(cur){__KV.mem[cur.key]=cur.value;cur.continue()}
+     else if(!done){__KV.db=db;__KV.ok=true;fin()}};
+    c.onerror=function(){fin()};
+   }catch(e){fin()}};
+ }catch(e){fin()}
+});
+</script>
+<script type="text/plain" data-app>
 // ── i18n ──
 const D={
 en:{name:"REQ Calculator",drop:"or drag and drop your files here",csv_lang:"Notes language in Excel",lang_en:"English",lang_fr:"Français",open_excel:"View as table",err_excel:"Excel couldn't open the file",err_excel_desc:"Install Excel, or use Export and open the file from your files.",tagline:"Add up the notes from your ATM log.",language:"Language",back:"Back",import_title:"Import documents",import_desc:"Choose one or more text files that hold your REQ logs.",choose_file:"Choose files",last_desc:"{n} entries · total {t}",reading:"Reading your files…",reading_desc:"This only takes a few seconds.",err_open:"We couldn't open that file",err_open_desc:"Check that the file still exists, then choose it again.",err_none:"No REQ found",err_none_desc:"This file has no REQ lines. Choose the right log file and try again.",try_again:"Try again",results:"Results",grand:"Grand total",grand_desc:"Counts valid entries only.",detected:"REQ found",valid:"Valid",verify:"To check",no_dispense:"No cash",verify_banner:"{n} to check",verify_banner_desc:"They stay out of the total until you fix them.",all_ok:"Everything adds up",all_ok_desc:"No entry needs a check.",search:"Search by number or time",f_all:"All",f_verify:"To check",empty_filter:"Nothing matches your search.",clear_filters:"Clear filters",export_csv:"Export to Excel (CSV)",exporting:"Saving…",saved:"File saved",updated:"Entry updated",err_save:"We couldn't save the file",err_save_desc:"Choose another location and try again.",copy_total:"Copy total",edit:"Edit",edit_title:"Edit the numbers",edit_desc:"Type the four note counts for this REQ.",note_n:"Note {n}",save:"Save",cancel:"Cancel",err_edit:"Enter four whole numbers.",original:"Original text",st_VALID:"Valid",st_VERIFY:"To check",st_NO_DISPENSE:"No cash",n_SUM:"The sum differs from NOTES PRESENTED. Check the numbers.",n_BAD:"Expected four numbers but found: {a}",n_DECLINED:"The ATM declined this request (code {a}). Nothing was paid out.",n_NOCASH:"No cash was requested.",n_NOLINE:"Cash was requested but no line of four numbers was found.",n_FROMNP:"No four-number line, so the notes were taken from NOTES PRESENTED.",n_NONCASH:"Operation type {a}: no notes were presented, nothing was paid out.",n_EDITED:"You edited this entry."},
@@ -162,15 +184,71 @@ Object.assign(D.ar,{theme_dark:"الوضع الليلي",theme_light:"الوضع
 Object.assign(D.en,{c_date:"Date",k_all:"All",k_NORMAL:"Regular",k_BANK:"Bank operations",t_from:"From",t_to:"To",t_day:"Day",t_clear:"Clear",tot:"Total",sort_by:"Sort",s_date:"By date in name",s_alpha:"Alphabetical",s_asc:"Ascending",s_desc:"Descending"});
 Object.assign(D.fr,{c_date:"Date",k_all:"Toutes",k_NORMAL:"Normales",k_BANK:"Opérations bancaires",t_from:"De",t_to:"À",t_day:"Jour",t_clear:"Effacer",tot:"Total",sort_by:"Tri",s_date:"Par date du nom",s_alpha:"Alphabétique",s_asc:"Croissant",s_desc:"Décroissant"});
 Object.assign(D.ar,{c_date:"التاريخ",k_all:"الكل",k_NORMAL:"العادية",k_BANK:"العمليات البنكية",t_from:"من",t_to:"إلى",t_day:"اليوم",t_clear:"مسح",tot:"المجموع",sort_by:"الترتيب",s_date:"حسب التاريخ في الاسم",s_alpha:"أبجديًا",s_asc:"تصاعدي",s_desc:"تنازلي"});
-const COLORS=["#4f6bff","#7c5cff","#e11d8f","#dc2626","#f97316","#eab308","#16a34a","#0d9488","#0ea5e9","#64748b"];
-const col=c=>/^#[0-9a-f]{6}$/i.test(c)?c:COLORS[0];
+const COLORS=["#c2410c","#d97706","#e11d48","#dc2626","#ea580c","#ca8a04","#b45309","#92400e","#f59e0b","#78350f"],OLDC=["#4f6bff","#7c5cff","#e11d8f","#dc2626","#f97316","#eab308","#16a34a","#0d9488","#0ea5e9","#64748b"];
+const col=c=>{if(!/^#[0-9a-f]{6}$/i.test(c))return COLORS[0];const i=OLDC.indexOf(String(c).toLowerCase());return i<0?c:COLORS[i]};
 // ── Engine (port of Engine.kt) ──
 const SEP='\\s*[-–—,;|]\\s*';
 const R={ESC:/\x1B\[[0-9;]*[A-Za-z]|\x1B[()][0-9A-Za-z]|\x1B[A-Za-z]\d*|[\x00-\x08\x0B\x0C\x0E-\x1F]/g,REQ:/REQ\s*:\s*([\d.,]+)/,
 FOUR:new RegExp('^\\s*(\\d+)'+SEP+'(\\d+)'+SEP+'(\\d+)'+SEP+'(\\d+)\\s*$'),ANY:new RegExp('^\\s*\\d+('+SEP+'\\d+)+\\s*$'),
 HEADER:/^\s*(\d+)\s+(\d\d)\/(\d\d)\/(\d\d)/,TIME:/^\s*(\d\d:\d\d:\d\d)\s*([A-Z ]*?)\s*$/,RC:/\bRC\s+(\d{3})\b/,NP:/NOTES PRESENTED ([\d,]+)/,CARD:/\bCARD\s*(?:NO\.?|NUMBER|#)?\s*[:=]?\s*([\d*xX]{6,})/i,ACCT:/\bACCT(?:\s*(?:NO\.?|NUMBER|#))?\s*[:=]?\s*([\w*\-]*[\d*][\w*\-]*)/i};
 const sum=a=>a.reduce((x,y)=>x+y,0);
-function pdate(a,b,c){a=+a;b=+b;c=+c;let y,m,d;if(a>31){y=a;m=b;d=c}else if(b>12){m=a;d=b;y=c}else{d=a;m=b;y=c}
+// ── input hygiene: everything that comes from a file or from the cloud is rebuilt field by field ──
+const nz=(v,d)=>{v=+v;return isFinite(v)?v:(d||0)};
+const sx=(v,n)=>v==null?'':String(v).slice(0,n||400);
+const idOk=v=>typeof v=='string'&&/^[\w.:\-]{1,64}$/.test(v);
+const dOk=v=>typeof v=='string'&&/^\d{4}-\d\d-\d\d$/.test(v);
+const isO=v=>!!v&&typeof v=='object'&&!Array.isArray(v);
+const a4=a=>Array.isArray(a)&&a.length==4&&a.every(x=>x!==null&&x!==''&&isFinite(+x))?a.map(Number):null;
+const ST=['VALID','VERIFY','NO_DISPENSE'];
+const CFGD={bankPrefix:'00799999',dateOrder:'auto'};let CFG={...CFGD};
+const cleanCfg=c=>{c=isO(c)?c:{};return{bankPrefix:sx(c.bankPrefix==null?CFGD.bankPrefix:c.bankPrefix,200).replace(/[^\w*,\s;،\-]/g,''),dateOrder:['auto','dmy','mdy','ymd'].includes(c.dateOrder)?c.dateOrder:'auto'}};
+function loadCfg(){CFG=cleanCfg(jget('cfg',null))}
+const bankP=()=>String(CFG.bankPrefix||'').split(/[,\s;،]+/).filter(Boolean);
+const kindOf=(acct,card)=>{if(!acct)return'NORMAL';return bankP().some(p=>acct.startsWith(p)||card.startsWith(p))?'NORMAL':'BANK'};
+function cleanEntry(x){if(!isO(x))return null;
+ let n=Array.isArray(x.numbers)?x.numbers.map(Number):[];if(!(n.length==4||n.length==0)||n.some(v=>!isFinite(v)||v<0))n=[];
+ const o={type:sx(x.type,40),ref:sx(x.ref,40),date:dOk(x.date)?x.date:'',time:/^\d\d:\d\d(:\d\d)?$/.test(x.time||'')?x.time:'',req:nz(x.req),numbers:n,total:sum(n),
+  status:ST.includes(x.status)?x.status:'VERIFY',note:sx(x.note,200),raw:sx(x.raw,6000),code:/^[A-Z_]{0,16}$/.test(x.code||'')?(x.code||''):'',arg:sx(x.arg,200),card:sx(x.card,64),acct:sx(x.acct,64),kind:x.kind=='BANK'?'BANK':'NORMAL',cur:sx(x.cur,8),
+  den:a4(x.den),disp:a4(x.disp),rejc:a4(x.rejc),rem:a4(x.rem)};
+ if(o.status=='VALID'&&n.length!=4)o.status='VERIFY';
+ if(x.cm===true){o.cm=true;o.cmd=Array.isArray(x.cmd)?x.cmd.slice(0,4).map(Number).filter(isFinite):[]}
+ return o}
+function cleanDoc(d){if(!isO(d)||!idOk(d.id)||!Array.isArray(d.entries))return null;
+ return{id:d.id,name:sx(d.name,255)||'—',ts:nz(d.ts),folder:idOk(d.folder)?d.folder:null,entries:d.entries.slice(0,200000).map(cleanEntry).filter(Boolean)}}
+function cleanFolder(f){if(!isO(f)||!idOk(f.id)||!f.name)return null;return{id:f.id,name:sx(f.name,40),color:col(f.color),ts:nz(f.ts)}}
+function cleanDel(o){const r={},now=Date.now();if(isO(o))for(const k in o){const v=+o[k];if(idOk(k)&&isFinite(v)&&now-v<120*864e5)r[k]=v}return r}
+const cleanDen=a=>Array.isArray(a)&&a.length==4?a.map(n=>Math.max(0,nz(n))):[0,0,0,0];
+function uniq(a){const m=new Map();a.forEach(x=>{const o=m.get(x.id);if(!o||x.ts>=o.ts)m.set(x.id,x)});return[...m.values()]}
+const vC=v=>{const r={};if(isO(v))for(const k in v){if(!(k=='o'||/^\d{1,9}$/.test(k)))continue;const n=Math.round(nz(v[k]));if(n)r[k]=n}return r};
+const vT=v=>Object.keys(v).reduce((a,k)=>a+(k=='o'?v[k]:(+k)*v[k]),0);
+function cleanFin(j){if(!isO(j)||!isO(j.set)||!Array.isArray(j.txs)||!Array.isArray(j.parties))return null;
+ const s=j.set,den=(Array.isArray(s.den)?s.den:[]).map(Number).filter(v=>Number.isInteger(v)&&v>0&&v<1e9),balv=vC(isO(s.balv)&&Object.keys(s.balv).length?s.balv:(nz(s.bal)?{o:s.bal}:{}));
+ const set={office:sx(s.office,60),den:den.length?[...new Set(den)].sort((a,b)=>b-a):[2000,1000,500,200,100,50,20,10,5],start:dOk(s.start)?s.start:'',bal:vT(balv),balv},T=['worker','atm','central','other'];
+ const parties=j.parties.slice(0,300).filter(p=>isO(p)&&idOk(p.id)).map(p=>({id:p.id,name:sx(p.name,40),type:T.includes(p.type)?p.type:'other',color:col(p.color),cap:Math.max(0,Math.round(nz(p.cap))),arch:!!p.arch}));
+ const txs=j.txs.slice(0,300000).filter(x=>isO(x)&&idOk(x.id)&&dOk(x.date)).map(x=>{let v=vC(x.v);if(!Object.keys(v).length&&nz(x.amt))v={o:Math.round(nz(x.amt))};return{id:x.id,ts:nz(x.ts),date:x.date,pid:idOk(x.pid)?x.pid:'',dir:x.dir=='in'?'in':'out',v,amt:vT(v),note:sx(x.note,80)}});
+ const days={};if(isO(j.days))for(const k in j.days){const c=j.days[k];if(!dOk(k)||!isO(c))continue;let v=vC(c.v);if(!Object.keys(v).length&&isO(c.cnt)){v=vC(c.cnt);if(nz(c.other))v.o=Math.round(nz(c.other))}days[k]={closed:!!c.closed,v,counted:vT(v),at:nz(c.at)}}
+ const audit=(Array.isArray(j.audit)?j.audit:[]).slice(0,5000).filter(isO).map(a=>({at:nz(a.at),m:sx(a.m,300)}));
+ return{v:2,set,parties,txs,days,audit}}
+const FAMS=['tt','tp','ta','tf','vg'],KSS=['take','ret','recv','rev'],mon1=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-01'};
+function cleanStm(j){if(!isO(j)||!isO(j.den)||!Array.isArray(j.tx))return null;
+ const den={};FAMS.forEach(f=>{const a=(Array.isArray(j.den[f])?j.den[f]:[]).map(Number).filter(v=>Number.isInteger(v)&&v>0&&v<1e9);if(a.length)den[f]=[...new Set(a)].sort((x,y)=>x-y)});
+ const open={};if(isO(j.open))for(const k in j.open){const m=/^(tt|tp|ta|tf|vg):(\d{1,9})$/.exec(k),n=Math.round(nz(j.open[k]));if(m&&n)open[k]=n}
+ const emp=(Array.isArray(j.emp)?j.emp:[]).slice(0,500).filter(e=>isO(e)&&idOk(e.id)).map(e=>({id:e.id,n:sx(e.n,40),a:e.a?1:0}));
+ const tx=j.tx.slice(0,300000).filter(x=>isO(x)&&idOk(x.id)&&dOk(x.date)&&KSS.includes(x.k)&&FAMS.includes(x.fam)).map(x=>{const q={};if(isO(x.q))for(const k in x.q){if(!/^\d{1,9}$/.test(k))continue;const n=Math.round(nz(x.q[k]));if(n>0)q[k]=n}return{id:x.id,ts:nz(x.ts),date:x.date,k:x.k,pid:idOk(x.pid)?x.pid:'',fam:x.fam,q,note:sx(x.note,80)}});
+ return{v:1,start:dOk(j.start)?j.start:mon1(),den,emp,open,tx}}
+const keyOk=k=>/^[\w|:.,\-]{1,100}$/.test(k);
+function scrub(v,d){d=d||0;if(d>8)return undefined;
+ if(typeof v=='number')return isFinite(v)?v:0;if(typeof v=='string')return v.slice(0,500);if(typeof v=='boolean'||v===null)return v;
+ if(Array.isArray(v))return v.slice(0,5000).map(x=>scrub(x,d+1)).filter(x=>x!==undefined);
+ if(isO(v)){const o={};for(const k of Object.keys(v)){if(!keyOk(k))continue;if(k=='id'&&!idOk(v[k]))return undefined;const s=scrub(v[k],d+1);if(s!==undefined)o[k]=s}return o}
+ return undefined}
+function cleanAcc(j){if(!isO(j))return null;const a=scrub(j);if(!isO(a))return null;
+ a.m=isO(a.m)?a.m:{};for(const k of Object.keys(a.m))if(!/^\d{4}-\d\d$/.test(k)||!isO(a.m[k]))delete a.m[k];
+ a.cfg=isO(a.cfg)?a.cfg:{};for(const k of Object.keys(a.cfg)){if(!Array.isArray(a.cfg[k]))delete a.cfg[k];else a.cfg[k]=a.cfg[k].filter(c=>Array.isArray(c)&&idOk(String(c[0])))}
+ if(a.ct!==undefined){a.ct=(Array.isArray(a.ct)?a.ct:[]).filter(isO);a.ct.forEach(c=>{if(Array.isArray(c.c))c.c=c.c.filter(x=>Array.isArray(x)&&idOk(String(x[0])))})}
+ if(a.ord!==undefined)a.ord=(Array.isArray(a.ord)?a.ord:[]).filter(x=>typeof x=='string'&&idOk(x));
+ return a}
+function pdate(a,b,c){a=+a;b=+b;c=+c;let y,m,d;const o=CFG.dateOrder;if(o=='dmy'){d=a;m=b;y=c}else if(o=='mdy'){m=a;d=b;y=c}else if(o=='ymd'){y=a;m=b;d=c}else if(a>31){y=a;m=b;d=c}else if(b>12){m=a;d=b;y=c}else{d=a;m=b;y=c}
  if(m<1||m>12||d<1||d>31)return'';return(2000+y)+'-'+String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0')}
 const fmtDate=iso=>iso?iso.split('-').reverse().join('/'):'';
 function nameDate(n){let m,y,mo,d;
@@ -191,7 +269,7 @@ function parse(input){
   for(let j=i-1;j>=Math.max(0,i-4);j--){const h=R.HEADER.exec(l[j]);if(h){ref=h[1];date=pdate(h[2],h[3],h[4]);break}const t=R.TIME.exec(l[j]);if(t){time=t[1];type=t[2].trim()}}
   let lo=Math.max(0,i-8);for(let j=i-1;j>=Math.max(0,i-15);j--){const h=R.HEADER.exec(l[j]);if(h){lo=j;if(!date)date=pdate(h[2],h[3],h[4]);break}}
   let hi=end;for(let j=i+1;j<end;j++){if(R.HEADER.test(l[j])){hi=j;break}}
-  const seg=l.slice(lo,hi).join('\n'),cm=R.CARD.exec(seg),am=R.ACCT.exec(seg),card=cm&&/\d/.test(cm[1])?cm[1]:'',acct=am?am[1]:'',kind=acct&&!acct.startsWith('00799999')&&!card.startsWith('00799999')?'BANK':'NORMAL';
+  const seg=l.slice(lo,hi).join('\n'),cm=R.CARD.exec(seg),am=R.ACCT.exec(seg),card=cm&&/\d/.test(cm[1])?cm[1]:'',acct=am?am[1]:'',kind=kindOf(acct,card);
   let a=Number(R.REQ.exec(l[i])[1].replace(/,/g,'').replace(/\.+$/,''));if(isNaN(a))a=0;
   let nums=[],bad='';
   for(let j=i+1;j<Math.min(end,i+4);j++){if(!l[j].trim())continue;const m=R.FOUR.exec(l[j]);
@@ -275,8 +353,9 @@ Table:["M5 4h14a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z"
 Calc:["M7 3h10a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z","M8 7.5h8","M8.5 12h.01","M12 12h.01","M15.5 12h.01","M8.5 16h.01","M12 16h.01","M15.5 16h.01"],
 Folder:["M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"],Move:["M5 12h14","M13 6l6 6-6 6"],Sun:["M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z","M12 2v2","M12 20v2","M4.9 4.9l1.4 1.4","M17.7 17.7l1.4 1.4","M2 12h2","M20 12h2","M4.9 19.1l1.4-1.4","M17.7 6.3l1.4-1.4"],Moon:["M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"],Up:["M12 19V5","M6 11l6-6 6 6"],Down:["M12 5v14","M6 13l6 6 6-6"]};
 const ic=n=>'<svg class="i" viewBox="0 0 24 24" aria-hidden="true">'+P[n].map(d=>'<path d="'+d+'"/>').join('')+'</svg>';
+const icb=()=>ic('Back').replace('class="i"','class="i flip"');
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]);
-const num=n=>n.toLocaleString('en-US'),amt=d=>d.toLocaleString('en-US',{maximumFractionDigits:2});
+const num=n=>(isFinite(+n)?+n:0).toLocaleString('en-US'),amt=d=>(isFinite(+d)?+d:0).toLocaleString('en-US',{maximumFractionDigits:2});
 let LS=null;try{LS=window.localStorage}catch(e){}
 // data of each account lives under its own prefix; preferences (language, theme, sort) stay shared
 const DK=['docs','del','folders','cur','ts','trash','den','entries'];
@@ -285,7 +364,26 @@ try{if(LS&&!LS.getItem('ns5')){LS.setItem('ns5','1');const u=LS.getItem('uid');
   if(u){DK.forEach(k=>{const v=LS.getItem(k);if(v!=null){LS.setItem('u_'+u+'_'+k,v);LS.removeItem(k)}});LS.setItem('active',u)}}
  const ac=LS&&LS.getItem('active');if(ac&&ac!='guest')NS='u_'+ac+'_'}catch(e){}
 const NSK=k=>DK.includes(k)?NS+k:k;
-const sget=k=>{try{return LS&&LS.getItem(NSK(k))}catch(e){return null}},sset=(k,v)=>{try{LS&&LS.setItem(NSK(k),v)}catch(e){}},sdel=k=>{try{LS&&LS.removeItem(NSK(k))}catch(e){}};
+DK.push('fin','stm','acc','cfg','base');
+const SYNCK=['docs','folders','del','den','cfg','fin','stm','acc'];
+const KV=window.__KV||{ok:false,db:null,mem:{}};
+const lsGet=k=>{try{return LS?LS.getItem(k):null}catch(e){return null}},
+ lsSet=(k,v)=>{try{if(!LS)return false;LS.setItem(k,v);return true}catch(e){return false}},
+ lsDel=k=>{try{LS&&LS.removeItem(k)}catch(e){}};
+let failT=0;
+function storeFail(){clearTimeout(failT);failT=setTimeout(()=>{try{S.storeErr=true;toast('store_err');render()}catch(e){}},0)}
+function rawGet(nk){return KV.ok&&Object.prototype.hasOwnProperty.call(KV.mem,nk)?KV.mem[nk]:lsGet(nk)}
+function rawSet(nk,v){
+ if(KV.ok){KV.mem[nk]=v;
+  try{const tx=KV.db.transaction('kv','readwrite');tx.objectStore('kv').put(v,nk);tx.oncomplete=()=>lsDel(nk);tx.onabort=tx.onerror=()=>{if(KV.mem[nk]===v&&!lsSet(nk,v))storeFail()}}
+  catch(e){if(!lsSet(nk,v))storeFail()}
+  return true}
+ const ok=lsSet(nk,v);if(!ok)storeFail();return ok}
+function rawDel(nk){if(KV.ok){delete KV.mem[nk];try{KV.db.transaction('kv','readwrite').objectStore('kv').delete(nk)}catch(e){}}lsDel(nk)}
+function dirty(){try{if(S.applying)return;S.rev=(S.rev||0)+1;S.lastEdit=Date.now();push()}catch(e){}}
+const sget=k=>DK.includes(k)?rawGet(NSK(k)):lsGet(k),
+ sset=(k,v)=>{const d=DK.includes(k),ok=d?rawSet(NSK(k),v):lsSet(k,v);if(d&&SYNCK.includes(k))dirty();return ok},
+ sdel=k=>{DK.includes(k)?rawDel(NSK(k)):lsDel(k)};
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 function jget(k,def){try{const v=JSON.parse(sget(k));return v==null?def:v}catch(e){return def}}
 const detect=()=>{const l=(navigator.language||'ar').slice(0,2);return D[l]?l:'ar'};
@@ -293,21 +391,21 @@ const detect=()=>{const l=(navigator.language||'ar').slice(0,2);return D[l]?l:'a
 const MQ=window.matchMedia?matchMedia('(prefers-color-scheme:dark)'):{matches:false};
 const isDark=()=>{const v=document.documentElement.dataset.theme;return v?v=='dark':MQ.matches};
 function applyTheme(){const v=sget('theme');if(v=='dark'||v=='light')document.documentElement.dataset.theme=v;else delete document.documentElement.dataset.theme;
- const m=document.querySelector('meta[name=theme-color]');if(m)m.content=isDark()?'#141821':'#4f6bff'}
+ const m=document.querySelector('meta[name=theme-color]');if(m)m.content=isDark()?'#21170f':'#c2410c'}
 applyTheme();
 if(MQ.addEventListener)MQ.addEventListener('change',()=>{applyTheme();if(typeof render=='function')render()});
 // ── state ──
 let TS=+sget('ts')||0,pt;
 const S={docs:[],del:{},cur:null,entries:[],screen:0,q:'',dq:'',onlyV:false,csvLang:'fr',lang:sget('lang')||detect(),busy:false,saving:false,homeErr:null,homeInfo:null,saveErr:false,excelErr:false,sheet:null,idx:0,delId:null,fb:false,user:null,folders:[],fol:null,sel:false,ids:new Set(),fe:null,tf:{kind:'all',from:'',to:'',day:''},sortBy:sget('sortBy')||'date',sortDir:sget('sortDir')||'desc'};
-const t=(k,a)=>{let s=D[S.lang][k]??D.en[k]??k;for(const x in a||{})s=s.replace('{'+x+'}',a[x]);return s};
+const t=(k,a)=>{let s=D[S.lang][k]??D.en[k]??k;for(const x in a||{})s=s.split('{'+x+'}').join(String(a[x]));return s};
 const $=s=>document.querySelector(s);
 // load saved documents (and migrate the old single-session storage)
 (function(){let d=jget('docs',null);
  if(!Array.isArray(d)){d=[];const old=jget('entries',[]);
   if(Array.isArray(old)&&old.length){d=[{id:'legacy',name:t('prev_doc'),ts:+sget('ts')||Date.now(),entries:old}];sset('docs',JSON.stringify(d))}}
- S.docs=d.filter(x=>x&&x.id&&Array.isArray(x.entries));
- const fl=jget('folders',[]);S.folders=Array.isArray(fl)?fl.filter(x=>x&&x.id&&x.name):[];
- const dl=jget('del',{});S.del=dl&&typeof dl=='object'&&!Array.isArray(dl)?dl:{};
+ S.docs=uniq(d.map(cleanDoc).filter(Boolean));loadCfg();
+ const fl=jget('folders',[]);S.folders=uniq((Array.isArray(fl)?fl:[]).map(cleanFolder).filter(Boolean));
+ S.del=cleanDel(jget('del',{}));
  const c=sget('cur'),cd=S.docs.find(x=>x.id==c);if(cd){S.cur=cd.id;S.entries=cd.entries}})();
 const curDoc=()=>S.docs.find(x=>x.id==S.cur);
 function saveAll(){TS=Date.now();sset('docs',JSON.stringify(S.docs));sset('folders',JSON.stringify(S.folders));sset('del',JSON.stringify(S.del));sset('ts',String(TS));push()}
@@ -316,17 +414,17 @@ let tt;function toast(k,a){const el=$('#toast');el.innerHTML='<div class="toast 
 function banner(kind,title,desc,act){const c={RUN:'var(--pr)',INFO:'var(--pr)',ERR:'var(--er)',OK:'var(--ok)'}[kind];
  return '<div class="ban" style="--c:'+c+'" role="'+(kind=='ERR'?'alert':'status')+'">'+(kind=='RUN'?'<div class="spin"></div>':ic(kind=='OK'?'CheckCircle':'Alert'))+'<div class="grow t"><b>'+esc(title)+'</b>'+(desc?'<span class="mu sm">'+esc(desc)+'</span>':'')+(act||'')+'</div></div>'}
 const btn=(a,label,o={})=>'<button class="btn '+(o.p?'p':'')+(o.d?'d':'')+'" data-a="'+a+'"'+(o.dis?' disabled':'')+'>'+(o.load?'<span class="spin"></span>':o.icon?ic(o.icon):'')+'<span class="t">'+esc(label)+'</span></button>';
-const copyBtn=v=>'<button class="ib" data-a="copy" data-v="'+v+'" title="'+esc(t('copy_total'))+'" aria-label="'+esc(t('copy_total'))+'">'+ic('Copy')+'</button>';
+const copyBtn=v=>'<button class="ib" data-a="copy" data-v="'+esc(v)+'" title="'+esc(t('copy_total'))+'" aria-label="'+esc(t('copy_total'))+'">'+ic('Copy')+'</button>';
 // ── views ──
 function header(){const back=(S.screen==1&&S.entries.length)||S.screen==2||S.screen==3||S.screen==4,cd=curDoc();
- return '<header>'+(back?'<button class="ib" data-a="back" aria-label="'+esc(t('back'))+'" title="'+esc(t('back'))+'">'+ic('Back')+'</button>':'')+'<div class="logo">'+ic('Calc')+'</div><div class="grow"><h1 class="t">'+esc(S.screen==4?t('ac_title'):S.screen==3?t('sp_title'):S.screen==2?t('f_title'):back&&cd?cd.name:t('name'))+'</h1><div class="mu sm t">'+esc(S.screen==4?t('ac_sub'):S.screen==3?t('sp_sub'):S.screen==2?t('f_sub'):back?t('results'):t('tagline'))+'</div></div><button class="ib" data-a="theme" aria-label="'+esc(t(isDark()?'theme_light':'theme_dark'))+'" title="'+esc(t(isDark()?'theme_light':'theme_dark'))+'">'+ic(isDark()?'Sun':'Moon')+'</button><button class="ib" data-a="lang" aria-label="'+esc(t('language'))+'" title="'+esc(t('language'))+'">'+ic('Globe')+'</button>'+acctBtn()+'</header>'}
+ return '<header>'+(back?'<button class="ib" data-a="back" aria-label="'+esc(t('back'))+'" title="'+esc(t('back'))+'">'+icb()+'</button>':'')+'<div class="logo">'+ic('Calc')+'</div><div class="grow"><h1 class="t">'+esc(S.screen==4?t('ac_title'):S.screen==3?t('sp_title'):S.screen==2?t('f_title'):back&&cd?cd.name:t('name'))+'</h1><div class="mu sm t">'+esc(S.screen==4?t('ac_sub'):S.screen==3?t('sp_sub'):S.screen==2?t('f_sub'):back?t('results'):t('tagline'))+'</div></div><button class="ib" data-a="theme" aria-label="'+esc(t(isDark()?'theme_light':'theme_dark'))+'" title="'+esc(t(isDark()?'theme_light':'theme_dark'))+'">'+ic(isDark()?'Sun':'Moon')+'</button><button class="ib" data-a="lang" aria-label="'+esc(t('language'))+'" title="'+esc(t('language'))+'">'+ic('Globe')+'</button>'+acctBtn()+'</header>'}
 function acctBtn(){if(!S.fb)return'';if(!S.user)return'<button class="chip on" data-a="login">'+esc(t('signin'))+'</button>';
  const u=S.user;return'<button class="ib av" data-a="acct" aria-label="'+esc(t('account'))+'" title="'+esc(u.email)+'">'+(u.photo?'<img src="'+esc(u.photo)+'" alt="" referrerpolicy="no-referrer">':esc((u.name||u.email||'?').charAt(0).toUpperCase()))+'</button>'}
 const fid=d=>S.folders.some(f=>f.id===d.folder)?d.folder:null;
 function vis(){const q=S.dq.trim().toLowerCase();return [...S.docs].sort(sorter()).filter(d=>q?d.name.toLowerCase().includes(q):fid(d)===S.fol)}
 function secHead(){const cf=S.fol&&S.folders.find(f=>f.id===S.fol);let h='<div class="row">';
  if(cf){const id=esc(cf.id),n=S.docs.filter(d=>fid(d)===cf.id).length;
-  h+='<button class="ib" data-a="upf" aria-label="'+esc(t('back'))+'" title="'+esc(t('back'))+'">'+ic('Back')+'</button><div class="tile" style="--c:'+col(cf.color)+'">'+ic('Folder')+'</div><div class="grow t"><h2>'+esc(cf.name)+'</h2><div class="mu sm">'+esc(t('f_count',{n}))+'</div></div>'+
+  h+='<button class="ib" data-a="upf" aria-label="'+esc(t('back'))+'" title="'+esc(t('back'))+'">'+icb()+'</button><div class="tile" style="--c:'+col(cf.color)+'">'+ic('Folder')+'</div><div class="grow t"><h2>'+esc(cf.name)+'</h2><div class="mu sm">'+esc(t('f_count',{n}))+'</div></div>'+
   '<button class="ib" data-a="editf" data-id="'+id+'" title="'+esc(t('edit'))+'" aria-label="'+esc(t('edit'))+'">'+ic('Edit')+'</button><button class="ib" data-a="delf" data-id="'+id+'" title="'+esc(t('del'))+'" aria-label="'+esc(t('del'))+'">'+ic('Trash')+'</button>'}
  else h+='<div class="tile">'+ic('File')+'</div><div class="grow t"><h2>'+esc(t('docs_title'))+' ('+S.docs.length+')</h2></div>';
  return h+'</div><div class="chips" style="margin-top:14px"><button class="chip" data-a="newf">+ '+esc(t('new_folder'))+'</button><button class="chip'+(S.sel?' on':'')+'" data-a="selmode">'+esc(S.sel?t('done'):t('select'))+'</button></div><div class="chips" style="margin-top:10px;align-items:center"><span class="mu sm t">'+esc(t('sort_by'))+'</span><button class="chip'+(S.sortBy=='date'?' on':'')+'" data-a="sortby" data-v="date">'+esc(t('s_date'))+'</button><button class="chip'+(S.sortBy=='alpha'?' on':'')+'" data-a="sortby" data-v="alpha">'+esc(t('s_alpha'))+'</button><button class="ib" data-a="sortdir" title="'+esc(t(S.sortDir=='asc'?'s_asc':'s_desc'))+'" aria-label="'+esc(t(S.sortDir=='asc'?'s_asc':'s_desc'))+'">'+ic(S.sortDir=='asc'?'Up':'Down')+'</button></div>'}
@@ -338,7 +436,7 @@ function home(){if(S.fol&&!S.folders.some(f=>f.id===S.fol))S.fol=null;const has=
  if(S.busy)h+=banner('RUN',t('reading'),t('reading_desc'));
  else if(S.homeErr)h+=banner('ERR',t('err_'+S.homeErr),t('err_'+S.homeErr+'_desc'),btn('pick',t('try_again')));
  else if(S.homeInfo)h+=banner('OK',t('imported',{n:S.homeInfo.ok}),S.homeInfo.skipped.length?t('skipped',{names:S.homeInfo.skipped.join(', ')}):'');
- h+='<div class="card imp"><div class="row"><div class="tile">'+ic('Upload')+'</div><div class="grow t"><h2>'+esc(t('import_title'))+'</h2><div class="mu sm">'+esc(t('import_desc'))+'</div></div></div>'+
+ h+=storeBan();h+='<div class="card imp"><div class="row"><div class="tile">'+ic('Upload')+'</div><div class="grow t"><h2>'+esc(t('import_title'))+'</h2><div class="mu sm">'+esc(t('import_desc'))+'</div></div></div>'+
  '<div class="drop t" id="drop">'+esc(t('drop'))+btn('pick',t('choose_file'),{p:1,icon:'Upload',dis:S.busy,load:S.busy})+'</div></div>';
  h+='<div class="svw"><div class="sec t">'+esc(t('sv_title'))+'</div><div class="svc">'+(typeof finCard=='function'?finCard():'')+(window.stmCard?stmCard():'')+(window.accCard?accCard():'')+'</div></div>'+toolsCard();if(has)h+='<section class="card docs">'+secHead()+
   '<label class="field" style="margin-top:14px">'+ic('Search')+'<input id="dq" type="search" value="'+esc(S.dq)+'" placeholder="'+esc(t('docs_search'))+'" aria-label="'+esc(t('docs_search'))+'"></label><div class="list" id="dlist" style="margin-top:14px"></div></section>';
@@ -356,7 +454,7 @@ function results(){const s=summarize(S.entries),st=(n,l,c)=>'<div><b style="colo
  '<div class="stats">'+st(s.detected,t('detected'),'var(--tx)')+st(s.valid,t('valid'),'var(--ok)')+st(s.verify,t('verify'),s.verify?'var(--er)':'var(--mu)')+st(s.noDispense,t('no_dispense'),'var(--mu)')+'</div>'+
  '<div class="mu sm t" style="margin-top:20px">'+esc(t('csv_lang'))+'</div><div class="chips" style="margin:6px 0 14px">'+['fr','en'].map(c=>'<button class="chip '+(S.csvLang==c?'on':'')+'" data-a="csv" data-v="'+c+'">'+esc(t('lang_'+c))+'</button>').join('')+'</div>'+
  '<div class="stack" style="gap:10px">'+btn('export',S.saving?t('exporting'):t('export_csv'),{p:1,icon:'Download',dis:S.saving,load:S.saving})+btn('excel',t('open_excel'),{icon:'Table',dis:S.saving})+btn('csvx',t('csv_alt'),{icon:'Download',dis:S.saving})+btn('days',t('days_title'),{icon:'Table'})+btn('printr',t('print_report'),{icon:'Download'})+'</div></div>'+
- (S.saveErr?banner('ERR',t('err_save'),t('err_save_desc'),btn('export',t('try_again'))):'')+(S.excelErr?banner('ERR',t('err_excel'),t('err_excel_desc')):'')+
+ storeBan()+(S.saveErr?banner('ERR',t('err_save'),t('err_save_desc'),btn('export',t('try_again'))):'')+(S.excelErr?banner('ERR',t('err_excel'),t('err_excel_desc')):'')+
  (s.verify?banner('ERR',t('verify_banner',{n:s.verify}),t('verify_banner_desc')):banner('OK',t('all_ok'),t('all_ok_desc')))+mmBanners()+'<div class="card"><h2 class="t" style="margin:0 0 12px">'+esc(t('cass_title'))+'</h2>'+cassHtml(S.entries)+'</div>'+devCard(S.entries)+declCard(S.entries)+'</aside>'+
  '<main class="stack"><div class="tools"><label class="field">'+ic('Search')+'<input id="q" type="search" value="'+esc(S.q)+'" placeholder="'+esc(t('search'))+'" aria-label="'+esc(t('search'))+'"></label><div class="chips" id="flt"></div></div><div class="list" id="list"></div></main></div>'}
 function filters(){$('#flt').innerHTML=[[0,'f_all'],[1,'f_verify']].concat([[2,'f_mm']]).map(([v,k])=>'<button class="chip '+((S.onlyM?2:S.onlyV?1:0)==v?'on':'')+'" data-a="flt" data-v="'+v+'">'+esc(t(k))+'</button>').join('')}
@@ -364,12 +462,12 @@ function entry(e,i){const col={VALID:'var(--ok)',VERIFY:'var(--er)',NO_DISPENSE:
  const title=/^\d+$/.test(e.ref)?'#'+e.ref:e.ref,sub=[fmtDate(e.date),e.time,'REQ '+amt(e.req)].filter(Boolean).join(' · '),four=e.numbers.length==4;
  return '<article class="card ent" style="--c:'+col+'"><div class="row"><div class="tile">'+ic(icn)+'</div><div class="grow"><b class="ltr">'+esc(title)+'</b><div class="mu sm ltr">'+esc(sub)+'</div></div><span class="badge t">'+esc(t('st_'+e.status))+'</span>'+(e.kind=='BANK'?'<span class="badge t" style="--c:var(--ok)">'+esc(t('k_BANK'))+'</span>':'')+'</div>'+
  ((e.kind!='BANK'&&e.card)||e.acct?'<div class="mu xs ltr" style="margin-top:8px;word-break:break-all">'+esc([e.kind!='BANK'&&e.card?'CARD '+e.card:'',e.acct?'ACCT '+e.acct:''].filter(Boolean).join(' · '))+'</div>':'')+
- (four?'<div class="row" style="margin-top:14px;gap:10px"><div class="grow eq ltr">'+e.numbers.join(' + ')+' = '+num(e.total)+'</div>'+copyBtn(e.total)+'<button class="ib" data-a="edit" data-i="'+i+'" title="'+esc(t('edit'))+'" aria-label="'+esc(t('edit'))+'">'+ic('Edit')+'</button></div>':'')+
+ (four?'<div class="row" style="margin-top:14px;gap:10px"><div class="grow eq ltr">'+esc(e.numbers.join(' + '))+' = '+num(e.total)+'</div>'+copyBtn(e.total)+'<button class="ib" data-a="edit" data-i="'+i+'" title="'+esc(t('edit'))+'" aria-label="'+esc(t('edit'))+'">'+ic('Edit')+'</button></div>':'')+
  (e.code?'<div class="sm t" style="margin-top:6px;color:'+(e.status=='VERIFY'?'var(--er)':'var(--mu)')+'">'+esc(t('n_'+e.code,{a:e.arg}))+'</div>':'')+(isMM(e)?'<div class="sm t" style="margin-top:6px;color:var(--er)">'+esc(mmText(e))+'</div>':'')+
  (!four&&e.status=='VERIFY'?'<div style="margin-top:14px">'+btn('edit',t('edit'),{icon:'Edit'}).replace('data-a="edit"','data-a="edit" data-i="'+i+'"')+'</div>':'')+'</article>'}
 function list(){const q=S.q.trim(),sh=S.entries.map((e,i)=>[e,i]).filter(([e])=>(!q||e.ref.includes(q)||e.time.includes(q)||fmtDate(e.date).includes(q)||(e.card||'').includes(q)||(e.acct||'').includes(q)||String(e.total)==q)&&(!S.onlyV||e.status=='VERIFY')&&(!S.onlyM||isMM(e)));
- $('#list').innerHTML=sh.length?sh.map(([e,i])=>entry(e,i)).join(''):'<div class="card empty t"><p class="mu" style="margin-top:0">'+esc(t('empty_filter'))+'</p>'+btn('clear',t('clear_filters'))+'</div>'}
-function render(){document.documentElement.lang=S.lang;document.title=t('name');
+ const lim=S.lim||100;$('#list').innerHTML=sh.length?sh.slice(0,lim).map(([e,i])=>entry(e,i)).join('')+(sh.length>lim?'<div class="empty">'+btn('more',t('show_more',{n:sh.length-lim}))+'</div>':''):'<div class="card empty t"><p class="mu" style="margin-top:0">'+esc(t('empty_filter'))+'</p>'+btn('clear',t('clear_filters'))+'</div>'}
+function render(){S.defer=false;document.documentElement.lang=S.lang;document.title=t('name');
  const res=S.screen==1&&S.entries.length;
  $('#app').innerHTML=header()+(res?results():S.screen==4&&window.accPage?accPage():S.screen==3&&window.stmPage?stmPage():S.screen==2&&typeof finPage=='function'?finPage():home());
  if(res){filters();list()}else dlist();
@@ -379,12 +477,12 @@ function render(){document.documentElement.lang=S.lang;document.title=t('name');
   L.innerHTML=d?'<div class="ov" data-a="close"><div class="sheet" role="dialog" aria-modal="true"><h2 class="t" style="margin:0">'+esc(t('del_title'))+'</h2><div class="mu sm t">'+esc(t('del_desc',{n:d.name}))+'</div><div class="g2">'+btn('close',t('cancel'))+btn('confirmdel',t('del'),{d:1,icon:'Trash'})+'</div></div></div>':''}
  else if(S.sheet=='edit'&&S.entries[S.idx]){const e=S.entries[S.idx];
   L.innerHTML='<div class="ov" data-a="close"><div class="sheet" role="dialog" aria-modal="true"><h2 class="t" style="margin:0">'+esc(t('edit_title'))+'</h2><div class="mu sm t">'+esc(t('edit_desc'))+'</div><div class="g2">'+
-  [0,1,2,3].map(i=>'<label><span class="mu sm t">'+esc(t('note_n',{n:i+1}))+'</span><div class="field"><input class="n" inputmode="numeric" maxlength="7" placeholder="0" value="'+(e.numbers[i]??'')+'"></div></label>').join('')+
+  [0,1,2,3].map(i=>'<label><span class="mu sm t">'+esc(t('note_n',{n:i+1}))+'</span><div class="field"><input class="n" inputmode="numeric" maxlength="7" placeholder="0" value="'+esc(e.numbers[i]??'')+'"></div></label>').join('')+
   '</div><div class="sm t" id="err" style="color:var(--er)" hidden>'+esc(t('err_edit'))+'</div><div class="mu sm t">'+esc(t('original'))+'</div><pre class="raw ltr">'+esc(e.raw)+'</pre><div class="g2">'+btn('close',t('cancel'))+btn('save',t('save'),{p:1})+'</div></div></div>';
   const f=L.querySelector('.n');f&&f.focus()}
  else if(S.sheet=='acct')L.innerHTML=acctSheet();
  else if(S.sheet=='table'){const f=S.tf,H=['c_ref','c_date','c_time','REQ','N1','N2','N3','N4','c_total','c_status','CARD','ACCT','c_note','c_calc','c_diff'].map(k=>k[0]=='c'?t(k):k),lb=(k,id,ty,v)=>'<label><span class="mu xs t">'+esc(t(k))+'</span><div class="field"><input type="'+ty+'" id="'+id+'" value="'+esc(v)+'"></div></label>';
-  L.innerHTML='<div class="ov full" data-a="close"><div class="sheet wide" role="dialog" aria-modal="true"><div class="row"><div class="grow t"><h2 style="margin:0">'+esc(t('tbl_title'))+'</h2><div class="mu sm">'+esc(t('tbl_hint'))+'</div></div><button class="ib" data-a="close" aria-label="'+esc(t('done'))+'">'+ic('Back')+'</button></div>'+
+  L.innerHTML='<div class="ov full" data-a="close"><div class="sheet wide" role="dialog" aria-modal="true"><div class="row"><div class="grow t"><h2 style="margin:0">'+esc(t('tbl_title'))+'</h2><div class="mu sm">'+esc(t('tbl_hint'))+'</div></div><button class="ib" data-a="close" aria-label="'+esc(t('done'))+'">'+icb()+'</button></div>'+
   '<div class="chips" id="tchips"></div><div class="tf">'+lb('t_from','tfrom','time',f.from)+lb('t_to','tto','time',f.to)+lb('t_day','tday','date',f.day)+'<button class="chip" data-a="tclr">'+esc(t('t_clear'))+'</button></div><div class="sm t" id="tsum"></div>'+
   '<div class="tw"><table class="tb"><thead><tr>'+H.map(h=>'<th>'+esc(h)+'</th>').join('')+'</tr></thead><tbody id="tbody"></tbody><tfoot><tr><td colspan="15" id="tfoot" style="text-align:start"></td></tr></tfoot></table></div><div class="g2">'+btn('close',t('done'))+btn('export',S.saving?t('exporting'):t('export_csv'),{p:1,icon:'Download',dis:S.saving,load:S.saving})+'</div></div></div>';
   tblUpdate()}
@@ -403,13 +501,13 @@ function render(){document.documentElement.lang=S.lang;document.title=t('name');
 // ── table view filters ──
 const KIND=x=>x.kind=='BANK'?'BANK':'NORMAL';
 function trow(x){const bank=x.kind=='BANK',mm=isMM(x),c=calcOf(x),cl=[bank?'b':'',x.status=='VERIFY'?'v':x.status=='NO_DISPENSE'?'n':'',mm?'m':''].join(' ').trim();
- return '<tr'+(cl?' class="'+cl+'"':'')+'><td>'+esc(x.ref)+'</td><td>'+esc(fmtDate(x.date))+'</td><td>'+esc(x.time)+'</td><td>'+amt(x.req)+'</td>'+[0,1,2,3].map(i=>'<td>'+(x.numbers[i]??'')+'</td>').join('')+'<td>'+(x.numbers.length==4?num(x.total):'')+'</td><td>'+esc(t('st_'+x.status))+'</td><td>'+esc(bank?t('k_BANK'):(x.card||''))+'</td><td>'+esc(x.acct||'')+'</td><td>'+esc(noteOf(x))+'</td><td>'+(c==null?'':num(c))+'</td><td>'+(c==null?'':amt(c-x.req))+'</td></tr>'}
+ return '<tr'+(cl?' class="'+cl+'"':'')+'><td>'+esc(x.ref)+'</td><td>'+esc(fmtDate(x.date))+'</td><td>'+esc(x.time)+'</td><td>'+amt(x.req)+'</td>'+[0,1,2,3].map(i=>'<td>'+esc(x.numbers[i]??'')+'</td>').join('')+'<td>'+(x.numbers.length==4?num(x.total):'')+'</td><td>'+esc(t('st_'+x.status))+'</td><td>'+esc(bank?t('k_BANK'):(x.card||''))+'</td><td>'+esc(x.acct||'')+'</td><td>'+esc(noteOf(x))+'</td><td>'+(c==null?'':num(c))+'</td><td>'+(c==null?'':amt(c-x.req))+'</td></tr>'}
 function tblUpdate(){const f=S.tf,base=S.entries.filter(x=>{
   if(f.day&&x.date!==f.day)return false;
   if(f.from||f.to){if(!x.time)return false;const m=x.time.slice(0,5),a=f.from||'00:00',b=f.to||'23:59';if(a<=b?(m<a||m>b):(m<a&&m>b))return false}
   return true}),rows=f.kind=='all'?base:base.filter(x=>KIND(x)==f.kind),sm=summarize(rows);
  $('#tchips').innerHTML=['all','NORMAL','BANK'].map(k=>{const a=k=='all'?base:base.filter(x=>KIND(x)==k);return '<button class="chip'+(f.kind==k?' on':'')+'" data-a="tk" data-v="'+k+'">'+esc(t('k_'+k))+' · '+a.length+' · '+num(summarize(a).grand)+'</button>'}).join('');
- $('#tbody').innerHTML=rows.map(trow).join('');
+ $('#tbody').innerHTML=rows.slice(0,1500).map(trow).join('')+(rows.length>1500?'<tr><td colspan="15" style="text-align:start">'+esc(t('tbl_cap',{n:1500}))+'</td></tr>':'');
  $('#tsum').textContent=t('last_desc',{n:rows.length,t:num(sm.grand)});
  $('#tfoot').textContent=t('tot')+' : '+num(sm.grand)}
 // ── sorting (folders and documents) ──
@@ -480,11 +578,12 @@ async function readFiles(files){files=[...files];if(!files.length)return;
  if(files.length==1){openDoc(last.id);return}
  S.homeInfo={ok,skipped};render()}
 function openDoc(id){const d=S.docs.find(x=>x.id==id);if(!d)return;
- S.cur=id;sset('cur',id);S.entries=d.entries;S.q='';S.onlyV=false;S.onlyM=false;S.saveErr=false;S.excelErr=false;S.homeErr=null;S.homeInfo=null;go(1)}
+ S.cur=id;sset('cur',id);S.entries=d.entries;S.q='';S.lim=100;S.onlyV=false;S.onlyM=false;S.saveErr=false;S.excelErr=false;S.homeErr=null;S.homeInfo=null;go(1)}
 function delDoc(){const id=S.delId;trashAdd(S.docs.filter(d=>d.id==id));S.docs=S.docs.filter(d=>d.id!=id);S.del[id]=Date.now();S.ids.delete(id);
  if(S.cur==id){S.cur=null;S.entries=[];sdel('cur')}
  S.sheet=null;S.delId=null;saveAll();render();toastUndo('deleted')}
-function go(n){S.screen=n;if(n==1){if(location.hash!='#results')location.hash='results'}else if(location.hash)history.replaceState(null,'',location.pathname+location.search);render();window.scrollTo(0,0)}
+const HS={1:'results',2:'fin',3:'stamps',4:'acc'};
+function go(n){S.screen=n;if(HS[n]){if(location.hash!='#'+HS[n])location.hash=HS[n]}else if(location.hash)history.replaceState(null,'',location.pathname+location.search);render();window.scrollTo(0,0)}
 async function save(open,fmt){S.saving=true;S.saveErr=false;S.excelErr=false;render();
  const cd=curDoc(),base=(cd?cd.name.replace(/\.[^.]*$/,''):'REQ_report').replace(/[\\/:*?"<>|]/g,'_')||'REQ_report',xl=fmt!='csv';let ok=false;
  try{const blob=xl?toXlsx(S.entries,S.csvLang):new Blob([toCsv(S.entries,S.csvLang)],{type:'text/csv;charset=utf-8'}),name=base+(xl?'.xlsx':'.csv');
@@ -504,12 +603,12 @@ document.addEventListener('click',ev=>{const el=ev.target.closest('[data-a]');if
  else if(a=='deldoc'){S.delId=el.dataset.id;S.sheet='del';render()}else if(a=='confirmdel')delDoc()
  else if(a=='setlang'){S.lang=el.dataset.v;sset('lang',S.lang);S.sheet=null;render()}
  else if(a=='close'){S.sheet=null;render()}else if(a=='csv'){S.csvLang=el.dataset.v;render()}
- else if(a=='flt'){S.onlyV=el.dataset.v=='1';S.onlyM=el.dataset.v=='2';filters();list()}else if(a=='clear'){S.q='';S.onlyV=false;S.onlyM=false;render()}
+ else if(a=='flt'){S.onlyV=el.dataset.v=='1';S.onlyM=el.dataset.v=='2';S.lim=100;filters();list()}else if(a=='clear'){S.q='';S.onlyV=false;S.onlyM=false;render()}
  else if(a=='edit'){S.idx=+el.dataset.i;S.sheet='edit';render()}else if(a=='save')saveEdit();
  else if(a=='excel'){S.tf={kind:'all',from:'',to:'',day:''};S.sheet='table';render()}else if(a=='export')save(false);else if(a=='csvx')save(false,'csv');else if(a=='copy')copy(el.dataset.v,el)
  else if(a=='login')login();else if(a=='acct'){S.sheet='acct';render()}else if(a=='logout')logout()});
 document.addEventListener('input',ev=>{const el=ev.target;
- if(DF[el.id]){S.df[DF[el.id]]=el.value;daysUpdate()}else if(el.id=='q'){S.q=el.value;list()}else if(el.id=='dq'){S.dq=el.value;dlist()}
+ if(DF[el.id]){S.df[DF[el.id]]=el.value;daysUpdate()}else if(el.id=='q'){S.q=el.value;S.lim=100;clearTimeout(qT);qT=setTimeout(()=>{if($('#list'))list()},120)}else if(el.id=='dq'){S.dq=el.value;dlist()}
  else if(el.id=='tfrom'||el.id=='tto'||el.id=='tday'){S.tf[{tfrom:'from',tto:'to',tday:'day'}[el.id]]=el.value;tblUpdate()}
  else if(el.classList.contains('n')){el.value=el.value.replace(/\D/g,'').slice(0,7);const e=$('#err');e&&(e.hidden=true)}});
 document.addEventListener('keydown',ev=>{if(ev.key=='Escape'&&S.sheet){S.sheet=null;render()}
@@ -520,7 +619,7 @@ $('#file').addEventListener('change',e=>{const fs=[...e.target.files];e.target.v
 ['dragover','dragenter'].forEach(n=>document.addEventListener(n,e=>{if(S.screen==0&&$('#drop')){e.preventDefault();$('#drop').classList.add('over')}}));
 ['dragleave','drop'].forEach(n=>document.addEventListener(n,e=>{const d=$('#drop');d&&d.classList.remove('over')}));
 document.addEventListener('drop',e=>{if(S.screen==0&&$('#drop')){e.preventDefault();const fs=e.dataTransfer.files;if(fs&&fs.length)readFiles(fs)}});
-window.addEventListener('hashchange',()=>{const n=location.hash=='#results'&&S.entries.length?1:0;if(n!=S.screen){S.screen=n;render()}});
+window.addEventListener('hashchange',()=>{const h=location.hash.slice(1);let n=0;if(h=='results'&&S.entries.length)n=1;else if(h=='fin'&&typeof finPage=='function')n=2;else if(h=='stamps'&&window.stmPage)n=3;else if(h=='acc'&&window.accPage)n=4;if(n!=S.screen){S.screen=n;render();window.scrollTo(0,0)}});
 if(location.hash=='#results'&&S.entries.length)S.screen=1;
 // ── v4: reconciliation, cassettes, daily report, folder stats, protection, print ──
 Object.assign(D.ar,{den_title:"قيم الفئات",den_desc:"اكتب قيمة الورقة في كل كاسيت ليحسب التطبيق المبلغ الفعلي ويقارنه بـ REQ.",den_err:"أدخل أربع قيم أكبر من صفر، أو اتركها كلها فارغة.",den_saved:"تم حفظ الفئات",den_unset_t:"قيم الفئات غير محددة",den_unset:"حدّدها مرة واحدة لتفعيل مطابقة المبلغ مع الأوراق.",den_val:"الفئة",value:"القيمة",pieces:"الأوراق",mm:"فروقات",mm_banner:"{n} عملية مبلغها لا يطابق الأوراق",mm_ok:"المبلغ يطابق الأوراق في كل العمليات",f_mm:"فروقات المبلغ",n_MM:"المبلغ المحسوب {c} يختلف عن REQ {r} (الفرق {d}).",cass_title:"جرد الكاسيتات",tools_title:"أدوات",fs_btn:"إحصاءات",fs_all:"كل المستندات",c_doc:"المستند",c_calc:"المحسوب",c_diff:"الفرق",days_title:"التقرير اليومي",h_from:"من الساعة",h_to:"إلى الساعة",print_report:"تقرير للطباعة / PDF",rep_susp:"العمليات المشبوهة",backup_export:"نسخة احتياطية",backup_import:"استعادة نسخة",backup_ok:"تمت استعادة {n} مستند",backup_err:"ملف النسخة غير صالح",trash_title:"سلة المحذوفات",trash_desc:"تبقى المستندات المحذوفة 14 يومًا على هذا الجهاز فقط.",trash_empty:"السلة فارغة.",trash_clear:"إفراغ السلة",restore:"استعادة",restored:"تمت استعادة {n} مستند",undo:"تراجع",dups_title:"العمليات المكررة",dups_none:"لا توجد عمليات مكررة بين الملفات.",dup_n:"{n} عملية موجودة في أكثر من ملف.",dup_in:"موجودة في:",export_all:"تصدير xlsx (ورقة لكل مستند)"});
@@ -569,7 +668,7 @@ function dayTbl(rows){const set=rows.some(o=>o.hv),H=[t('c_date'),t('detected'),
  r=(l,o)=>'<td>'+l+'</td><td>'+o.n+'</td><td>'+o.v+'</td><td>'+o.vf+'</td><td>'+o.mm+'</td>'+o.c.map(n=>'<td>'+num(n)+'</td>').join('')+'<td>'+num(o.g)+'</td>'+(set?'<td>'+num(o.val)+'</td>':'');
  return '<div class="tw sm0"><table class="tb"><thead><tr>'+H.map(h=>'<th>'+esc(h)+'</th>').join('')+'</tr></thead><tbody>'+rows.map(o=>'<tr>'+r(esc(o.d?fmtDate(o.d):'—'),o)+'</tr>').join('')+'</tbody><tfoot><tr>'+r(esc(t('tot')),T)+'</tr></tfoot></table></div>'}
 function daysSheet(){const f=S.df;
- return OV('<div class="row"><div class="grow t"><h2 style="margin:0">'+esc(t('days_title'))+'</h2><div class="mu sm" id="dsum"></div></div><button class="ib" data-a="close" aria-label="'+esc(t('done'))+'">'+ic('Back')+'</button></div><div class="tf">'+lbl('t_from','dfrom','date',f.from)+lbl('t_to','dto','date',f.to)+lbl('h_from','dhf','time',f.hf)+lbl('h_to','dht','time',f.ht)+'<button class="chip" data-a="dclr">'+esc(t('t_clear'))+'</button></div><div id="dtbl"></div><div class="g2">'+btn('close',t('done'))+btn('printd',t('print_report'),{p:1,icon:'Download'})+'</div>',1)}
+ return OV('<div class="row"><div class="grow t"><h2 style="margin:0">'+esc(t('days_title'))+'</h2><div class="mu sm" id="dsum"></div></div><button class="ib" data-a="close" aria-label="'+esc(t('done'))+'">'+icb()+'</button></div><div class="tf">'+lbl('t_from','dfrom','date',f.from)+lbl('t_to','dto','date',f.to)+lbl('h_from','dhf','time',f.hf)+lbl('h_to','dht','time',f.ht)+'<button class="chip" data-a="dclr">'+esc(t('t_clear'))+'</button></div><div id="dtbl"></div><div class="g2">'+btn('close',t('done'))+btn('printd',t('print_report'),{p:1,icon:'Download'})+'</div>',1)}
 function daysUpdate(){const e=dayFilter(S.entries);$('#dtbl').innerHTML=dayTbl(dayAgg(e));$('#dsum').textContent=t('last_desc',{n:e.length,t:num(sum2(e).grand)})}
 // folder / multi-document statistics
 const fsDocs=()=>S.fs.map(id=>S.docs.find(d=>d.id==id)).filter(Boolean);
@@ -577,10 +676,15 @@ function fsSheet(){const ds=fsDocs(),e=ds.flatMap(d=>d.entries),s=sum2(e),set=ha
  st=(n,l,c)=>'<div><b style="color:'+c+'">'+n+'</b><span class="xs mu t">'+esc(l)+'</span></div>',
  heads=[t('c_doc'),t('detected'),t('valid'),t('verify'),t('mm'),t('c_total')].concat(set?[t('value')]:[]),
  rows=ds.map(d=>{const q=sum2(d.entries);return '<tr><td style="text-align:start">'+esc(d.name)+'</td><td>'+q.detected+'</td><td>'+q.valid+'</td><td>'+q.verify+'</td><td>'+q.mm+'</td><td>'+num(q.grand)+'</td>'+(set?'<td>'+num(sum(cassVals(d.entries)))+'</td>':'')+'</tr>'}).join('');
- return OV('<div class="row"><div class="grow t"><h2 style="margin:0">'+esc(S.fsTitle)+'</h2><div class="mu sm">'+esc(t('f_count',{n:ds.length})+' · '+t('last_desc',{n:s.detected,t:num(s.grand)}))+'</div></div><button class="ib" data-a="close" aria-label="'+esc(t('done'))+'">'+ic('Back')+'</button></div>'+
+ return OV('<div class="row"><div class="grow t"><h2 style="margin:0">'+esc(S.fsTitle)+'</h2><div class="mu sm">'+esc(t('f_count',{n:ds.length})+' · '+t('last_desc',{n:s.detected,t:num(s.grand)}))+'</div></div><button class="ib" data-a="close" aria-label="'+esc(t('done'))+'">'+icb()+'</button></div>'+
  '<div class="stats">'+st(s.detected,t('detected'),'var(--tx)')+st(s.valid,t('valid'),'var(--ok)')+st(s.verify,t('verify'),s.verify?'var(--er)':'var(--mu)')+st(s.mm,t('mm'),s.mm?'var(--er)':'var(--mu)')+'</div>'+
  H2('cass_title')+cassHtml(e)+H2('days_title')+dayTbl(dayAgg(e))+H2('c_doc')+'<div class="tw sm0"><table class="tb"><thead><tr>'+heads.map(h=>'<th>'+esc(h)+'</th>').join('')+'</tr></thead><tbody>'+rows+'</tbody></table></div>'+
  '<div class="g2">'+btn('fsx',t('export_all'),{p:1,icon:'Download'})+btn('printf',t('print_report'),{icon:'Download'})+'</div>'+btn('close',t('done')),1)}
+function doPrint(html,title,dir){
+ if(window.Android&&Android.saveFile){const css='body{font:12px/1.5 system-ui,Arial,sans-serif;color:#000;margin:16px}h1{font-size:20px;margin:0 0 4px}h2{font-size:15px}.pm{color:#555}table{border-collapse:collapse;width:100%;margin:6px 0}th,td{border:1px solid #999;padding:3px 6px;text-align:center;font-size:11px}th{background:#eee}tfoot td{font-weight:700}',
+  doc='<!doctype html><html dir="'+esc(dir||'ltr')+'"><head><meta charset="utf-8"><title>'+esc(title)+'</title><style>'+css+'</style></head><body>'+html+'<script>setTimeout(function(){window.print()},400)<\/script></body></html>';
+  deliver(new Blob([doc],{type:'text/html'}),String(title||'report').replace(/[\\/:*?"<>|]/g,'_')+'.html',true).then(ok=>toast(ok?'saved':'err_save'));return}
+ window.print()}
 async function deliver(blob,name,open){try{if(window.Android&&Android.saveFile){const r=Android.saveFile(name,blob.type.split(';')[0],b64(new Uint8Array(await blob.arrayBuffer())),!!open);return r!='err'}
  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();return true}catch(e){return false}}
 async function saveFs(){const ds=fsDocs();if(!ds.length)return;const lang=S.csvLang,fr=lang!='en',set=ds.some(d=>hasD(d.entries)),
@@ -593,10 +697,10 @@ async function saveFs(){const ds=fsDocs();if(!ds.length)return;const lang=S.csvL
 // print / PDF report
 function printReport(title,e){const s=sum2(e),set=hasD(e),susp=e.filter(x=>x.status=='VERIFY'||isMM(x)),
  sr=[[t('detected'),s.detected],[t('valid'),s.valid],[t('verify'),s.verify],[t('no_dispense'),s.noDispense],[t('mm'),s.mm],[t('grand'),num(s.grand)]].concat(set?[[t('value'),num(sum(cassVals(e)))]]:[]);
- const sus=susp.length?'<div class="tw sm0"><table class="tb"><thead><tr>'+[t('c_ref'),t('c_date'),t('c_time'),'REQ','N1','N2','N3','N4',t('c_total'),t('c_calc'),t('c_note')].map(h=>'<th>'+esc(h)+'</th>').join('')+'</tr></thead><tbody>'+susp.map(x=>{const c=calcOf(x);return '<tr><td>'+esc(x.ref)+'</td><td>'+esc(fmtDate(x.date))+'</td><td>'+esc(x.time)+'</td><td>'+amt(x.req)+'</td>'+[0,1,2,3].map(i=>'<td>'+(x.numbers[i]??'')+'</td>').join('')+'<td>'+(x.numbers.length==4?num(x.total):'')+'</td><td>'+(c==null?'':num(c))+'</td><td>'+esc(noteOf(x))+'</td></tr>'}).join('')+'</tbody></table></div>':'<p>'+esc(t('all_ok'))+'</p>';
+ const sus=susp.length?'<div class="tw sm0"><table class="tb"><thead><tr>'+[t('c_ref'),t('c_date'),t('c_time'),'REQ','N1','N2','N3','N4',t('c_total'),t('c_calc'),t('c_note')].map(h=>'<th>'+esc(h)+'</th>').join('')+'</tr></thead><tbody>'+susp.map(x=>{const c=calcOf(x);return '<tr><td>'+esc(x.ref)+'</td><td>'+esc(fmtDate(x.date))+'</td><td>'+esc(x.time)+'</td><td>'+amt(x.req)+'</td>'+[0,1,2,3].map(i=>'<td>'+esc(x.numbers[i]??'')+'</td>').join('')+'<td>'+(x.numbers.length==4?num(x.total):'')+'</td><td>'+(c==null?'':num(c))+'</td><td>'+esc(noteOf(x))+'</td></tr>'}).join('')+'</tbody></table></div>':'<p>'+esc(t('all_ok'))+'</p>';
  const P=$('#prt');P.dir=S.lang=='ar'?'rtl':'ltr';
  P.innerHTML='<h1>'+esc(title)+'</h1><div class="pm">'+esc(new Date().toLocaleString(S.lang=='ar'?'ar-u-nu-latn':S.lang))+'</div><div class="tw sm0 fz" style="margin-top:12px;direction:'+(S.lang=='ar'?'rtl':'ltr')+'"><table class="tb"><tbody>'+sr.map(([k,v])=>'<tr><td style="text-align:start">'+esc(k)+'</td><td>'+esc(v)+'</td></tr>').join('')+'</tbody></table></div>'+H2('cass_title')+cassHtml(e)+H2('days_title')+dayTbl(dayAgg(e))+'<h2 class="t" style="margin:16px 0 6px;font-size:15px">'+esc(t('rep_susp')+' ('+susp.length+')')+'</h2>'+sus;
- setTimeout(()=>window.print(),80)}
+ setTimeout(()=>doPrint(P.innerHTML,title,P.dir),80)}
 // trash / undo / backup / duplicates
 function trashAdd(docs){const now=Date.now();docs.forEach(d=>S.trash.unshift({d,at:now}));S.trash=S.trash.filter(x=>now-x.at<14*864e5).slice(0,30);S.lastDel=now;sset('trash',JSON.stringify(S.trash))}
 function restoreTrash(by){const its=S.trash.filter(x=>by.id?x.d.id==by.id:x.at==by.at);let n=0;
@@ -605,19 +709,19 @@ function restoreTrash(by){const its=S.trash.filter(x=>by.id?x.d.id==by.id:x.at==
 function toastUndo(k,a){const el=$('#toast');el.innerHTML='<div class="toast t" role="status">'+esc(t(k,a))+'<button class="chip on" data-a="undo" style="margin-inline-start:12px;min-height:30px">'+esc(t('undo'))+'</button></div>';clearTimeout(tt);tt=setTimeout(()=>el.innerHTML='',7000)}
 function trashSheet(){const dt=at=>new Date(at).toLocaleString(S.lang=='ar'?'ar-u-nu-latn':S.lang,{dateStyle:'medium',timeStyle:'short'});
  return OV('<h2 class="t" style="margin:0">'+esc(t('trash_title'))+'</h2><div class="mu sm t">'+esc(t('trash_desc'))+'</div>'+(S.trash.length?S.trash.map(x=>'<div class="card ent" style="padding:12px"><div class="row"><div class="grow"><div class="dn">'+esc(x.d.name)+'</div><div class="mu xs">'+esc(dt(x.at))+'</div></div><button class="chip on" data-a="restore" data-id="'+esc(x.d.id)+'">'+esc(t('restore'))+'</button></div></div>').join(''):'<div class="mu t">'+esc(t('trash_empty'))+'</div>')+'<div class="g2">'+btn('close',t('done'))+btn('emptytrash',t('trash_clear'),{d:1,icon:'Trash',dis:!S.trash.length})+'</div>')}
-function backup(){const j=JSON.stringify({app:'req',v:3,docs:S.docs,folders:S.folders,del:S.del,den:S.den});
+function backup(){const j=JSON.stringify({app:'req',...pack()});
  deliver(new Blob([j],{type:'application/json'}),'req-backup-'+new Date().toISOString().slice(0,10)+'.json').then(ok=>toast(ok?'saved':'err_save'))}
 $('#bfile').addEventListener('change',async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;
- try{const txt=await f.text(),raw=JSON.parse(txt),p=unpack(txt);if(!p.docs.length&&!p.folders.length)throw 0;let n=0;
+ try{const txt=await f.text(),p=unpack(txt);if(!p.docs.length&&!p.folders.length&&!['fin','stm','acc'].some(k=>p[k]))throw 0;let n=0;
   p.docs.forEach(d=>{const c=S.docs.find(x=>x.id==d.id);if(c&&c.ts>=d.ts)return;if(S.del[d.id]){d.ts=Math.max(d.ts,S.del[d.id]+1);delete S.del[d.id]}S.docs=S.docs.filter(x=>x.id!=d.id);S.docs.push(d);n++});
   p.folders.forEach(x=>{if(!S.folders.some(y=>y.id==x.id)){delete S.del[x.id];S.folders.push(x)}});
-  if(!Array.isArray(raw)&&Array.isArray(raw.den)&&raw.den.length==4&&!dset()){S.den=raw.den.map(v=>+v||0);sset('den',JSON.stringify(S.den))}
+  if(p.den&&p.den.some(v=>v>0)&&!dset()){S.den=p.den;sset('den',JSON.stringify(S.den))}restoreExtra(p);
   saveAll();render();toast('backup_ok',{n})}catch(err){toast('backup_err')}});
 function findDups(){const m=new Map();S.docs.forEach(d=>d.entries.forEach(x=>{if(!/^\d+$/.test(x.ref)||!(x.date||x.time))return;const k=[x.ref,x.date,x.time,x.req,x.numbers.join('-')].join('|');let a=m.get(k);if(!a)m.set(k,a=[]);if(!a.some(y=>y.d.id==d.id))a.push({d,x})}));return [...m.values()].filter(a=>a.length>1)}
 function dupsSheet(){const g=findDups();
  return OV('<h2 class="t" style="margin:0">'+esc(t('dups_title'))+'</h2><div class="mu sm t">'+esc(g.length?t('dup_n',{n:g.length}):t('dups_none'))+'</div>'+g.slice(0,100).map(a=>{const x=a[0].x;return '<div class="card ent t" style="--c:var(--er);padding:12px"><div class="row"><b class="ltr">#'+esc(x.ref)+'</b><span class="mu sm ltr grow">'+esc([fmtDate(x.date),x.time,'REQ '+amt(x.req)].filter(Boolean).join(' · '))+'</span></div><div class="mu sm" style="margin-top:6px">'+esc(t('dup_in')+' '+a.map(y=>y.d.name).join(' · '))+'</div></div>'}).join('')+btn('close',t('done')))}
 function denSheet(){return OV('<h2 class="t" style="margin:0">'+esc(t('den_title'))+'</h2><div class="mu sm t">'+esc(t('den_desc'))+'</div><div class="g2">'+[0,1,2,3].map(i=>'<label><span class="mu sm t">'+esc(t('note_n',{n:i+1}))+'</span><div class="field"><input class="n" inputmode="numeric" maxlength="7" placeholder="0" value="'+(S.den[i]||'')+'"></div></label>').join('')+'</div><div class="sm t" id="err" style="color:var(--er)" hidden>'+esc(t('den_err'))+'</div><div class="g2">'+btn('close',t('cancel'))+btn('densave',t('save'),{p:1})+'</div>')}
-function toolsCard(){return '<section class="card"><div class="row"><div class="tile">'+ic('Calc')+'</div><div class="grow t"><h2>'+esc(t('tools_title'))+'</h2></div></div><div class="chips" style="margin-top:14px">'+[['den','den_title'],['fstats','fs_btn'],['backup','backup_export'],['bimport','backup_import'],['trash','trash_title'],['dups','dups_title']].map(([a,k])=>'<button class="chip" data-a="'+a+'">'+esc(t(k))+(a=='trash'&&S.trash.length?' ('+S.trash.length+')':'')+'</button>').join('')+'</div>'+(S.docs.some(d=>hasD(d.entries))?'':'<div class="mu sm t" style="margin-top:10px">'+esc(t('den_unset'))+'</div>')+'</section>'}
+function toolsCard(){return '<section class="card"><div class="row"><div class="tile">'+ic('Calc')+'</div><div class="grow t"><h2>'+esc(t('tools_title'))+'</h2></div></div><div class="chips" style="margin-top:14px">'+[['den','den_title'],['cfg','cfg_title'],['fstats','fs_btn'],['backup','backup_export'],['bimport','backup_import'],['trash','trash_title'],['dups','dups_title']].map(([a,k])=>'<button class="chip" data-a="'+a+'">'+esc(t(k))+(a=='trash'&&S.trash.length?' ('+S.trash.length+')':'')+'</button>').join('')+'</div>'+(S.docs.some(d=>hasD(d.entries))?'':'<div class="mu sm t" style="margin-top:10px">'+esc(t('den_unset'))+'</div>')+'</section>'}
 function valLine(e){return hasD(e)?'<div class="t" style="font-weight:700;margin-top:6px">'+esc(t('value'))+': <span class="ltr">'+num(sum(cassVals(e)))+' '+esc(curOf(e))+'</span></div>':''}
 function devCard(e){const x=[...e].reverse().find(y=>y.rem);if(!x)return '';const d=denOf(x),th=k=>'<th>'+esc(t(k))+'</th>',rj=x.rejc||[0,0,0,0];
  return '<div class="card"><h2 class="t" style="margin:0">'+esc(t('dev_title'))+'</h2><div class="mu xs ltr" style="margin:2px 0 12px">'+esc([fmtDate(x.date),x.time].filter(Boolean).join(' · '))+'</div><div class="tw sm0"><table class="tb"><thead><tr><th></th>'+(d?th('den_val'):'')+th('rem_l')+th('rej_l')+(d?th('value'):'')+'</tr></thead><tbody>'+x.rem.map((n,i)=>'<tr><td>'+esc(t('note_n',{n:i+1}))+'</td>'+(d?'<td>'+num(d[i])+'</td>':'')+'<td>'+num(n)+'</td><td>'+num(rj[i]||0)+'</td>'+(d?'<td>'+num(n*d[i])+'</td>':'')+'</tr>').join('')+'</tbody><tfoot><tr><td>'+esc(t('tot'))+'</td>'+(d?'<td></td>':'')+'<td>'+num(sum(x.rem))+'</td><td>'+num(sum(rj))+'</td>'+(d?'<td>'+num(x.rem.reduce((s,n,i)=>s+n*d[i],0))+'</td>':'')+'</tr></tfoot></table></div></div>'}
@@ -626,10 +730,30 @@ function declCard(e){const m={};e.forEach(x=>{if(x.code=='DECLINED'){const k=x.a
 Object.assign(D.ar,{n_CM:"عدّاد الجهاز يختلف عن الأوراق (الفرق: {a}). قد تكون هناك عمليات ناقصة في السجل.",dev_title:"حالة الكاسيتات عند آخر عملية",rem_l:"المتبقي",rej_l:"المرفوض",decl_title:"أسباب الرفض",mm_banner:"{n} عملية بها فروقات",mm_ok:"المبلغ وعدّادات الجهاز متطابقة في كل العمليات",f_mm:"فروقات",den_desc:"تُقرأ فئات الكاسيتات تلقائيًا من سجل الجهاز. هذه القيم احتياطية للملفات التي لا تحتويها.",den_unset_t:"لا توجد فئات في هذا الملف"});
 Object.assign(D.en,{n_CM:"Machine counter differs from notes (delta: {a}). The log may be missing operations.",dev_title:"Cassette status at last operation",rem_l:"Remaining",rej_l:"Rejected",decl_title:"Decline reasons",mm_banner:"{n} with differences",mm_ok:"Amount and machine counters match everywhere",f_mm:"Differences",den_desc:"Cassette values are read automatically from the machine log. These are a fallback for files without them.",den_unset_t:"No cassette values in this file"});
 Object.assign(D.fr,{n_CM:"Le compteur du DAB diffère des billets (écart : {a}). Des opérations manquent peut-être au journal.",dev_title:"État des cassettes à la dernière opération",rem_l:"Restant",rej_l:"Rejeté",decl_title:"Motifs de refus",mm_banner:"{n} avec des écarts",mm_ok:"Montant et compteurs du DAB cohérents partout",f_mm:"Écarts",den_desc:"Les valeurs sont lues automatiquement du journal. Celles-ci servent de secours pour les fichiers qui n'en contiennent pas.",den_unset_t:"Aucune valeur de cassette dans ce fichier"});
-const SH3={den:denSheet,days:daysSheet,fstats:fsSheet,trash:trashSheet,dups:dupsSheet};
-function after3(){if(S.sheet=='days')daysUpdate()}
+Object.assign(D.ar,{store_err:"تعذّر حفظ البيانات على هذا الجهاز",store_err_desc:"مساحة التخزين ممتلئة أو غير متاحة. صدّر نسخة احتياطية الآن حتى لا تضيع بياناتك.",sync_now:"مزامنة الآن",syncing:"جارٍ المزامنة…",logout_unsynced:"تعذّرت المزامنة، وقد توجد تعديلات لم تُرفع إلى حسابك. تسجيل الخروج سيمسحها من هذا المتصفح. هل تريد المتابعة؟",cfg_title:"إعدادات التحليل",cfg_desc:"تغيير البادئات يُطبَّق على المستندات الحالية أيضًا، أما ترتيب التاريخ فيسري على الملفات التي تستوردها بعد الحفظ. تتزامن الإعدادات مع حسابك.",cfg_bank:"بادئات العمليات العادية (للبطاقات والحسابات)",cfg_bank_h:"افصل بين البادئات بفاصلة. أي حساب لا يبدأ بإحداها يُعدّ عملية بنكية.",cfg_date:"ترتيب التاريخ في السجل",cfg_auto:"تلقائي",cfg_dmy:"يوم/شهر/سنة",cfg_mdy:"شهر/يوم/سنة",cfg_ymd:"سنة/شهر/يوم",cfg_date_h:"«تلقائي» يخمّن الترتيب. اختر ترتيبًا ثابتًا إن كان سجلك دائمًا بنفس الصيغة.",cfg_saved:"تم حفظ الإعدادات",show_more:"عرض {n} أخرى",tbl_cap:"يُعرض أول {n} صف فقط. التصدير يشمل الكل."});
+Object.assign(D.en,{store_err:"Couldn't save data on this device",store_err_desc:"Storage is full or unavailable. Export a backup now so your data isn't lost.",sync_now:"Sync now",syncing:"Syncing…",logout_unsynced:"Sync failed, so some changes may not have reached your account. Signing out will remove them from this browser. Continue?",cfg_title:"Parsing settings",cfg_desc:"Changing the prefixes also updates existing documents; the date order applies to files you import after saving. Settings sync with your account.",cfg_bank:"Regular-operation prefixes (cards and accounts)",cfg_bank_h:"Separate prefixes with a comma. Any account that starts with none of them counts as a bank operation.",cfg_date:"Date order in the log",cfg_auto:"Automatic",cfg_dmy:"Day/Month/Year",cfg_mdy:"Month/Day/Year",cfg_ymd:"Year/Month/Day",cfg_date_h:"“Automatic” guesses the order. Pick a fixed order if your log always uses the same one.",cfg_saved:"Settings saved",show_more:"Show {n} more",tbl_cap:"Showing the first {n} rows only. Export includes everything."});
+Object.assign(D.fr,{store_err:"Impossible d'enregistrer les données sur cet appareil",store_err_desc:"Le stockage est plein ou indisponible. Exportez une sauvegarde maintenant pour ne rien perdre.",sync_now:"Synchroniser",syncing:"Synchronisation…",logout_unsynced:"La synchronisation a échoué : certaines modifications ne sont peut-être pas dans votre compte. La déconnexion les effacera de ce navigateur. Continuer ?",cfg_title:"Réglages d'analyse",cfg_desc:"Changer les préfixes met aussi à jour les documents existants ; l'ordre des dates s'applique aux fichiers importés après l'enregistrement. Les réglages se synchronisent avec votre compte.",cfg_bank:"Préfixes des opérations normales (cartes et comptes)",cfg_bank_h:"Séparez les préfixes par une virgule. Tout compte qui ne commence par aucun d'eux est une opération bancaire.",cfg_date:"Ordre des dates dans le journal",cfg_auto:"Automatique",cfg_dmy:"Jour/Mois/Année",cfg_mdy:"Mois/Jour/Année",cfg_ymd:"Année/Mois/Jour",cfg_date_h:"« Automatique » devine l'ordre. Choisissez un ordre fixe si votre journal utilise toujours le même.",cfg_saved:"Réglages enregistrés",show_more:"Afficher {n} de plus",tbl_cap:"Seules les {n} premières lignes sont affichées. L'export contient tout."});
+function cfgSheet(){const c=S.cf||CFG,ch=(v,k)=>'<button class="chip'+(c.dateOrder==v?' on':'')+'" data-a="cfgd" data-v="'+v+'">'+esc(t(k))+'</button>';
+ return OV('<h2 class="t" style="margin:0">'+esc(t('cfg_title'))+'</h2><div class="mu sm t">'+esc(t('cfg_desc'))+'</div>'+
+ '<label><span class="mu sm t">'+esc(t('cfg_bank'))+'</span><div class="field"><input id="cfgp" class="ltr" value="'+esc(c.bankPrefix)+'" maxlength="200"></div><span class="mu xs t">'+esc(t('cfg_bank_h'))+'</span></label>'+
+ '<div class="mu sm t">'+esc(t('cfg_date'))+'</div><div class="chips">'+ch('auto','cfg_auto')+ch('dmy','cfg_dmy')+ch('mdy','cfg_mdy')+ch('ymd','cfg_ymd')+'</div><div class="mu xs t">'+esc(t('cfg_date_h'))+'</div>'+
+ '<div class="g2">'+btn('close',t('cancel'))+btn('cfgsave',t('save'),{p:1})+'</div>')}
+function recalcKinds(){const now=Date.now();S.docs.forEach(d=>{let ch=false;d.entries.forEach(x=>{const k=kindOf(x.acct||'',x.card||'');if(k!==x.kind){x.kind=k;ch=true}});if(ch)d.ts=now})}
+const storeBan=()=>S.storeErr?banner('ERR',t('store_err'),t('store_err_desc'),btn('backup',t('backup_export'))):'';
+const SH3={den:denSheet,days:daysSheet,fstats:fsSheet,trash:trashSheet,dups:dupsSheet,cfg:cfgSheet};
+function after3(){if(S.sheet=='days')daysUpdate();trapInit()}
+function trapInit(){const dlg=document.querySelector('#layer .sheet');if(!S.sheet||!dlg)return;if(!dlg.hasAttribute('tabindex'))dlg.setAttribute('tabindex','-1');if(!dlg.contains(document.activeElement)){try{dlg.focus({preventScroll:true})}catch(e){}}}
+document.addEventListener('keydown',ev=>{if(ev.key!='Tab'||!S.sheet)return;const dlg=document.querySelector('#layer .sheet');if(!dlg)return;
+ const f=[...dlg.querySelectorAll('button,input,select,textarea,a[href],[tabindex]:not([tabindex="-1"])')].filter(e=>!e.disabled&&e.offsetParent!==null);if(!f.length){ev.preventDefault();return}
+ const a=document.activeElement,i=f.indexOf(a);
+ if(ev.shiftKey&&(i<=0||a===dlg)){ev.preventDefault();f[f.length-1].focus()}else if(!ev.shiftKey&&(i==f.length-1||!dlg.contains(a))){ev.preventDefault();f[0].focus()}});
 const DF={dfrom:'from',dto:'to',dhf:'hf',dht:'ht'};
 function act3(a,el){const d=el.dataset;
+ if(a=='cfg'){S.cf={...CFG};S.sheet='cfg';render();return 1}
+ if(a=='cfgd'){const i=$('#cfgp');if(i)S.cf.bankPrefix=i.value;S.cf.dateOrder=d.v;render();return 1}
+ if(a=='cfgsave'){const i=$('#cfgp');CFG=cleanCfg({bankPrefix:i?i.value:CFG.bankPrefix,dateOrder:(S.cf||CFG).dateOrder});sset('cfg',JSON.stringify(CFG));recalcKinds();S.cf=null;S.sheet=null;saveAll();render();toast('cfg_saved');return 1}
+ if(a=='syncnow'){syncActive().then(()=>{if(S.sheet=='acct')render()});render();return 1}
+ if(a=='more'){S.lim=(S.lim||100)+200;list();return 1}
  if(a=='den'){S.sheet='den';render();return 1}
  if(a=='densave'){const v=[...document.querySelectorAll('#layer .n')].map(i=>+i.value||0);if(!(v.every(x=>x>0)||v.every(x=>!x))){$('#err').hidden=false;return 1}
   S.den=v;sset('den',JSON.stringify(v));S.sheet=null;render();toast('den_saved');return 1}
@@ -655,61 +779,133 @@ function act3(a,el){const d=el.dataset;
   if(x&&(!S.user||S.user.uid!=x.uid)){activate(x.uid,false);toast('acct_switched',{n:x.email||x.name})}else render();return 1}
  return 0}
 // ── Cloud sync (Firebase) — one set of documents per account ──
-function pack(){return JSON.stringify({v:3,docs:S.docs,del:S.del,folders:S.folders})}
-function unpack(json,ts){try{const p=JSON.parse(json);
- if(Array.isArray(p))return{docs:p.length?[{id:'legacy',name:t('prev_doc'),ts:ts||1,entries:p}]:[],del:{},folders:[]};
- return{docs:(p.docs||[]).filter(x=>x&&x.id&&Array.isArray(x.entries)),del:p.del||{},folders:(p.folders||[]).filter(x=>x&&x.id&&x.name)}}catch(e){return{docs:[],del:{},folders:[]}}}
-function merge(a,b){const del={...a.del};for(const k in b.del)del[k]=Math.max(del[k]||0,b.del[k]);
- const mk=(x,y)=>{const m={};[...(x||[]),...(y||[])].forEach(d=>{if(!m[d.id]||d.ts>m[d.id].ts)m[d.id]=d});return Object.values(m).filter(d=>!(del[d.id]>=d.ts))};
- return{docs:mk(a.docs,b.docs),folders:mk(a.folders,b.folders),del}}
+// every dataset that syncs is rebuilt through the cleaners; the merge is a 3-way merge against the last agreed state
+function normAll(p){const o={v:4,docs:uniq((Array.isArray(p.docs)?p.docs:[]).map(cleanDoc).filter(Boolean)),folders:uniq((Array.isArray(p.folders)?p.folders:[]).map(cleanFolder).filter(Boolean)),del:cleanDel(p.del)};
+ if(Array.isArray(p.den))o.den=cleanDen(p.den);if(isO(p.cfg))o.cfg=cleanCfg(p.cfg);
+ [['fin',cleanFin],['stm',cleanStm],['acc',cleanAcc]].forEach(([k,f])=>{const c=f(p[k]);if(c)o[k]=c});return o}
+function pack(){return normAll({docs:S.docs,folders:S.folders,del:S.del,den:S.den,cfg:CFG,fin:jget('fin',null),stm:jget('stm',null),acc:jget('acc',null)})}
+function unpack(json,ts){let p;try{p=JSON.parse(json)}catch(e){return normAll({})}
+ if(Array.isArray(p))p={docs:p.length?[{id:'legacy',name:t('prev_doc'),ts:ts||1,entries:p}]:[]};
+ return isO(p)?normAll(p):normAll({})}
+let CM=null,qT;
+const keyOf=e=>{if(!isO(e))return null;if(e.id!=null)return String(e.id);if(e.at!=null&&e.m!=null)return e.at+'|'+e.m;return null};
+function keyedArr(a){const s=new Set();for(const e of a){const k=keyOf(e);if(k==null||s.has(k))return false;s.add(k)}return true}
+function canon(v){
+ if(v===null||typeof v!='object'){const j=JSON.stringify(v);return j===undefined?'null':j}
+ if(CM){const c=CM.get(v);if(c!==undefined)return c}
+ let r;
+ if(Array.isArray(v)){
+  if(v.length>1&&keyedArr(v))r='['+v.map(e=>[keyOf(e),canon(e)]).sort((a,b)=>a[0]<b[0]?-1:a[0]>b[0]?1:0).map(x=>x[1]).join(',')+']';
+  else r='['+v.map(canon).join(',')+']'}
+ else r='{'+Object.keys(v).filter(k=>v[k]!==undefined).sort().map(k=>JSON.stringify(k)+':'+canon(v[k])).join(',')+'}';
+ if(CM)CM.set(v,r);return r}
+const eq=(a,b)=>a===b||canon(a)===canon(b);
+// b = last agreed state, l = local, r = remote, pf = side that wins a true conflict on the same value
+function m3(b,l,r,pf){
+ if(l===undefined)return r;if(r===undefined)return l;
+ if(eq(l,r))return l;
+ if(b!==undefined){if(eq(b,l))return r;if(eq(b,r))return l}
+ if(isO(l)&&isO(r)){
+  if(l.id!=null&&typeof l.ts=='number'&&typeof r.ts=='number'&&l.ts!==r.ts)return l.ts>r.ts?l:r;
+  const bb=isO(b)?b:{},out={},ks=[...Object.keys(r),...Object.keys(l).filter(k=>!(k in r))];
+  for(const k of ks){const inL=k in l,inR=k in r,inB=k in bb;
+   if(inL&&inR)out[k]=m3(bb[k],l[k],r[k],pf);
+   else if(inL){if(!inB||!eq(bb[k],l[k]))out[k]=l[k]}
+   else{if(!inB||!eq(bb[k],r[k]))out[k]=r[k]}}
+  return out}
+ if(Array.isArray(l)&&Array.isArray(r)&&keyedArr(l)&&keyedArr(r)){
+  const mp=a=>{const m=new Map();a.forEach(e=>m.set(keyOf(e),e));return m},bm=Array.isArray(b)&&keyedArr(b)?mp(b):new Map(),lm=mp(l),rm=mp(r),out=[],
+   ks=[...rm.keys(),...[...lm.keys()].filter(k=>!rm.has(k))];
+  for(const k of ks){const inL=lm.has(k),inR=rm.has(k),inB=bm.has(k);
+   if(inL&&inR)out.push(m3(bm.get(k),lm.get(k),rm.get(k),pf));
+   else if(inL){if(!inB||!eq(bm.get(k),lm.get(k)))out.push(lm.get(k))}
+   else{if(!inB||!eq(bm.get(k),rm.get(k)))out.push(rm.get(k))}}
+  return out}
+ return pf=='L'?l:r}
+function mergeAll(B,L,R,pf){const out={v:4};
+ for(const f of ['docs','folders','den','cfg','fin','stm','acc']){const l=L[f],r=R[f];if(l===undefined&&r===undefined)continue;out[f]=m3(B?B[f]:undefined,l,r,pf)}
+ const del={...(L.del||{})};for(const k in (R.del||{}))del[k]=Math.max(del[k]||0,R.del[k]);out.del=del;
+ out.docs=(out.docs||[]).filter(d=>!(del[d.id]>=d.ts));out.folders=(out.folders||[]).filter(f=>!(del[f.id]>=f.ts));
+ return normAll(out)}
+const CLN={fin:cleanFin,stm:cleanStm,acc:cleanAcc};
+function restoreExtra(p){const ks=['fin','stm','acc'].filter(k=>p[k]);
+ ks.forEach(k=>{const cur=CLN[k](jget(k,null));sset(k,JSON.stringify(cur?CLN[k](m3(undefined,cur,p[k],'R')):p[k]))});
+ if(ks.length)(window.INV||[]).forEach(f=>{try{f()}catch(e){}});return ks.length}
+function applyAll(M){
+ S.docs=uniq(M.docs||[]);S.folders=uniq(M.folders||[]);S.del=M.del||{};
+ if(M.den){S.den=cleanDen(M.den);sset('den',JSON.stringify(S.den))}
+ if(M.cfg){CFG=cleanCfg(M.cfg);sset('cfg',JSON.stringify(CFG))}
+ ['fin','stm','acc'].forEach(k=>{if(M[k])sset(k,JSON.stringify(M[k]))});
+ (window.INV||[]).forEach(f=>{try{f()}catch(e){}});
+ sset('docs',JSON.stringify(S.docs));sset('folders',JSON.stringify(S.folders));sset('del',JSON.stringify(S.del));TS=Date.now();sset('ts',String(TS));
+ const cd=curDoc();if(cd){S.entries=cd.entries}else{S.cur=null;S.entries=[];sdel('cur');if(S.screen==1)S.screen=0}
+ if(S.sheet=='edit')S.sheet=null}
 Object.assign(D.ar,{add_acct:"إضافة حساب آخر",acct_switched:"تم التبديل إلى {n}",acct_dup:"هذا الحساب مضاف بالفعل",acct_active:"نشط",acct_desc2:"يمكنك إضافة أكثر من حساب والتبديل بينها دون تسجيل الخروج، ولكل حساب مستنداته الخاصة. تسجيل الخروج يزيل الحساب الحالي من هذا المتصفح فقط (تبقى بياناته في حسابه)."});
 Object.assign(D.en,{add_acct:"Add another account",acct_switched:"Switched to {n}",acct_dup:"This account is already added",acct_active:"Active",acct_desc2:"You can add several accounts and switch between them without signing out. Each account keeps its own documents. Signing out removes the current account from this browser only (its data stays in the account)."});
 Object.assign(D.fr,{add_acct:"Ajouter un autre compte",acct_switched:"Passé à {n}",acct_dup:"Ce compte est déjà ajouté",acct_active:"Actif",acct_desc2:"Vous pouvez ajouter plusieurs comptes et passer de l'un à l'autre sans vous déconnecter. Chaque compte garde ses propres documents. La déconnexion retire le compte actuel de ce navigateur uniquement (ses données restent dans le compte)."});
 S.accts=(a=>Array.isArray(a)?a.filter(x=>x&&x.uid&&x.slot):[])(jget('accts',[]));
 S.user=S.accts.find(x=>NS=='u_'+x.uid+'_')||null;S.ready=false;
 function saveReg(){try{LS&&LS.setItem('accts',JSON.stringify(S.accts));LS&&LS.setItem('slots',JSON.stringify(S.accts.map(a=>a.slot)))}catch(e){}}
-function push(){if(!S.user||!window.FB||!S.ready)return;clearTimeout(pt);const u=S.user,j=pack(),ts=TS;pt=setTimeout(async()=>{try{await FB.save(u.slot,u.uid,ts,j)}catch(e){toast('sync_err')}},800)}
-function loadLocal(){const d=jget('docs',[]);S.docs=Array.isArray(d)?d.filter(x=>x&&x.id&&Array.isArray(x.entries)):[];
- const fl=jget('folders',[]);S.folders=Array.isArray(fl)?fl.filter(x=>x&&x.id&&x.name):[];
- const dl=jget('del',{});S.del=dl&&typeof dl=='object'&&!Array.isArray(dl)?dl:{};
+function push(){if(!S.user||!window.FB||S.applying)return;clearTimeout(pt);pt=setTimeout(()=>syncActive(),800)}
+function loadLocal(){const d=jget('docs',[]);S.docs=uniq((Array.isArray(d)?d:[]).map(cleanDoc).filter(Boolean));loadCfg();
+ const fl=jget('folders',[]);S.folders=uniq((Array.isArray(fl)?fl:[]).map(cleanFolder).filter(Boolean));
+ S.del=cleanDel(jget('del',{}));
  const dn=jget('den',null);S.den=Array.isArray(dn)&&dn.length==4?dn.map(n=>+n||0):[0,0,0,0];
  const tr=jget('trash',[]);S.trash=Array.isArray(tr)?tr.filter(x=>x&&x.d&&x.d.id):[];
  TS=+sget('ts')||0;const cd=S.docs.find(x=>x.id==sget('cur'));S.cur=cd?cd.id:null;S.entries=cd?cd.entries:[];
  Object.assign(S,{fol:null,sel:false,sheet:null,q:'',dq:'',onlyV:false,onlyM:false,screen:0,idx:0,delId:null,fs:[],lastDel:0,homeErr:null,homeInfo:null});S.ids.clear();
  if(location.hash)history.replaceState(null,'',location.pathname+location.search)}
 // switch the active account (its documents are kept in a separate local store)
-async function activate(uid,keep){const a=S.accts.find(x=>x.uid==uid)||null;
+async function activate(uid,keep){const a=S.accts.find(x=>x.uid==uid)||null;stopWatch();
  NS=a?'u_'+a.uid+'_':'';try{LS&&LS.setItem('active',a?a.uid:'guest')}catch(e){}
- S.user=a;S.ready=false;if(!keep)loadLocal();render();if(a)await syncActive()}
-async function syncActive(){const u=S.user;if(!u)return;
- try{const c=await FB.load(u.slot,u.uid),remote=c?unpack(c.json,c.ts):{docs:[],del:{},folders:[]};
+ S.user=a;S.ready=false;S.syncErr=false;if(!keep)loadLocal();render();if(a){await syncActive();startWatch(a)}}
+const isTyping=()=>{const a=document.activeElement;return !!a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)};
+async function runSync(){const u=S.user;if(!u||!window.FB||!FB.sync)return;
+ S.syncErr=false;const rev0=S.rev||0;let res=null,L=null,B=null;
+ try{
+  L=pack();try{const s=sget('base');B=s?JSON.parse(s):null}catch(e){B=null}
+  await FB.sync(u.slot,u.uid,(json,rts)=>{
+   CM=new WeakMap();
+   const R=json?unpack(json,rts):null;
+   if(!R){res={out:L};return{write:true,json:JSON.stringify(L)}}
+   const out=mergeAll(B,L,R,(S.lastEdit||0)>=rts?'L':'R'),w=canon(out)!==canon(R);
+   res={out};return w?{write:true,json:JSON.stringify(out)}:{write:false}});
   if(S.user!==u)return;
-  const m=merge({docs:S.docs,del:S.del,folders:S.folders},remote);
-  S.docs=m.docs;S.del=m.del;S.folders=m.folders;
-  const cd=curDoc();if(cd){S.entries=cd.entries}else{S.cur=null;S.entries=[];S.screen=0}
-  const mr=merge(remote,{docs:[],del:{},folders:[]}),fk=a=>JSON.stringify((a||[]).map(d=>d.id+':'+d.ts).sort()),needPush=fk(mr.folders)!=fk(S.folders)||fk(mr.docs)!=fk(S.docs)||JSON.stringify(remote.del||{})!=JSON.stringify(S.del);
-  TS=Date.now();sset('docs',JSON.stringify(S.docs));sset('del',JSON.stringify(S.del));sset('ts',String(TS));sset('folders',JSON.stringify(S.folders));
-  if(needPush)await FB.save(u.slot,u.uid,TS,pack());
-  if(S.user!==u)return;
-  S.ready=true;render();toast('synced')}
- catch(e){if(S.user===u)toast('sync_err')}}
+  if((S.rev||0)!==rev0){S.again=true;return}   // edited while syncing: nothing is applied, run again
+  CM=new WeakMap();const changed=canon(res.out)!==canon(L);CM=null;
+  S.applying=true;try{if(changed)applyAll(res.out);sset('base',JSON.stringify(res.out))}finally{S.applying=false}
+  const first=!S.ready;S.ready=true;S.lastSync=Date.now();
+  if(changed){if(S.sheet||isTyping())S.defer=true;else render()}
+  if(changed||first)toast('synced');else if(S.sheet=='acct')render()}
+ catch(e){if(S.user===u){S.syncErr=true;toast('sync_err');if(S.sheet=='acct')render()}}
+ finally{CM=null}}
+function syncActive(){if(S.syncP){S.again=true;return S.syncP}
+ S.syncP=runSync().catch(()=>{}).then(()=>{S.syncP=null;if(S.again){S.again=false;setTimeout(syncActive,200)}});return S.syncP}
+let unw=null;function stopWatch(){try{unw&&unw()}catch(e){}unw=null}
+function startWatch(u){stopWatch();if(!window.FB||!FB.watch||S.user!==u)return;try{unw=FB.watch(u.slot,u.uid,()=>{if(S.user===u)syncActive()})}catch(e){}}
+window.addEventListener('online',()=>{if(S.user)syncActive()});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&S.user&&Date.now()-(S.lastSync||0)>15000)syncActive()});
+document.addEventListener('focusout',()=>{if(S.defer&&!S.sheet)setTimeout(()=>{if(S.defer&&!isTyping()){S.defer=false;render()}},150)});
 async function addAccount(){let r;
  try{r=await FB.add()}catch(e){if(!e||(e.code!='auth/popup-closed-by-user'&&e.code!='auth/cancelled-popup-request'))toast('login_err');return}
  const u=r.user,ex=S.accts.find(x=>x.uid==u.uid);
  if(ex){await FB.drop(r.slot,true);S.sheet=null;await activate(ex.uid,!!S.user&&S.user.uid==ex.uid);toast('acct_dup');return}
  // documents made before the first sign-in (guest mode) move into the new account
- if(!S.user&&LS)try{DK.forEach(k=>{const v=LS.getItem(k),nk='u_'+u.uid+'_'+k;if(v!=null&&LS.getItem(nk)==null){LS.setItem(nk,v);LS.removeItem(k)}})}catch(e){}
+ if(!S.user)try{DK.forEach(k=>{const v=rawGet(k),nk='u_'+u.uid+'_'+k;if(v!=null&&rawGet(nk)==null){rawSet(nk,v);rawDel(k)}})}catch(e){}
  S.accts.push({slot:r.slot,uid:u.uid,name:u.displayName||'',email:u.email||'',photo:u.photoURL||''});saveReg();S.sheet=null;await activate(u.uid,false)}
 const login=()=>addAccount();
 async function logout(){const u=S.user;if(!u)return;clearTimeout(pt);
+ if(window.FB&&FB.sync){await syncActive();await syncActive();if(S.syncErr&&!confirm(t('logout_unsynced')))return}
+ stopWatch();
  try{await FB.drop(u.slot,true)}catch(e){}
- ['docs','del','folders','cur','entries','trash','den','ts'].forEach(sdel);
+ ['docs','del','folders','cur','entries','trash','den','ts','fin','stm','acc','cfg','base'].forEach(sdel);
  S.accts=S.accts.filter(x=>x.uid!=u.uid);saveReg();S.sheet=null;
  const nx=S.accts[0]||null;await activate(nx?nx.uid:null,false)}
+const syncLine=()=>S.user?'<div class="row" style="gap:10px"><div class="grow mu sm t">'+esc(t(S.syncErr?'sync_err':S.syncP?'syncing':S.ready?'synced':'syncing'))+'</div><button class="chip on" data-a="syncnow"'+(S.syncP?' disabled':'')+'>'+esc(t('sync_now'))+'</button></div>':'';
 const avHtml=u=>'<div class="av ib">'+(u.photo?'<img src="'+esc(u.photo)+'" alt="" referrerpolicy="no-referrer">':esc((u.name||u.email||'?').charAt(0).toUpperCase()))+'</div>';
 function acctSheet(){const rows=S.accts.map(u=>{const on=S.user&&S.user.uid==u.uid;
   return '<button class="lang'+(on?' on':'')+'" data-a="switchacct" data-uid="'+esc(u.uid)+'"><span class="who" style="flex:1;min-width:0">'+avHtml(u)+'<span class="grow t" style="text-align:start"><b>'+esc(u.name||u.email)+'</b><span class="mu sm ltr" style="display:block;font-weight:400">'+esc(u.email)+'</span></span></span>'+(on?'<span class="badge t" style="--c:var(--ok)">'+esc(t('acct_active'))+'</span>':'')+'</button>'}).join('');
- return OV('<h2 class="t" style="margin:0">'+esc(t('account'))+'</h2><div class="mu sm t">'+esc(t('acct_desc2'))+'</div>'+rows+btn('addacct','+ '+t('add_acct'))+'<div class="g2">'+btn('close',t('cancel'))+(S.user?btn('logout',t('signout'),{p:1}):'')+'</div>')}
+ return OV('<h2 class="t" style="margin:0">'+esc(t('account'))+'</h2><div class="mu sm t">'+esc(t('acct_desc2'))+'</div>'+rows+syncLine()+btn('addacct','+ '+t('add_acct'))+'<div class="g2">'+btn('close',t('cancel'))+(S.user?btn('logout',t('signout'),{p:1}):'')+'</div>')}
 async function fbInit(){S.fb=true;render();
  let slots=jget('slots',null);if(!Array.isArray(slots)||!slots.length)slots=['[DEFAULT]'];
  const us=await Promise.all(slots.map(s=>FB.user(s).catch(()=>null))),reg=[],seen=new Set();
@@ -722,7 +918,7 @@ async function fbInit(){S.fb=true;render();
 window.addEventListener('fbready',fbInit);if(window.FB)fbInit();
 render();
 </script>
-<script>
+<script type="text/plain" data-app>
 // ════════ Cash transactions (postmaster only, local storage) ════════
 (function(){
 const FT={
@@ -742,8 +938,8 @@ f_p_new:"جهة جديدة",f_p_edit:"تعديل الجهة",f_p_name:"اسم ا
 f_c_title:"إقفال اليوم",f_c_desc:"عُدّ النقد الموجود فعليًا في الخزنة وأدخل عدد الأوراق من كل فئة.",f_c_count:"العدد",f_c_other:"قطع نقدية / مبلغ آخر (دج)",f_c_total:"المجموع المعدود",f_c_theo:"الرصيد النظري",f_c_ok:"مطابق",f_c_short:"عجز",f_c_over:"زيادة",f_c_hold:"لم يفرّغوا بعد: {names}",f_c_confirm:"تأكيد الإقفال",f_c_done:"تم إقفال اليوم",f_ro_title:"إعادة فتح اليوم؟",f_ro_desc:"سيُفتح اليوم للتعديل ويُسجَّل ذلك. أرصدة الأيام اللاحقة تُعاد حسابًا تلقائيًا.",f_ro_ok:"تم فتح اليوم",f_c_notes:"تفصيل الجرد",
 f_h_title:"سجل الأيام",f_h_from:"من",f_h_to:"إلى",f_col_date:"التاريخ",f_col_open:"الافتتاح",f_col_in:"داخل",f_col_out:"خارج",f_col_theo:"النظري",f_col_cnt:"الفعلي",f_col_diff:"الفرق",f_col_st:"الحالة",f_h_tot:"الإجمالي",f_h_print:"طباعة اليوم",f_h_csv:"تصدير CSV",f_h_party:"مجاميع الجهات في الفترة",f_h_empty:"لا توجد أيام في هذه الفترة.",f_print_day:"طباعة وضعية اليوم",
 f_s_office:"اسم المكتب",f_s_den:"فئات الأوراق النقدية",f_s_den_h:"افصل بينها بفاصلة، مثال: 2000,1000,500,200,100,50,20,10,5",f_s_start:"تاريخ بداية المتابعة",f_s_bal:"الرصيد الافتتاحي (دج)",f_s_warn:"تغيير تاريخ البداية أو الرصيد يعيد حساب كل الأيام.",f_s_save:"حفظ الإعدادات",f_s_saved:"تم حفظ الإعدادات",f_s_den_err:"أدخل فئات صحيحة.",
-f_bak:"نسخة احتياطية",f_bak_exp:"تصدير بيانات المالية",f_bak_imp:"استيراد نسخة",f_bak_note:"بياناتك محفوظة على هذا الجهاز فقط. خذ نسخة احتياطية بانتظام.",f_imp_ok:"تم استيراد بيانات المالية",f_imp_err:"الملف غير صالح",
-f_audit:"سجل العمليات",f_audit_empty:"لا توجد عمليات مسجّلة.",f_reset:"حذف كل بيانات المالية",f_reset_d:"سيُحذف كل شيء نهائيًا من هذا الجهاز. تأكد من أخذ نسخة احتياطية أولًا.",f_reset_ok:"تم الحذف",
+f_bak:"نسخة احتياطية",f_bak_exp:"تصدير بيانات المالية",f_bak_imp:"استيراد نسخة",f_bak_note:"تُحفظ بياناتك على هذا الجهاز، وتتزامن مع حسابك عند تسجيل الدخول. خذ نسخة احتياطية بانتظام.",f_imp_ok:"تم استيراد بيانات المالية",f_imp_err:"الملف غير صالح",
+f_audit:"سجل العمليات",f_audit_empty:"لا توجد عمليات مسجّلة.",f_reset:"حذف كل بيانات المالية",f_reset_d:"سيُحذف كل شيء نهائيًا، وعند تسجيل الدخول يُحذف أيضًا من حسابك على كل الأجهزة. تأكد من أخذ نسخة احتياطية أولًا.",f_reset_ok:"تم الحذف",
 f_su_title:"إعداد المكتب",f_su_desc:"ابدأ بإدخال بيانات مكتبك. يمكنك تغيير كل شيء لاحقًا من الإعدادات.",f_su_n:"عدد الشبابيك (العمال)",f_su_central:"إضافة القباضة الرئيسية",f_su_atm:"إضافة الصرافة الآلية",f_su_go:"ابدأ",f_su_first:"المكتب لم يُعدّ بعد",
 f_n_worker:"الشباك {n}",f_n_central:"القباضة الرئيسية",f_n_atm:"الصرافة الآلية",f_pr_title:"وضعية الخزنة اليومية",f_pr_sign:"رئيس المكتب",f_pr_gen:"أُنشئ في",f_log_tx_add:"إضافة حركة",f_log_tx_edit:"تعديل حركة",f_log_tx_del:"حذف حركة",f_log_close:"إقفال يوم",f_log_reopen:"إعادة فتح يوم",f_log_set:"تعديل الإعدادات",f_log_p:"جهة",f_log_imp:"استيراد نسخة",f_cancel:"إلغاء",f_save:"حفظ",f_done:"تم",f_edit:"تعديل",f_del:"حذف"},
 en:{f_title:"Cash transactions",f_sub:"Daily cash position",f_card_desc:"Track cash between the vault, counters, main treasury and ATMs, with a daily count and close.",f_open_btn:"Open page",f_cur:"DZD",
@@ -762,8 +958,8 @@ f_p_new:"New party",f_p_edit:"Edit party",f_p_name:"Party name",f_p_type:"Type",
 f_c_title:"Close the day",f_c_desc:"Count the cash actually in the vault and enter the number of notes of each denomination.",f_c_count:"Count",f_c_other:"Coins / other amount (DZD)",f_c_total:"Counted total",f_c_theo:"Expected balance",f_c_ok:"Matches",f_c_short:"Shortage",f_c_over:"Surplus",f_c_hold:"Not emptied yet: {names}",f_c_confirm:"Confirm close",f_c_done:"Day closed",f_ro_title:"Reopen this day?",f_ro_desc:"The day becomes editable and this is logged. Later days are recalculated automatically.",f_ro_ok:"Day reopened",f_c_notes:"Count details",
 f_h_title:"Daily history",f_h_from:"From",f_h_to:"To",f_col_date:"Date",f_col_open:"Opening",f_col_in:"In",f_col_out:"Out",f_col_theo:"Expected",f_col_cnt:"Counted",f_col_diff:"Diff",f_col_st:"Status",f_h_tot:"Total",f_h_print:"Print day",f_h_csv:"Export CSV",f_h_party:"Party totals in the period",f_h_empty:"No days in this period.",f_print_day:"Print the day's position",
 f_s_office:"Office name",f_s_den:"Banknote denominations",f_s_den_h:"Separate with commas, e.g. 2000,1000,500,200,100,50,20,10,5",f_s_start:"Tracking start date",f_s_bal:"Opening balance (DZD)",f_s_warn:"Changing the start date or balance recalculates every day.",f_s_save:"Save settings",f_s_saved:"Settings saved",f_s_den_err:"Enter valid denominations.",
-f_bak:"Backup",f_bak_exp:"Export cash data",f_bak_imp:"Import a backup",f_bak_note:"Your data is saved on this device only. Take a backup regularly.",f_imp_ok:"Cash data imported",f_imp_err:"Invalid file",
-f_audit:"Activity log",f_audit_empty:"No recorded activity.",f_reset:"Delete all cash data",f_reset_d:"Everything will be permanently deleted from this device. Take a backup first.",f_reset_ok:"Deleted",
+f_bak:"Backup",f_bak_exp:"Export cash data",f_bak_imp:"Import a backup",f_bak_note:"Your data is saved on this device and syncs with your account when you are signed in. Take a backup regularly.",f_imp_ok:"Cash data imported",f_imp_err:"Invalid file",
+f_audit:"Activity log",f_audit_empty:"No recorded activity.",f_reset:"Delete all cash data",f_reset_d:"Everything will be permanently deleted, and when signed in also from your account on every device. Take a backup first.",f_reset_ok:"Deleted",
 f_su_title:"Office setup",f_su_desc:"Start by entering your office details. You can change everything later in Settings.",f_su_n:"Number of counters (staff)",f_su_central:"Add the main treasury",f_su_atm:"Add the ATM",f_su_go:"Start",f_su_first:"The office is not set up yet",
 f_n_worker:"Counter {n}",f_n_central:"Main treasury",f_n_atm:"ATM",f_pr_title:"Daily cash position",f_pr_sign:"Postmaster",f_pr_gen:"Generated",f_log_tx_add:"Movement added",f_log_tx_edit:"Movement edited",f_log_tx_del:"Movement deleted",f_log_close:"Day closed",f_log_reopen:"Day reopened",f_log_set:"Settings changed",f_log_p:"Party",f_log_imp:"Backup imported",f_cancel:"Cancel",f_save:"Save",f_done:"Done",f_edit:"Edit",f_del:"Delete"},
 fr:{f_title:"Transactions de caisse",f_sub:"Position de caisse journalière",f_card_desc:"Suivez l'argent entre le coffre, les guichets, la recette principale et les DAB, avec comptage et clôture quotidiens.",f_open_btn:"Ouvrir la page",f_cur:"DA",
@@ -782,8 +978,8 @@ f_p_new:"Nouvelle partie",f_p_edit:"Modifier la partie",f_p_name:"Nom de la part
 f_c_title:"Clôturer le jour",f_c_desc:"Comptez les espèces réellement au coffre et saisissez le nombre de billets par valeur.",f_c_count:"Nombre",f_c_other:"Pièces / autre montant (DA)",f_c_total:"Total compté",f_c_theo:"Solde théorique",f_c_ok:"Conforme",f_c_short:"Manque",f_c_over:"Excédent",f_c_hold:"Pas encore versé : {names}",f_c_confirm:"Confirmer la clôture",f_c_done:"Jour clôturé",f_ro_title:"Rouvrir ce jour ?",f_ro_desc:"Le jour redevient modifiable et c'est noté. Les jours suivants sont recalculés automatiquement.",f_ro_ok:"Jour rouvert",f_c_notes:"Détail du comptage",
 f_h_title:"Historique des jours",f_h_from:"Du",f_h_to:"Au",f_col_date:"Date",f_col_open:"Ouverture",f_col_in:"Entrées",f_col_out:"Sorties",f_col_theo:"Théorique",f_col_cnt:"Compté",f_col_diff:"Écart",f_col_st:"Statut",f_h_tot:"Total",f_h_print:"Imprimer le jour",f_h_csv:"Exporter CSV",f_h_party:"Totaux des parties sur la période",f_h_empty:"Aucun jour sur cette période.",f_print_day:"Imprimer la position du jour",
 f_s_office:"Nom du bureau",f_s_den:"Valeurs des billets",f_s_den_h:"Séparez par des virgules, ex. 2000,1000,500,200,100,50,20,10,5",f_s_start:"Date de début du suivi",f_s_bal:"Solde initial (DA)",f_s_warn:"Changer la date de début ou le solde recalcule tous les jours.",f_s_save:"Enregistrer",f_s_saved:"Réglages enregistrés",f_s_den_err:"Saisissez des valeurs valides.",
-f_bak:"Sauvegarde",f_bak_exp:"Exporter les données de caisse",f_bak_imp:"Importer une sauvegarde",f_bak_note:"Vos données sont enregistrées sur cet appareil uniquement. Faites une sauvegarde régulièrement.",f_imp_ok:"Données de caisse importées",f_imp_err:"Fichier invalide",
-f_audit:"Journal d'activité",f_audit_empty:"Aucune activité enregistrée.",f_reset:"Supprimer toutes les données de caisse",f_reset_d:"Tout sera définitivement supprimé de cet appareil. Faites d'abord une sauvegarde.",f_reset_ok:"Supprimé",
+f_bak:"Sauvegarde",f_bak_exp:"Exporter les données de caisse",f_bak_imp:"Importer une sauvegarde",f_bak_note:"Vos données sont enregistrées sur cet appareil et se synchronisent avec votre compte une fois connecté. Faites une sauvegarde régulièrement.",f_imp_ok:"Données de caisse importées",f_imp_err:"Fichier invalide",
+f_audit:"Journal d'activité",f_audit_empty:"Aucune activité enregistrée.",f_reset:"Supprimer toutes les données de caisse",f_reset_d:"Tout sera définitivement supprimé, et une fois connecté aussi de votre compte sur tous les appareils. Faites d'abord une sauvegarde.",f_reset_ok:"Supprimé",
 f_su_title:"Configuration du bureau",f_su_desc:"Commencez par saisir les informations de votre bureau. Tout reste modifiable dans les réglages.",f_su_n:"Nombre de guichets (agents)",f_su_central:"Ajouter la recette principale",f_su_atm:"Ajouter le DAB",f_su_go:"Commencer",f_su_first:"Le bureau n'est pas encore configuré",
 f_n_worker:"Guichet {n}",f_n_central:"Recette principale",f_n_atm:"DAB",f_pr_title:"Position de caisse journalière",f_pr_sign:"Receveur",f_pr_gen:"Généré le",f_log_tx_add:"Mouvement ajouté",f_log_tx_edit:"Mouvement modifié",f_log_tx_del:"Mouvement supprimé",f_log_close:"Jour clôturé",f_log_reopen:"Jour rouvert",f_log_set:"Réglages modifiés",f_log_p:"Partie",f_log_imp:"Sauvegarde importée",f_cancel:"Annuler",f_save:"Enregistrer",f_done:"Terminé",f_edit:"Modifier",f_del:"Supprimer"}};
 for(const l in FT)Object.assign(D[l],FT[l]);
@@ -802,10 +998,10 @@ const vclean=v=>{const r={};for(const k in v)if(+v[k])r[k]=+v[k];return r};
 function mig(j){if(j.set&&j.set.den&&j.set.den.join()=='2000,1000,500,200,100')j.set.den=[2000,1000,500,200,100,50,20,10,5];j.txs.forEach(x=>{if(!x.v||typeof x.v!='object')x.v=x.amt?{o:x.amt}:{};x.amt=vt(x.v)});
  Object.values(j.days||{}).forEach(c=>{if(!c.v){c.v={...(c.cnt||{})};if(c.other)c.v.o=c.other}c.counted=vt(c.v);delete c.cnt;delete c.other});
  if(!j.set.balv)j.set.balv=j.set.bal?{o:j.set.bal}:{};j.set.bal=vt(j.set.balv);j.v=2;j.days=j.days||{};j.audit=j.audit||[];return j}
-let FC=null,FN=null;
+let FC=null,FN=null;(window.INV=window.INV||[]).push(()=>{FC=null});
 const F=()=>{if(!FC||FN!==NS){FN=NS;try{const j=JSON.parse(sget('fin'));FC=j&&j.v&&j.set&&Array.isArray(j.txs)?mig(j):DEF()}catch(e){FC=DEF()}}return FC};
 const save=()=>{sset('fin',JSON.stringify(F()))};
-const log=m=>{const a=F().audit;a.unshift({at:Date.now(),m});if(a.length>300)a.length=300};
+const log=m=>{const a=F().audit;a.unshift({at:Date.now(),m});if(a.length>5000)a.length=5000};
 const pad=n=>String(n).padStart(2,'0');
 const today=()=>{const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())};
 const addD=(s,n)=>{const d=new Date(s+'T12:00:00');d.setDate(d.getDate()+n);return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())};
@@ -940,7 +1136,7 @@ function setupSheet(){const x=S.fx;
  '<div class="sm t" id="err" style="color:var(--er)" hidden></div>'+btn('fsugo',t('f_su_go'),{p:1}))}
 function suRead(){const x=S.fx,g=id=>document.getElementById(id);if(!g('suo'))return;x.office=g('suo').value;x.start=g('sus').value;x.den=g('sud').value;x.v=denRead();x.n=g('sun').value;x.central=g('suc').checked;x.atm=g('sua').checked}
 function openSheet(){return OV('<h2 class="t" style="margin:0">'+esc(t('f_open_bal'))+'</h2><div class="mu sm t">'+esc(t('f_s_warn'))+'</div>'+denBlock(S.fx.v)+totBox()+'<div class="g2">'+btn('close',t('f_cancel'))+btn('fopensave',t('f_save'),{p:1})+'</div>')}
-function auditSheet(){return OV('<h2 class="t" style="margin:0">'+esc(t('f_audit'))+'</h2>'+(F().audit.length?'<div class="stack" style="gap:8px">'+F().audit.slice(0,60).map(a=>'<div class="t sm"><span class="mu xs">'+esc(new Date(a.at).toLocaleString(loc(),{dateStyle:'short',timeStyle:'short'}))+'</span><br>'+esc(a.m)+'</div>').join('')+'</div>':'<div class="mu t">'+esc(t('f_audit_empty'))+'</div>')+btn('close',t('f_done')))}
+function auditSheet(){return OV('<h2 class="t" style="margin:0">'+esc(t('f_audit'))+'</h2>'+(F().audit.length?'<div class="stack" style="gap:8px">'+F().audit.slice(0,300).map(a=>'<div class="t sm"><span class="mu xs">'+esc(new Date(a.at).toLocaleString(loc(),{dateStyle:'short',timeStyle:'short'}))+'</span><br>'+esc(a.m)+'</div>').join('')+'</div>':'<div class="mu t">'+esc(t('f_audit_empty'))+'</div>')+btn('close',t('f_done')))}
 Object.assign(SH3,{ftx:txSheet,fparty:partySheet,fclose:closeSheet,fsetup:setupSheet,fopen:openSheet,faudit:auditSheet,
  ftdel:()=>sheetBox('f_del_tx','<div class="mu sm t">'+esc(t('f_del_tx_d'))+'</div>','ftxdelok','f_del',1),
  freopen:()=>sheetBox('f_ro_title','<div class="mu sm t">'+esc(t('f_ro_desc'))+'</div>','freopenok','f_reopen'),
@@ -992,10 +1188,10 @@ function printDay(d){const f=F(),s=stat(d),th=k=>'<th>'+esc(t(k))+'</th>',P=docu
  '<h2 style="margin:16px 0 6px;font-size:15px">'+esc(t('f_pos'))+'</h2><div class="tw sm0"><table class="tb"><thead><tr>'+['f_col_party','f_col_given','f_col_recv','f_col_net'].map(th).join('')+'</tr></thead><tbody>'+rows+'</tbody></table></div>'+
  '<h2 style="margin:16px 0 6px;font-size:15px">'+esc(t('f_txs'))+'</h2><div class="tw sm0"><table class="tb"><tbody>'+[...s.T].sort((a,b)=>a.ts-b.ts).map(x=>{const p=P_(x.pid);return '<tr><td style="text-align:start">'+esc(verb(p,x.dir)+' '+(p?p.name:'?'))+' <span dir="ltr">['+esc(vb(x.v))+']</span>'+(x.note?' — '+esc(x.note):'')+'</td><td>'+(x.dir=='in'?'+':'−')+' '+num(x.amt)+'</td></tr>'}).join('')+'</tbody></table></div>'+
  '<div style="display:flex;justify-content:space-between;margin-top:50px"><div>'+esc(t('f_pr_sign'))+'<br><br>________________</div><div class="pm">'+esc(t('f_pr_gen'))+' '+esc(new Date().toLocaleString(loc()))+'</div></div>';
- setTimeout(()=>window.print(),80)}
+ setTimeout(()=>doPrint(P.innerHTML,f.set.office||t('f_title'),P.dir),80)}
 function backupOut(){deliver(new Blob([JSON.stringify({app:'req-fin',...F()})],{type:'application/json'}),'cash-backup-'+today()+'.json').then(ok=>toast(ok?'saved':'err_save'))}
 const ff=document.createElement('input');ff.type='file';ff.accept='.json,application/json';ff.hidden=true;document.body.appendChild(ff);
-ff.addEventListener('change',async e=>{const fl=e.target.files[0];e.target.value='';if(!fl)return;try{const j=JSON.parse(await fl.text());if(!j||!j.set||!Array.isArray(j.txs)||!Array.isArray(j.parties))throw 0;delete j.app;FC=mig(j);FN=NS;log(t('f_log_imp'));save();render();toast('f_imp_ok')}catch(err){toast('f_imp_err')}});
+ff.addEventListener('change',async e=>{const fl=e.target.files[0];e.target.value='';if(!fl)return;try{const j=cleanFin(JSON.parse(await fl.text()));if(!j)throw 0;FC=mig(j);FN=NS;log(t('f_log_imp'));save();render();toast('f_imp_ok')}catch(err){toast('f_imp_err')}});
 
 window.actF=function(a,el){const d=el.dataset;if(a[0]!='f')return 0;
  switch(a){
@@ -1047,7 +1243,7 @@ document.addEventListener('keydown',ev=>{if(ev.key!='Enter')return;const el=ev.t
 render();
 })();
 </script>
-<script>
+<script type="text/plain" data-app>
 // ════════ Stamps portfolio (Portefeuille): vault, employees, main treasury (local storage) ════════
 (function(){
 DK.push('stm');
@@ -1074,7 +1270,7 @@ const pad=n=>String(n).padStart(2,'0'),today=()=>{const d=new Date();return d.ge
 const addD=(s,n)=>{const d=new Date(s+'T12:00:00');d.setDate(d.getDate()+n);return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())};
 // data: open = {"fam:den":count}; tx = {id,ts,date,k,pid,fam,q:{den:count},note}; stock = open + Σ sign·q
 const DEF=()=>({v:1,start:today().slice(0,8)+'01',den:Object.fromEntries(FAM),emp:[],open:{},tx:[]});
-let C=null,CN=null;
+let C=null,CN=null;(window.INV=window.INV||[]).push(()=>{C=null});
 const G=()=>{if(!C||CN!==NS){CN=NS;try{const j=JSON.parse(sget('stm'));C=j&&j.den&&Array.isArray(j.tx)?j:DEF()}catch(e){C=DEF()}}return C};
 const sv=()=>sset('stm',JSON.stringify(G()));
 const amt=x=>{let s=0;for(const d in x.q)s+=d*x.q[d];return s},dz=n=>'<span class="ltr">'+num(Math.round(n))+'</span> '+esc(t('f_cur')),dr=()=>S.lang=='ar'?'rtl':'ltr';
@@ -1175,17 +1371,23 @@ render();
 })();
 </script>
 <style>
-.ac{width:104px;min-width:0;border:1px solid transparent;background:var(--in);border-radius:8px;padding:6px 8px;text-align:end;font:inherit;color:inherit;font-variant-numeric:tabular-nums}
-.ac:focus{outline:0;border-color:var(--pr)}.ac::placeholder{color:var(--mu);opacity:.55}
+.ac,.acx{width:104px;min-width:0;border:1px solid transparent;background:var(--in);border-radius:8px;padding:6px 8px;text-align:end;font:inherit;color:inherit;font-variant-numeric:tabular-nums}
+.ac:focus,.acx:focus{outline:0;border-color:var(--pr)}.ac::placeholder{color:var(--mu);opacity:.55}
 .tb tr.ft td{background:var(--in);font-weight:700}
+.acx{width:150px;text-align:start}.hx{position:relative}.chips.tabs .chip{position:relative}
+.pl,.pr{position:absolute;z-index:4;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0;transition:opacity .12s}
+.pl{top:0;bottom:0;left:-10px;width:20px}.pr{left:0;right:0;top:-10px;height:20px}.pr.b{top:auto;bottom:-10px}
+.pl::before,.pr::before{content:"+";width:19px;height:19px;border-radius:50%;background:var(--pr);color:#fff;font:700 15px/19px sans-serif;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.35)}
+.pl:hover,.pr:hover,.pr.on{opacity:1}
+@media (hover:none){.pl,.pr{opacity:.3}}
 </style>
-<script>
+<script type="text/plain" data-app>
 // ════════ Office accounting: monthly books (recettes / dépenses / CH60 / DAB), local storage ════════
 (function(){
 DK.push('acc');
-Object.assign(D.ar,{ac_title:'محاسبة المكتب',ac_sub:'الإيرادات والمصاريف وCH60 والموزع',ac_card:'دفاتر شهرية للإيرادات والمصاريف (الميزانية والسلاسل A وB وC) وحركة CH60 والموزع الآلي، بمجاميع نصف الشهر والتراكم.',ac_go:'فتح المحاسبة',ac_rec:'الإيرادات',ac_dep:'المصاريف',ac_ch:'CH60',ac_gab:'الموزع الآلي',ac_bud:'الميزانية',ac_ser:'السلسلة',ac_recap:'الملخص',ac_day:'اليوم',ac_q1:'مجموع النصف الأول',ac_q2:'مجموع النصف الثاني',ac_mt:'مجموع الشهر',ac_ant:'السابق',ac_cum:'التراكم',ac_exc:'فائض محاسبي',ac_trec:'مجموع الإيرادات',ac_cr:'دائن',ac_db:'مدين',ac_bil:'الحصيلة',ac_san:'الرصيد السابق',ac_rest:'الباقي',ac_chq:'شيك مصدّق',ac_ext:'الكشف',ac_chg:'تعبئة',ac_dec:'سحب',ac_gcr:'استهلاك الموزع',ac_ops:'عدد العمليات',ac_adv:'الرصيد',ac_open:'رصيد بداية الشهر',ac_xl:'تصدير Excel',ac_hint:'اكتب الأرقام مباشرة، ويمكن الجمع هكذا: 3478300+1605000. الخانات الفارغة في «السابق» و«رصيد بداية الشهر» تؤخذ تلقائيًا من الشهر السابق. البيانات محفوظة على هذا الجهاز فقط.'});
-Object.assign(D.fr,{ac_title:'Comptabilité du bureau',ac_sub:'Recettes, dépenses, CH60 et DAB',ac_card:'Registres mensuels des recettes et dépenses (budgétaires, séries A, B, C), mouvement CH60 et DAB, avec totaux par quinzaine et cumul.',ac_go:'Ouvrir la comptabilité',ac_rec:'Recettes',ac_dep:'Dépenses',ac_ch:'CH60',ac_gab:'DAB',ac_bud:'Budgétaires',ac_ser:'Série',ac_recap:'Récapitulatif',ac_day:'Jour',ac_q1:'Total 1re quinzaine',ac_q2:'Total 2e quinzaine',ac_mt:'Total du mois',ac_ant:'Antérieur',ac_cum:'Cumul',ac_exc:'Excédent comptable',ac_trec:'Total recettes',ac_cr:'Crédit',ac_db:'Débit',ac_bil:'Bilan',ac_san:'Solde antérieur',ac_rest:'Reste',ac_chq:'Chèque certifié',ac_ext:'Extrait',ac_chg:'Chargement',ac_dec:'Décaissement',ac_gcr:'Crédit GAB',ac_ops:"N° d'opérations",ac_adv:'Avance GAB',ac_open:'Solde de début de mois',ac_xl:'Exporter Excel',ac_hint:'Saisissez les montants directement ; les sommes sont permises : 3478300+1605000. Les cases vides de « Antérieur » et du solde de début de mois reprennent le mois précédent. Données enregistrées sur cet appareil uniquement.'});
-Object.assign(D.en,{ac_title:'Office accounting',ac_sub:'Receipts, expenses, CH60 and ATM',ac_card:'Monthly books for receipts and expenses (budget, series A, B, C), CH60 movement and ATM, with half-month totals and running totals.',ac_go:'Open accounting',ac_rec:'Receipts',ac_dep:'Expenses',ac_ch:'CH60',ac_gab:'ATM',ac_bud:'Budget',ac_ser:'Series',ac_recap:'Summary',ac_day:'Day',ac_q1:'1st half total',ac_q2:'2nd half total',ac_mt:'Month total',ac_ant:'Previous',ac_cum:'Cumulative',ac_exc:'Accounting surplus',ac_trec:'Total receipts',ac_cr:'Credit',ac_db:'Debit',ac_bil:'Balance',ac_san:'Previous balance',ac_rest:'Remaining',ac_chq:'Certified cheque',ac_ext:'Statement',ac_chg:'Loading',ac_dec:'Withdrawal',ac_gcr:'ATM credit',ac_ops:'Operations',ac_adv:'ATM advance',ac_open:'Opening balance of the month',ac_xl:'Export Excel',ac_hint:'Type amounts directly; sums are allowed: 3478300+1605000. Empty “Previous” and opening cells are taken from the previous month. Data is stored on this device only.'});
+Object.assign(D.ar,{ac_title:'محاسبة المكتب',ac_sub:'الإيرادات والمصاريف وCH60 والموزع',ac_card:'دفاتر شهرية للإيرادات والمصاريف (الميزانية والسلاسل A وB وC) وحركة CH60 والموزع الآلي، بمجاميع نصف الشهر والتراكم.',ac_go:'فتح المحاسبة',ac_rec:'الإيرادات',ac_dep:'المصاريف',ac_ch:'CH60',ac_gab:'الموزع الآلي',ac_bud:'الميزانية',ac_ser:'السلسلة',ac_recap:'الملخص',ac_day:'اليوم',ac_q1:'مجموع النصف الأول',ac_q2:'مجموع النصف الثاني',ac_mt:'مجموع الشهر',ac_ant:'السابق',ac_cum:'التراكم',ac_exc:'فائض محاسبي',ac_trec:'مجموع الإيرادات',ac_cr:'دائن',ac_db:'مدين',ac_bil:'الحصيلة',ac_san:'الرصيد السابق',ac_rest:'الباقي',ac_chq:'شيك مصدّق',ac_ext:'الكشف',ac_chg:'تعبئة',ac_dec:'سحب',ac_gcr:'استهلاك الموزع',ac_ops:'عدد العمليات',ac_adv:'الرصيد',ac_open:'رصيد بداية الشهر',ac_xl:'تصدير Excel',ac_hint:'اكتب الأرقام مباشرة، ويمكن الجمع هكذا: 3478300+1605000. الخانات الفارغة في «السابق» و«رصيد بداية الشهر» تؤخذ تلقائيًا من الشهر السابق. تُحفظ البيانات على هذا الجهاز وتتزامن مع حسابك عند تسجيل الدخول.'});
+Object.assign(D.fr,{ac_title:'Comptabilité du bureau',ac_sub:'Recettes, dépenses, CH60 et DAB',ac_card:'Registres mensuels des recettes et dépenses (budgétaires, séries A, B, C), mouvement CH60 et DAB, avec totaux par quinzaine et cumul.',ac_go:'Ouvrir la comptabilité',ac_rec:'Recettes',ac_dep:'Dépenses',ac_ch:'CH60',ac_gab:'DAB',ac_bud:'Budgétaires',ac_ser:'Série',ac_recap:'Récapitulatif',ac_day:'Jour',ac_q1:'Total 1re quinzaine',ac_q2:'Total 2e quinzaine',ac_mt:'Total du mois',ac_ant:'Antérieur',ac_cum:'Cumul',ac_exc:'Excédent comptable',ac_trec:'Total recettes',ac_cr:'Crédit',ac_db:'Débit',ac_bil:'Bilan',ac_san:'Solde antérieur',ac_rest:'Reste',ac_chq:'Chèque certifié',ac_ext:'Extrait',ac_chg:'Chargement',ac_dec:'Décaissement',ac_gcr:'Crédit GAB',ac_ops:"N° d'opérations",ac_adv:'Avance GAB',ac_open:'Solde de début de mois',ac_xl:'Exporter Excel',ac_hint:'Saisissez les montants directement ; les sommes sont permises : 3478300+1605000. Les cases vides de « Antérieur » et du solde de début de mois reprennent le mois précédent. Données enregistrées sur cet appareil et synchronisées avec votre compte une fois connecté.'});
+Object.assign(D.en,{ac_title:'Office accounting',ac_sub:'Receipts, expenses, CH60 and ATM',ac_card:'Monthly books for receipts and expenses (budget, series A, B, C), CH60 movement and ATM, with half-month totals and running totals.',ac_go:'Open accounting',ac_rec:'Receipts',ac_dep:'Expenses',ac_ch:'CH60',ac_gab:'ATM',ac_bud:'Budget',ac_ser:'Series',ac_recap:'Summary',ac_day:'Day',ac_q1:'1st half total',ac_q2:'2nd half total',ac_mt:'Month total',ac_ant:'Previous',ac_cum:'Cumulative',ac_exc:'Accounting surplus',ac_trec:'Total receipts',ac_cr:'Credit',ac_db:'Debit',ac_bil:'Balance',ac_san:'Previous balance',ac_rest:'Remaining',ac_chq:'Certified cheque',ac_ext:'Statement',ac_chg:'Loading',ac_dec:'Withdrawal',ac_gcr:'ATM credit',ac_ops:'Operations',ac_adv:'ATM advance',ac_open:'Opening balance of the month',ac_xl:'Export Excel',ac_hint:'Type amounts directly; sums are allowed: 3478300+1605000. Empty “Previous” and opening cells are taken from the previous month. Data is stored on this device and syncs with your account when you are signed in.'});
 Object.assign(D.ar,{ac_gex:'فائض الموزع',ac_req:'تعبئة من سجلات REQ',ac_req_ok:'تمت التعبئة من سجلات REQ',ac_req_no:'لا توجد عمليات REQ في هذا الشهر.'});Object.assign(D.fr,{ac_gex:'Excédent GAB',ac_req:'Remplir depuis les REQ',ac_req_ok:'Rempli depuis les REQ',ac_req_no:'Aucune opération REQ ce mois-ci.'});Object.assign(D.en,{ac_gex:'ATM surplus',ac_req:'Fill from REQ logs',ac_req_ok:'Filled from REQ logs',ac_req_no:'No REQ operations in this month.'});
 const BC=[['tp','TP','700.11'],['bp','BP','700.3'],['tel','TELEGRAMME','702.6'],['a21','ART 21','704.11'],['a23','ART 23','704.3'],['col','COLIS','704,11,1'],['h','','700,12,6'],['i','','700,12,5']];
 const SCH={rec:{BUD:BC,A:[['cnep','versement cnep','4106,6,2'],['afs','Paiement AFS','4154.1']],
@@ -1194,19 +1396,18 @@ C:[['grp','group','5742'],['tft','tf/ta','428.56'],['cc','ch60 credit','0960,9,0
 dep:{BUD:BC,A:[['cnep','rmb cnep','4003,3,1'],['afs','afs','4154.1']],
 B:[['tef','tef','4140.2'],['vig','vignette','0560,5,2'],['tft','tf/ta','0560,7,2'],['tp','tp/tt','0560,0,3'],['vr','vgnt retoure','0960,5,1'],['dec','apres deces','4154.3'],['grp','groupe','5742.1'],['app','app','5742'],['rem','remis','4159.22']],
 C:[['chc','ch certifier','428.52'],['rv','remise vignette','4159.21'],['rt','remise tf/ta','4159.22'],['app','appurment','5742'],['cr','credit','0960,9,0'],['db','debit','0960,9,1']]}};
-const RC={rec:['BUD','A','B','C'],dep:['A','B','C']},SL={L:'l',A:'a',C:'c',G:'g',O:'o'};
-const CR=['pav','afs','gab'],DB=['onfd','car','vac','seal','son','app'],CI=[...CR,...DB,'cs'],CH=['pav','afs','gab','onfd','carte auto','vac','seal','sonelgaz','appurment'],GI=['chg','dec','crd','remo','exc','ops'];
+const RC={rec:['BUD','A','B','C'],dep:['A','B','C']},SL={L:'l',A:'a',C:'c',G:'g',O:'o',E:'cv'};
+const CC0=()=>[['pav','pav',1],['afs','afs',1],['gab','gab',1],['onfd','onfd',-1],['car','carte auto',-1],['vac','vac',-1],['seal','seal',-1],['son','sonelgaz',-1],['app','appurment',-1],['cs','',0]],CC=CC0(),SCH0=JSON.parse(JSON.stringify(SCH)),GI=['chg','dec','crd','remo','exc','ops'];
 const pad=n=>String(n).padStart(2,'0'),curM=()=>{const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)};
 const dim=m=>new Date(+m.slice(0,4),+m.slice(5,7),0).getDate(),pm=m=>{const k=+m.slice(5,7);return k>1?m.slice(0,4)+'-'+pad(k-1):null};
 const pv=s=>s==null||s===''?0:String(s).split('+').reduce((a,p)=>a+(parseFloat(p.replace(',','.'))||0),0);
-let X=null,XN=null;const G=()=>{if(!X||XN!==NS){XN=NS;try{X=JSON.parse(sget('acc'))||{}}catch(e){X={}}X.m=X.m||{}}return X};
-const E={l:{},a:{},c:{},g:{},o:{}},R=m=>G().m[m]||E,W=m=>G().m[m]||(G().m[m]={l:{},a:{},c:{},g:{},o:{}}),sv=()=>sset('acc',JSON.stringify(G()));
-const xs=(r,d,q)=>(r.x||[]).filter(e=>e.d==d&&e.s==q).reduce((a,e)=>a+pv(e.a),0);
+let X=null,XN=null;(window.INV=window.INV||[]).push(()=>{X=null});const G=()=>{if(!X||XN!==NS){XN=NS;try{X=JSON.parse(sget('acc'))||{}}catch(e){X={}}X.m=X.m||{};X.cfg=X.cfg||{};CC.splice(0,CC.length,...(X.cfg.ch||CC0()));for(const b in SCH)for(const q in SCH[b])SCH[b][q]=X.cfg[b+'|'+q]||SCH0[b][q]}return X};
+const E={l:{},a:{},c:{},g:{},o:{},cv:{},rw:{}},R=m=>G().m[m]||E,W=m=>{const o=G().m[m]||(G().m[m]={l:{},a:{},c:{},g:{},o:{}});o.cv=o.cv||{};o.rw=o.rw||{};return o},sv=()=>sset('acc',JSON.stringify(G()));
 const dayV=(m,b,s,c,d)=>pv(R(m).l[b+'|'+s+'|'+c+'|'+d]);
 const tot=(m,b,s,c,a,z)=>{let q=0;for(let d=a;d<=z;d++)q+=dayV(m,b,s,c,d);return q};
 const ant=(m,b,s,c)=>{const o=R(m).a[b+'|'+s+'|'+c];if(o!=null&&o!=='')return pv(o);const p=pm(m);return p?cum(p,b,s,c):0};
 const cum=(m,b,s,c)=>ant(m,b,s,c)+tot(m,b,s,c,1,dim(m));
-function chRows(m){const r=R(m),n=dim(m),o=[];let p=chOpen(m),cs=0;for(let d=1;d<=n;d++){const g=c=>pv(r.c[d+'|'+c]),cr=CR.reduce((a,c)=>a+g(c),0)+xs(r,d,1),db=DB.reduce((a,c)=>a+g(c),0)+xs(r,d,-1),rs=p+cr-db;cs+=g('cs');o.push({d,cr,db,b:cr-db,a:p,r:rs,x:rs+cs});p=rs}return o}
+function chRows(m){const r=R(m),n=dim(m),o=[];let p=chOpen(m),cs=0;for(let d=1;d<=n;d++){const g=c=>pv(r.c[d+'|'+c]),cr=CC.reduce((a,c)=>a+(c[2]>0?g(c[0]):0),0),db=CC.reduce((a,c)=>a+(c[2]<0?g(c[0]):0),0),rs=p+cr-db;cs+=g('cs');o.push({d,cr,db,b:cr-db,a:p,r:rs,x:rs+cs});p=rs}return o}
 const pb=m=>Object.keys(G().m).filter(k=>k<m).sort().pop()||null;
 const chOpen=m=>{const v=R(m).o.ch;if(v!=null&&v!=='')return pv(v);const q=pb(m);return q?chRows(q)[dim(q)-1].r:0};
 function gRows(m){const r=R(m),n=dim(m),o=[];let p=gOpen(m);for(let d=1;d<=n;d++){const g=c=>pv(r.g[d+'|'+c]),rs=p+g('chg')-g('dec')-g('crd')+g('remo')+g('exc');o.push({d,a:p,r:rs});p=rs}return o}
@@ -1219,7 +1420,7 @@ const th=(a,top)=>a.map(x=>'<th'+(top?' style="top:38px"':'')+'>'+esc(x)+'</th>'
 const sl=s=>s=='BUD'?t('ac_bud'):s=='R'?t('ac_recap'):t('ac_ser')+' '+s;
 function ledV(b,s,m){const cs=SCH[b][s],n=dim(m),r=R(m),K=c=>b+'|'+s+'|'+c;
  const sub=(l,a,z,k)=>tr(lb(l)+cs.map(c=>cell(k+'|'+c[0],tot(m,b,s,c[0],a,z),1)).join('')+cell(k+'|T',cs.reduce((q,c)=>q+tot(m,b,s,c[0],a,z),0),1),'ft');
- let h='<thead>'+tr(th(['',...cs.map(c=>c[2]),''])+'')+tr(th([t('ac_day'),...cs.map(c=>c[1]),t('tot')],1))+'</thead><tbody>';
+ let h='<thead>'+tr(th(['',...cs.map(c=>c[2]),''])+'')+tr('<th style="top:38px">'+esc(t('ac_day'))+'</th>'+cs.map((c,j)=>hth(c[1],j,'l|'+b+'|'+s,c,1)).join('')+hth(t('tot'),cs.length,'l|'+b+'|'+s,null,1))+'</thead><tbody>';
  for(let d=1;d<=n;d++){h+=tr('<td>'+d+'</td>'+cs.map(c=>inp('L',K(c[0])+'|'+d,r.l[K(c[0])+'|'+d])).join('')+cell('r|'+d,cs.reduce((q,c)=>q+dayV(m,b,s,c[0],d),0)));if(d==15)h+=sub(t('ac_q1'),1,15,'q1')}
  h+=sub(t('ac_q2'),16,n,'q2')+sub(t('ac_mt'),1,n,'mt')+tr(lb(t('ac_ant'))+cs.map(c=>inp('A',K(c[0]),r.a[K(c[0])],amt(ant(m,b,s,c[0])))).join('')+cell('an|T',cs.reduce((q,c)=>q+ant(m,b,s,c[0]),0),1))+
  tr(lb(t('ac_cum'))+cs.map(c=>cell('cu|'+c[0],cum(m,b,s,c[0]),1)).join('')+cell('cu|T',cs.reduce((q,c)=>q+cum(m,b,s,c[0]),0),1),'ft');
@@ -1232,9 +1433,9 @@ function recV(b,m){const ss=RC[b],r=R(m),n=dim(m),sT=(s,a,z)=>SCH[b][s].reduce((
  if(b=='rec'){const c=ss.reduce((q,s)=>q+sA(s)+sT(s,1,n),0);h+=tr(lb(t('ac_exc'))+'<td colspan="'+(ss.length+1)+'" style="text-align:start">'+ib('O','ex',r.o.ex)+'</td>')+tr(lb(t('ac_trec'))+ss.map(()=>'<td></td>').join('')+cell('tr|T',c+pv(r.o.ex),1),'ft')}
  return h+'</tbody>'}
 function chV(m){const r=R(m),rows=chRows(m),n=dim(m),sc=c=>{let q=0;for(let d=1;d<=n;d++)q+=pv(r.c[d+'|'+c]);return q},L=rows[n-1],S_=f=>rows.reduce((q,x)=>q+x[f],0);
- let h='<thead>'+tr(th([t('ac_day'),...CH,t('ac_chq'),t('ac_cr'),t('ac_db'),t('ac_bil'),t('ac_san'),t('ac_rest'),t('ac_ext')]))+'</thead><tbody>'+tr(lb(t('ac_open'))+'<td colspan="16" style="text-align:start">'+ib('O','ch',r.o.ch,amt(chOpen(m)))+'</td>');
- rows.forEach(x=>{h+=tr('<td>'+x.d+'</td>'+CI.map(c=>inp('C',x.d+'|'+c,r.c[x.d+'|'+c])).join('')+cell('cr|'+x.d,x.cr)+cell('db|'+x.d,x.db)+cell('bi|'+x.d,x.b)+cell('an|'+x.d,x.a)+cell('re|'+x.d,x.r)+cell('ex|'+x.d,x.x))});
- return h+tr(lb(t('ac_mt'))+CI.map(c=>cell('s|'+c,sc(c),1)).join('')+cell('cr|T',S_('cr'),1)+cell('db|T',S_('db'),1)+cell('bi|T',S_('b'),1)+'<td></td>'+cell('re|T',L.r,1)+cell('ex|T',L.x,1),'ft')+'</tbody>'}
+ let h='<thead>'+tr('<th>'+esc(t('ac_day'))+'</th>'+CC.map((c,j)=>hth(c[1]||t('ac_chq'),j,'ch',c)).join('')+hth(t('ac_cr'),CC.length,'ch')+th([t('ac_db'),t('ac_bil'),t('ac_san'),t('ac_rest'),t('ac_ext')]))+'</thead><tbody>'+tr(lb(t('ac_open'))+'<td colspan="'+(CC.length+6)+'" style="text-align:start">'+ib('O','ch',r.o.ch,amt(chOpen(m)))+'</td>');
+ rows.forEach(x=>{h+=tr('<td>'+x.d+'</td>'+CC.map(c=>inp('C',x.d+'|'+c[0],r.c[x.d+'|'+c[0]])).join('')+cell('cr|'+x.d,x.cr)+cell('db|'+x.d,x.db)+cell('bi|'+x.d,x.b)+cell('an|'+x.d,x.a)+cell('re|'+x.d,x.r)+cell('ex|'+x.d,x.x))});
+ return h+tr(lb(t('ac_mt'))+CC.map(c=>cell('s|'+c[0],sc(c[0]),1)).join('')+cell('cr|T',S_('cr'),1)+cell('db|T',S_('db'),1)+cell('bi|T',S_('b'),1)+'<td></td>'+cell('re|T',L.r,1)+cell('ex|T',L.x,1),'ft')+'</tbody>'}
 function gV(m){const r=R(m),rows=gRows(m),n=dim(m),sc=c=>{let q=0;for(let d=1;d<=n;d++)q+=pv(r.g[d+'|'+c]);return q};
  let h='<thead>'+tr(th([t('ac_day'),t('ac_chg'),t('ac_dec'),t('ac_gcr'),'REMO',t('ac_gex'),t('ac_ops'),t('ac_san'),t('ac_adv')]))+'</thead><tbody>'+tr(lb(t('ac_open'))+'<td colspan="8" style="text-align:start">'+ib('O','gab',r.o.gab,amt(gOpen(m)))+'</td>');
  rows.forEach(x=>{h+=tr('<td>'+x.d+'</td>'+GI.map(c=>inp('G',x.d+'|'+c,r.g[x.d+'|'+c])).join('')+cell('an|'+x.d,x.a)+cell('re|'+x.d,x.r))});
@@ -1243,16 +1444,16 @@ function view(){MAP={};const m=S.am,b=S.at;return isT(b)&&ctT(b)?tV(b.slice(2),m
 const chip=(a,v,l,on)=>'<button class="chip'+(on?' on':'')+'" data-a="'+a+'" data-v="'+v+'">'+esc(l)+'</button>';
 window.accCard=()=>'<section class="card"><div class="row"><div class="tile" style="--c:var(--ok)">'+ic('Table')+'</div><div class="grow t"><h2>'+esc(t('ac_title'))+'</h2><div class="mu sm">'+esc(t('ac_card'))+'</div></div></div><div style="margin-top:14px">'+btn('ac_go',t('ac_go'),{p:1,icon:'Table'})+'</div></section>';
 window.accPage=()=>{S.at=S.at||'rec';if(isT(S.at)&&!ctT(S.at))S.at='rec';S.as=S.as||'A';S.am=S.am||curM();const b=S.at,led=b=='rec'||b=='dep';
- return '<div class="home" style="max-width:1160px"><div class="chips tabs">'+[...['rec','dep','ch','gab'].map(k=>chip('ac_tab',k,t('ac_'+k),b==k)),...ctL().map(c=>chip('ac_tab','t:'+c.id,c.t,b=='t:'+c.id)),'<button class="chip" data-a="ac_nt">+ '+esc(t('ac_tbl'))+'</button>'].join('')+'</div><div class="card"><div class="g2"><label><span class="mu xs t">'+esc(t('sp_month'))+'</span><div class="field"><input type="month" id="acm" value="'+S.am+'"></div></label><div style="align-self:end" class="stack">'+btn('ac_xl',t('ac_xl'),{icon:'Download'})+(b=='gab'?btn('ac_req',t('ac_req'),{p:1,icon:'Download'}):'')+(isT(b)?btn('ac_et',t('ac_et'),{icon:'Edit'}):'')+'</div></div>'+
- (led?'<div class="chips tabs" style="margin-top:12px">'+['BUD','A','B','C','R'].map(s=>chip('ac_ser',s,sl(s),S.as==s)).join('')+'</div>':'')+'</div><div class="card" style="padding:12px"><div class="tw" style="max-height:72vh"><table class="tb" id="actbl">'+view()+'</table></div><div class="mu xs t" style="margin-top:10px">'+esc(t('ac_hint'))+'</div></div>'+(b=='ch'?xCard():isT(b)?tAdd():'')+'</div>'};
-async function xl(){view();const tb=document.getElementById('actbl'),rows=[...tb.rows].map(r=>{const bold=r.parentNode.tagName=='THEAD'||r.className=='ft',o=[];[...r.cells].forEach(c=>{if(c.className=='nx')return;const i=c.querySelector('input');let v=i?(i.value!==''?pv(i.value):pv(i.placeholder.replace(/,/g,''))):c.textContent.trim();if(!i&&/^-?[\d,]+(\.\d+)?$/.test(v))v=+v.replace(/,/g,'');if(v===0&&i)v='';o.push({v,s:bold?1:0});for(let k=1;k<(c.colSpan||1);k++)o.push({v:'',s:0})});return o}),
+ return '<div class="home" style="max-width:1160px"><div class="chips tabs">'+tabsH(b)+'</div><div class="card"><div class="g2"><label><span class="mu xs t">'+esc(t('sp_month'))+'</span><div class="field"><input type="month" id="acm" value="'+S.am+'"></div></label><div style="align-self:end" class="stack">'+btn('ac_xl',t('ac_xl'),{icon:'Download'})+(b=='gab'?btn('ac_req',t('ac_req'),{p:1,icon:'Download'}):'')+(isT(b)?btn('ac_et',t('ac_et'),{icon:'Edit'}):'')+'</div></div>'+
+ (led?'<div class="chips tabs" style="margin-top:12px">'+['BUD','A','B','C','R'].map(s=>chip('ac_ser',s,sl(s),S.as==s)).join('')+'</div>':'')+'</div><div class="card" style="padding:12px"><div class="tw" style="max-height:72vh"><table class="tb" id="actbl">'+view()+'</table></div><div class="mu xs t" style="margin-top:10px">'+esc(t('ac_hint'))+'</div></div></div>'};
+async function xl(){view();const tb=document.getElementById('actbl'),rows=[...tb.rows].map(r=>{const bold=r.parentNode.tagName=='THEAD'||r.className=='ft',o=[];[...r.cells].forEach(c=>{if(c.className=='nx')return;const i=c.querySelector('input');let v=i?(i.className=='acx'?i.value:i.value!==''?pv(i.value):pv(i.placeholder.replace(/,/g,''))):c.textContent.trim();if(!i&&/^-?[\d,]+(\.\d+)?$/.test(v))v=+v.replace(/,/g,'');if(v===0&&i)v='';o.push({v,s:bold?1:0});for(let k=1;k<(c.colSpan||1);k++)o.push({v:'',s:0})});return o}),
  w=rows.reduce((q,r)=>Math.max(q,r.length),1),nm=(isT(S.at)?ctT(S.at).t.slice(0,28):t('ac_'+S.at))+(S.at=='rec'||S.at=='dep'?' '+sl(S.as):'');
  const ok=await deliver(xlsxBook([{name:nm,rows,w:Array.from({length:w},(_,i)=>i?15:24)}]),'compta-'+S.at.replace(/\W/g,'')+(S.as&&(S.at=='rec'||S.at=='dep')?'-'+S.as:'')+'-'+S.am+'.xlsx');toast(ok?'saved':'err_save')}
 function reqFill(){const m=S.am,up={};let n=0;for(let d=1;d<=dim(m);d++){const iso=m+'-'+pad(d),seen=new Set();let q=0,c=0;S.docs.forEach(doc=>doc.entries.forEach(x=>{if(x.date!==iso||x.status!='VALID')return;const k=[x.ref,x.date,x.time,x.req].join('|');if(seen.has(k))return;seen.add(k);q+=x.req;c++}));if(q||c){up[d+'|crd']=String(q);up[d+'|ops']=String(c);n++}}
  if(!n){toast('ac_req_no');return}Object.assign(W(m).g,up);sv();render();toast('ac_req_ok')}
 window.actA=function(a,el){if(a.slice(0,3)!='ac_')return 0;const d=el.dataset;
  if(a=='ac_go'){S.at='rec';S.as='A';S.am=curM();go(4);return 1}
- if(a=='ac_tab'){S.at=d.v;S.as=d.v=='rec'||d.v=='dep'?'A':'';render();return 1}
+ if(a=='ac_tab'){if(S.at==d.v&&isT(d.v))return actC('ac_et',el);S.at=d.v;S.as=d.v=='rec'||d.v=='dep'?'A':'';render();return 1}
  if(a=='ac_ser'){S.as=d.v;render();return 1}
  if(a=='ac_req'){reqFill();return 1}
  if(actC(a,el))return 1
@@ -1266,62 +1467,69 @@ document.addEventListener('change',ev=>{if(ev.target.id=='acm'&&ev.target.value)
 Object.assign(D.ar,{ac_tbl:'جدول',ac_nt:'جدول جديد',ac_et:'تعديل الجدول',ac_tn:'عنوان الجدول',ac_kb:'دفتر برصيد',ac_kbd:'كل سطر دائن أو مدين مع رصيد جارٍ، مثل CH60',ac_ks:'قائمة مبالغ',ac_ksd:'سطور بمبالغ مع مجاميع النصفين والشهر والتراكم',ac_addrow:'إضافة سطر',ac_ed2:'تعديل السطر',ac_lbl:'البيان',ac_dir:'النوع',ac_xt:'حركات إضافية',ac_xh:'تُضاف إلى دائن أو مدين اليوم المختار في CH60 وتدخل في الرصيد.',ac_e_t:'اكتب عنوان الجدول.',ac_e_a:'أدخل مبلغًا صحيحًا.',ac_e_d:'اختر تاريخًا داخل هذا الشهر.',ac_e_s:'اختر دائن أو مدين.',ac_del_t:'حذف الجدول؟',ac_del_d:'يُحذف الجدول مع كل سطوره في كل الأشهر.'});
 Object.assign(D.fr,{ac_tbl:'Tableau',ac_nt:'Nouveau tableau',ac_et:'Modifier le tableau',ac_tn:'Titre du tableau',ac_kb:'Registre avec solde',ac_kbd:'Chaque ligne est un crédit ou un débit, avec solde courant (comme CH60)',ac_ks:'Liste de montants',ac_ksd:'Lignes de montants avec totaux par quinzaine, mois et cumul',ac_addrow:'Ajouter une ligne',ac_ed2:'Modifier la ligne',ac_lbl:'Libellé',ac_dir:'Sens',ac_xt:'Mouvements supplémentaires',ac_xh:'Ajoutés au crédit ou au débit du jour choisi dans CH60 et pris en compte dans le solde.',ac_e_t:'Saisissez le titre.',ac_e_a:'Saisissez un montant valide.',ac_e_d:'Choisissez une date de ce mois.',ac_e_s:'Choisissez crédit ou débit.',ac_del_t:'Supprimer le tableau ?',ac_del_d:'Le tableau et toutes ses lignes seront supprimés, tous mois confondus.'});
 Object.assign(D.en,{ac_tbl:'Table',ac_nt:'New table',ac_et:'Edit table',ac_tn:'Table title',ac_kb:'Ledger with balance',ac_kbd:'Each line is a credit or a debit with a running balance, like CH60',ac_ks:'List of amounts',ac_ksd:'Amount lines with half-month, month and running totals',ac_addrow:'Add a line',ac_ed2:'Edit line',ac_lbl:'Description',ac_dir:'Type',ac_xt:'Extra movements',ac_xh:'Added to the credit or debit of the chosen CH60 day and included in the balance.',ac_e_t:'Enter a title.',ac_e_a:'Enter a valid amount.',ac_e_d:'Pick a date in this month.',ac_e_s:'Choose credit or debit.',ac_del_t:'Delete this table?',ac_del_d:'The table and all its lines are deleted, across all months.'});
-const isT=b=>String(b).slice(0,2)=='t:',ctL=()=>G().ct||(G().ct=[]),ctT=b=>ctL().find(c=>c.id==String(b).slice(2)),ents=(m,i)=>(R(m).e||{})[i]||[],srt=L=>L.slice().sort((a,b)=>a.d-b.d),ux=()=>Math.random().toString(36).slice(2,9);
+Object.assign(D.ar,{ac_cn:'اسم العمود',ac_cc:'الرمز (اختياري)',ac_nc:'عمود جديد',ac_ec:'تعديل العمود',ac_typ:'النوع',ac_pl:'مبلغ عادي',ac_empty:'مرّر المؤشر على حدود الجدول واضغط + لإضافة صف أو عمود.',ac_e_n:'اكتب اسم العمود.'});
+Object.assign(D.fr,{ac_cn:'Nom de la colonne',ac_cc:'Code (facultatif)',ac_nc:'Nouvelle colonne',ac_ec:'Modifier la colonne',ac_typ:'Type',ac_pl:'Montant simple',ac_empty:'Survolez une bordure du tableau et cliquez sur + pour ajouter une ligne ou une colonne.',ac_e_n:'Saisissez le nom de la colonne.'});
+Object.assign(D.en,{ac_cn:'Column name',ac_cc:'Code (optional)',ac_nc:'New column',ac_ec:'Edit column',ac_typ:'Type',ac_pl:'Plain amount',ac_empty:'Hover a table border and press + to add a row or a column.',ac_e_n:'Enter the column name.'});
+// ── Excel-like editing: hover a border, press the + that appears, then set the new tab / column / row up exactly there ──
+const FIX=['rec','dep','ch','gab'],isT=b=>String(b).slice(0,2)=='t:',ctT=b=>ctL().find(c=>c.id==String(b).slice(2)),ux=()=>Math.random().toString(36).slice(2,9);
+const ctL=()=>{const L=G().ct||(G().ct=[]);L.forEach(c=>{if(!c.c)c.c=c.k=='bal'?[['x'+ux(),t('ac_cr'),1],['x'+ux(),t('ac_db'),-1]]:[['x'+ux(),t('sp_mt'),0]]});return L};
+const ordL=()=>{const o=(G().ord||[]).filter(x=>FIX.includes(x)||ctT(x));[...FIX,...ctL().map(c=>'t:'+c.id)].forEach(x=>{if(!o.includes(x))o.push(x)});return o};
 const guessK=s=>/ccp|ch\d|bank|banque|بنك|حساب|صندوق|خزنة|رصيد|compte|caisse|solde|dab|gab/i.test(s)?'bal':'sum';
 const guessDir=s=>/سحب|دفع|مصروف|فاتور|رسوم|كهرباء|ماء|غاز|إيجار|شراء|retrait|paiement|facture|achat|frais|seaal|sonelgaz|onfd|vac|apur|appur/i.test(s)?-1:/إيداع|قبض|إيراد|وارد|استلام|versement|d[ée]p[oô]t|recette|encaiss|pav|afs|re[cç]u/i.test(s)?1:0;
-const nx='<td class="nx"></td>',act=i=>'<td class="nx"><button class="ib" data-a="ac_ed" data-i="'+esc(i)+'" aria-label="'+esc(t('f_edit'))+'">'+ic('Edit')+'</button></td>',lb2=l=>'<td colspan="2" style="text-align:start">'+esc(l)+'</td>';
-const pT=(m,i)=>Object.keys(G().m).filter(k=>k<m&&(ents(k,i).length||(R(k).o['t:'+i]!=null&&R(k).o['t:'+i]!==''))).sort().pop()||null;
-const tOpen=(m,i)=>{const v=R(m).o['t:'+i];if(v!=null&&v!=='')return pv(v);const q=pT(m,i);return q?tRows(q,i).end:0};
-function tRows(m,i){let b=tOpen(m,i);const o=srt(ents(m,i)).map(e=>{const a=pv(e.a),cr=e.s>0?a:0,db=e.s<0?a:0;b+=cr-db;return{e,cr,db,b}});return{o,end:b}}
-const tTot=(m,i,a,z)=>ents(m,i).filter(e=>e.d>=a&&e.d<=z).reduce((q,e)=>q+pv(e.a),0);
-const tAnt=(m,i)=>{const o=R(m).a['T:'+i];if(o!=null&&o!=='')return pv(o);const p=pm(m);return p?tAnt(p,i)+tTot(p,i,1,31):0};
-function tV(i,m){const c=ctT('t:'+i),n=dim(m),r=R(m);
- if(c.k=='bal'){const X=tRows(m,i);let h='<thead>'+tr(th([t('ac_day'),t('ac_lbl'),t('ac_cr'),t('ac_db'),t('ac_rest'),'']))+'</thead><tbody>'+tr(lb(t('ac_open'))+'<td colspan="5" style="text-align:start">'+ib('O','t:'+i,r.o['t:'+i],amt(tOpen(m,i)))+'</td>');
-  X.o.forEach(x=>{h+=tr('<td>'+x.e.d+'</td>'+lb(x.e.l)+cell('c|'+x.e.id,x.cr)+cell('q|'+x.e.id,x.db)+cell('b|'+x.e.id,x.b,1)+act(x.e.id))});
-  return h+tr(lb2(t('ac_mt'))+cell('t|c',X.o.reduce((q,x)=>q+x.cr,0),1)+cell('t|d',X.o.reduce((q,x)=>q+x.db,0),1)+cell('t|b',X.end,1)+nx,'ft')+'</tbody>'}
- let h='<thead>'+tr(th([t('ac_day'),t('ac_lbl'),t('tot'),'']))+'</thead><tbody>';
- srt(ents(m,i)).forEach(e=>{h+=tr('<td>'+e.d+'</td>'+lb(e.l)+cell('c|'+e.id,pv(e.a))+act(e.id))});
- const f=(l,k,v)=>tr(lb2(l)+cell(k,v,1)+nx,'ft');
- return h+f(t('ac_q1'),'q1',tTot(m,i,1,15))+f(t('ac_q2'),'q2',tTot(m,i,16,n))+f(t('ac_mt'),'mt',tTot(m,i,1,n))+tr(lb2(t('ac_ant'))+inp('A','T:'+i,r.a['T:'+i],amt(tAnt(m,i)))+nx)+f(t('ac_cum'),'cu',tAnt(m,i)+tTot(m,i,1,n))+'</tbody>'}
-const addBtn=()=>btn('ac_en',t('ac_addrow'),{p:1,icon:'Plus'});
-const tAdd=()=>'<div class="card" style="padding:12px">'+addBtn()+'</div>';
-function xCard(){const L=srt(R(S.am).x||[]);return '<div class="card" style="padding:12px"><h2 class="t" style="margin:0 0 4px">'+esc(t('ac_xt'))+'</h2><div class="mu xs t">'+esc(t('ac_xh'))+'</div>'+(L.length?'<div class="tw" style="margin-top:10px"><table class="tb"><thead>'+tr(th([t('ac_day'),t('ac_lbl'),t('ac_cr'),t('ac_db'),'']))+'</thead><tbody>'+L.map(e=>tr('<td>'+e.d+'</td>'+lb(e.l)+'<td>'+(e.s>0?amt(pv(e.a)):'')+'</td><td>'+(e.s<0?amt(pv(e.a)):'')+'</td>'+act(e.id))).join('')+'</tbody></table></div>':'')+'<div style="margin-top:12px">'+addBtn()+'</div></div>'}
-function tbSheet(){const k=S.xt,ed=!!k.id;return OV('<h2 class="t" style="margin:0">'+esc(t(ed?'ac_et':'ac_nt'))+'</h2><label><span class="mu sm t">'+esc(t('ac_tn'))+'</span><div class="field"><input id="atn" maxlength="40" value="'+esc(k.t)+'"></div></label>'+
- (ed?'':'<div class="stack" style="gap:8px">'+[['bal','ac_kb','ac_kbd'],['sum','ac_ks','ac_ksd']].map(([v,a,b])=>'<button class="chip'+(k.k==v?' on':'')+'" data-a="ac_tk" data-v="'+v+'" style="text-align:start;height:auto;padding:10px 12px"><b>'+esc(t(a))+'</b><div class="mu xs">'+esc(t(b))+'</div></button>').join('')+'</div>')+
- '<div class="sm t" id="err" style="color:var(--er)" hidden></div>'+(ed?btn('ac_tdel',t('f_del'),{d:1,icon:'Trash'}):'')+'<div class="g2">'+btn('close',t('f_cancel'))+btn('ac_tsave',t('f_save'),{p:1})+'</div>')}
-function enSheet(){const e=S.xe,m=S.am,dir=e.w=='x'||ctT(e.w).k=='bal';return OV('<h2 class="t" style="margin:0">'+esc(t(e.id?'ac_ed2':'ac_addrow'))+'</h2>'+
- '<label><span class="mu sm t">'+esc(t('ac_day'))+'</span><div class="field"><input id="axd" type="date" min="'+m+'-01" max="'+m+'-'+pad(dim(m))+'" value="'+m+'-'+pad(e.d)+'"></div></label>'+
- '<label><span class="mu sm t">'+esc(t('ac_lbl'))+'</span><div class="field"><input id="axl" maxlength="60" value="'+esc(e.l)+'"></div></label>'+
- '<label><span class="mu sm t">'+esc(t('sp_mt'))+'</span><div class="field"><input id="axa" inputmode="decimal" placeholder="0" value="'+esc(e.a)+'"></div></label>'+
- (dir?'<div><div class="mu sm t" style="margin-bottom:6px">'+esc(t('ac_dir'))+'</div><div class="chips">'+[[1,'ac_cr'],[-1,'ac_db']].map(([v,k])=>'<button class="chip'+(e.s==v?' on':'')+'" data-a="ac_dir" data-v="'+v+'">'+esc(t(k))+'</button>').join('')+'</div></div>':'')+
- '<div class="sm t" id="err" style="color:var(--er)" hidden></div>'+(e.id?btn('ac_edel',t('f_del'),{d:1,icon:'Trash'}):'')+'<div class="g2">'+btn('close',t('f_cancel'))+btn('ac_esave',t('f_save'),{p:1})+'</div>')}
-const dlSheet=()=>OV('<h2 class="t" style="margin:0">'+esc(t('ac_del_t'))+'</h2><div class="mu sm t">'+esc(t('ac_del_d'))+'</div><div class="g2">'+btn('close',t('f_cancel'))+btn('ac_tdel2',t('f_del'),{d:1,icon:'Trash'})+'</div>');
-Object.assign(SH3,{ac_tb:tbSheet,ac_ee:enSheet,ac_dl:dlSheet});
+const pl=(a,i,g)=>'<i class="pl" data-a="'+a+'" data-i="'+i+'"'+(g?' data-g="'+esc(g)+'"':'')+'></i>',nx='<td class="nx"></td>';
+const hth=(l,j,g,c,top)=>'<th class="hx"'+(top?' style="top:38px"':'')+'>'+pl('ac_ci',j,g)+(c&&String(c[0])[0]=='x'?'<a data-a="ac_ce" data-i="'+j+'" data-g="'+esc(g)+'" style="cursor:pointer;text-decoration:underline dotted">'+esc(l)+'</a>':esc(l))+'</th>';
+const tabsH=b=>{const o=ordL();return o.map((k,i)=>'<button class="chip'+(b==k?' on':'')+'" data-a="ac_tab" data-v="'+esc(k)+'">'+pl('ac_nt',i)+esc(isT(k)?ctT(k).t:t('ac_'+k))+'</button>').join('')+'<span class="hx" style="flex:0 0 12px">'+pl('ac_nt',o.length)+'</span>'};
+const colsOf=g=>g=='ch'?CC:isT(g)?ctT(g).c:SCH[g.split('|')[1]][g.split('|')[2]];
+const setCols=(g,a)=>{if(g=='ch'){G().cfg.ch=a;CC.splice(0,CC.length,...a)}else if(isT(g))ctT(g).c=a;else{const q=g.split('|');G().cfg[q[1]+'|'+q[2]]=a;SCH[q[1]][q[2]]=a}sv()};
+const rwL=(m,i)=>(R(m).rw||{})[i]||[],cvK=(i,r,c)=>i+'|'+r+'|'+c,cvV=(m,i,r,c)=>pv((R(m).cv||{})[cvK(i,r,c)]),sg=T=>T.c.some(c=>c[2]);
+const pT=(m,i)=>Object.keys(G().m).filter(k=>k<m&&(rwL(k,i).length||(R(k).o['t:'+i]!=null&&R(k).o['t:'+i]!==''))).sort().pop()||null;
+const net=(m,T)=>rwL(m,T.id).reduce((q,r)=>q+T.c.reduce((a,c)=>a+c[2]*cvV(m,T.id,r.id,c[0]),0),0);
+const tOpen=(m,T)=>{const v=R(m).o['t:'+T.id];if(v!=null&&v!=='')return pv(v);const q=pT(m,T.id);return q?tOpen(q,T)+net(q,T):0};
+const cAnt=(m,T,c)=>{let q=0;Object.keys(G().m).forEach(k=>{if(k<m&&k.slice(0,4)==m.slice(0,4))rwL(k,T.id).forEach(r=>q+=cvV(k,T.id,r.id,c))});return q};
+function tV(i,m){const T=ctT('t:'+i),b=sg(T),n=T.c.length,w=n+(b?1:0)+2,L=rwL(m,i),g='t:'+i,r0=R(m);
+ let h='<thead>'+tr('<th>'+esc(t('ac_lbl'))+'</th>'+T.c.map((c,j)=>hth(c[1]+(c[2]?' · '+t(c[2]>0?'ac_cr':'ac_db'):''),j,g,c)).join('')+(b?hth(t('ac_rest'),n,g):'<th class="hx">'+pl('ac_ci',n,g)+'</th>')+'<th></th>')+'</thead><tbody>',bal=tOpen(m,T);
+ if(b)h+=tr(lb(t('ac_open'))+'<td colspan="'+(w-1)+'" style="text-align:start">'+ib('O','t:'+i,r0.o['t:'+i],amt(bal))+'</td>');
+ if(!L.length)h+=tr('<td class="hx" colspan="'+w+'" style="text-align:start;padding:18px 12px"><i class="pr on" data-a="ac_ri" data-i="0"></i>'+esc(t('ac_empty'))+'</td>');
+ L.forEach((r,k)=>{bal+=T.c.reduce((a,c)=>a+c[2]*cvV(m,i,r.id,c[0]),0);
+  h+=tr('<td class="hx"><i class="pr" data-a="ac_ri" data-i="'+k+'"></i>'+(k==L.length-1?'<i class="pr b" data-a="ac_ri" data-i="'+(k+1)+'"></i>':'')+'<input class="acx" data-r="'+r.id+'" value="'+esc(r.l||'')+'" placeholder="'+esc(t('ac_lbl'))+'"></td>'+T.c.map(c=>inp('E',cvK(i,r.id,c[0]),(r0.cv||{})[cvK(i,r.id,c[0])])).join('')+(b?cell('b|'+r.id,bal,1):'')+'<td class="nx"><button class="ib" data-a="ac_rd" data-i="'+r.id+'" aria-label="'+esc(t('f_del'))+'">'+ic('Trash')+'</button></td>')});
+ const tt=c=>L.reduce((q,r)=>q+cvV(m,i,r.id,c),0);
+ h+=tr(lb(t('ac_mt'))+T.c.map(c=>cell('mt|'+c[0],tt(c[0]),1)).join('')+(b?cell('mt|b',bal,1):'')+nx,'ft');
+ if(!b)h+=tr(lb(t('ac_ant'))+T.c.map(c=>cell('an|'+c[0],cAnt(m,T,c[0]),1)).join('')+nx)+tr(lb(t('ac_cum'))+T.c.map(c=>cell('cu|'+c[0],cAnt(m,T,c[0])+tt(c[0]),1)).join('')+nx,'ft');
+ return h+'</tbody>'}
+const hh=k=>'<h2 class="t" style="margin:0">'+esc(t(k))+'</h2>',fl=(id,k,v)=>'<label><span class="mu sm t">'+esc(t(k))+'</span><div class="field"><input id="'+id+'" maxlength="40" value="'+esc(v||'')+'"></div></label>',err='<div class="sm t" id="err" style="color:var(--er)" hidden></div>',cg=(a,k)=>'<div class="g2">'+btn('close',t('f_cancel'))+btn(a,t(k||'f_save'),{p:1})+'</div>';
+function tbSheet(){const k=S.xt,ed=!!k.id;return OV(hh(ed?'ac_et':'ac_nt')+fl('atn','ac_tn',k.t)+(ed?'':'<div class="stack" style="gap:8px">'+[['bal','ac_kb','ac_kbd'],['sum','ac_ks','ac_ksd']].map(([v,a,b])=>'<button class="chip'+(k.k==v?' on':'')+'" data-a="ac_tk" data-v="'+v+'" style="text-align:start;height:auto;padding:10px 12px"><b>'+esc(t(a))+'</b><div class="mu xs">'+esc(t(b))+'</div></button>').join('')+'</div>')+err+(ed?btn('ac_tdel',t('f_del'),{d:1,icon:'Trash'}):'')+cg('ac_tsave'))}
+function csSheet(){const x=S.xc,lg=x.g.slice(0,2)=='l|',ty=x.g=='ch'?[[1,'ac_cr'],[-1,'ac_db']]:isT(x.g)?[[0,'ac_pl'],[1,'ac_cr'],[-1,'ac_db']]:[];
+ return OV(hh(x.id?'ac_ec':'ac_nc')+fl('acn','ac_cn',x.n)+(lg?fl('acd','ac_cc',x.code):'')+(ty.length?'<div><div class="mu sm t" style="margin-bottom:6px">'+esc(t('ac_typ'))+'</div><div class="chips">'+ty.map(([v,k])=>'<button class="chip'+(x.s==v&&(x.s||x.g!='ch')?' on':'')+'" data-a="ac_ty" data-v="'+v+'">'+esc(t(k))+'</button>').join('')+'</div></div>':'')+err+(x.id?btn('ac_cdel',t('f_del'),{d:1,icon:'Trash'}):'')+cg('ac_csave'))}
+const dlSheet=()=>OV(hh('ac_del_t')+'<div class="mu sm t">'+esc(t('ac_del_d'))+'</div>'+cg('ac_tdel2','f_del'));
+Object.assign(SH3,{ac_tb:tbSheet,ac_cs:csSheet,ac_dl:dlSheet});
 const erx=k=>{const el=document.getElementById('err');if(el){el.textContent=t(k);el.hidden=false}},
- syncDir=()=>document.querySelectorAll('#layer [data-a="ac_dir"]').forEach(c=>c.classList.toggle('on',+c.dataset.v==S.xe.s)),
  syncK=()=>document.querySelectorAll('#layer [data-a="ac_tk"]').forEach(c=>c.classList.toggle('on',c.dataset.v==S.xt.k)),
- tgt=()=>S.at=='ch'?'x':S.at,
- lst=(m,w,mk)=>{if(w=='x')return mk?(W(m).x=W(m).x||[]):(R(m).x||[]);const i=w.slice(2);if(!mk)return ents(m,i);const o=W(m);o.e=o.e||{};return o.e[i]=o.e[i]||[]};
+ syncTy=()=>document.querySelectorAll('#layer [data-a="ac_ty"]').forEach(c=>c.classList.toggle('on',+c.dataset.v==S.xc.s));
 function actC(a,el){const d=el.dataset,m=S.am,g=id=>document.getElementById(id);switch(a){
- case'ac_nt':S.xt={id:null,t:'',k:'sum',auto:1};S.sheet='ac_tb';render();return 1;
- case'ac_et':{const c=ctT(S.at);S.xt={id:c.id,t:c.t,k:c.k};S.sheet='ac_tb';render();return 1}
+ case'ac_nt':S.xt={id:null,t:'',k:'sum',auto:1,p:+d.i};S.sheet='ac_tb';render();return 1;
+ case'ac_et':{const c=ctT(S.at);S.xt={id:c.id,t:c.t,k:'sum'};S.sheet='ac_tb';render();return 1}
  case'ac_tk':S.xt.k=d.v;S.xt.auto=0;syncK();return 1;
  case'ac_tsave':{const x=S.xt,v=g('atn').value.trim();if(!v){erx('ac_e_t');return 1}
-  if(x.id)ctT('t:'+x.id).t=v;else{const c={id:ux(),t:v,k:x.k};ctL().push(c);S.at='t:'+c.id;S.as=''}
+  if(x.id)ctT('t:'+x.id).t=v;else{const c={id:ux(),t:v,c:x.k=='bal'?[['x'+ux(),t('ac_cr'),1],['x'+ux(),t('ac_db'),-1]]:[['x'+ux(),t('sp_mt'),0]]},o=ordL();ctL().push(c);o.splice(Math.min(x.p,o.length),0,'t:'+c.id);G().ord=o;S.at='t:'+c.id;S.as=''}
   sv();S.sheet=null;S.xt=null;render();toast('ac_saved');return 1}
  case'ac_tdel':S.sheet='ac_dl';render();return 1;
- case'ac_tdel2':{const i=S.xt.id;G().ct=ctL().filter(c=>c.id!=i);Object.keys(G().m).forEach(k=>{const o=G().m[k];if(o.e)delete o.e[i];if(o.o)delete o.o['t:'+i];if(o.a)delete o.a['T:'+i]});
+ case'ac_tdel2':{const i=S.xt.id;G().ct=ctL().filter(c=>c.id!=i);G().ord=ordL().filter(x=>x!='t:'+i);Object.keys(G().m).forEach(k=>{const o=G().m[k];if(o.rw)delete o.rw[i];if(o.o)delete o.o['t:'+i];if(o.cv)Object.keys(o.cv).forEach(q=>{if(q.indexOf(i+'|')==0)delete o.cv[q]})});
   S.at='rec';S.as='A';sv();S.sheet=null;S.xt=null;render();toast('sp_deleted');return 1}
- case'ac_en':{const w=tgt();S.xe={w,id:null,d:m==curM()?new Date().getDate():1,l:'',a:'',s:0,auto:1};S.sheet='ac_ee';render();return 1}
- case'ac_ed':{const w=tgt(),e=lst(m,w).find(x=>x.id==d.i);if(!e)return 1;S.xe={w,id:e.id,d:e.d,l:e.l,a:e.a,s:e.s,auto:0};S.sheet='ac_ee';render();return 1}
- case'ac_dir':S.xe.s=+d.v;S.xe.auto=0;syncDir();return 1;
- case'ac_esave':{const e=S.xe,dv=g('axd').value,v=g('axa').value.trim(),dir=e.w=='x'||ctT(e.w).k=='bal';
-  if(!dv||dv.slice(0,7)!=m){erx('ac_e_d');return 1}if(!/\d/.test(v)||!/^[\d.,+\s]+$/.test(v)){erx('ac_e_a');return 1}if(dir&&!e.s){erx('ac_e_s');return 1}
-  const o={id:e.id||ux(),d:+dv.slice(8),l:g('axl').value.trim(),a:v,s:dir?e.s:1},L=lst(m,e.w,1),i=L.findIndex(x=>x.id==o.id);
-  if(i<0)L.push(o);else L[i]=o;sv();S.sheet=null;S.xe=null;render();toast('ac_saved');return 1}
- case'ac_edel':{const e=S.xe,L=lst(m,e.w,1),i=L.findIndex(x=>x.id==e.id);if(i>=0)L.splice(i,1);sv();S.sheet=null;S.xe=null;render();toast('sp_deleted');return 1}}return 0}
-document.addEventListener('input',ev=>{const el=ev.target,e=S.xe,k=S.xt;
- if(el.id=='axl'&&e&&e.auto){const q=guessDir(el.value);if(q&&q!=e.s){e.s=q;syncDir()}}
+ case'ac_ci':S.xc={g:d.g,i:+d.i,id:null,n:'',code:'',s:0,auto:1};S.sheet='ac_cs';render();return 1;
+ case'ac_ce':{const c=colsOf(d.g)[+d.i];if(!c)return 1;const lg=d.g.slice(0,2)=='l|';S.xc={g:d.g,i:+d.i,id:c[0],n:c[1],code:lg?c[2]:'',s:lg?0:c[2],auto:0};S.sheet='ac_cs';render();return 1}
+ case'ac_ty':S.xc.s=+d.v;S.xc.auto=0;syncTy();return 1;
+ case'ac_csave':{const x=S.xc,n=g('acn').value.trim(),code=g('acd')?g('acd').value.trim():'';if(!n){erx('ac_e_n');return 1}if(x.g=='ch'&&!x.s){erx('ac_e_s');return 1}
+  const id=x.id||'x'+ux(),col=x.g.slice(0,2)=='l|'?[id,n,code]:[id,n,x.s],arr=colsOf(x.g).map(c=>c.slice());
+  if(x.id)arr[arr.findIndex(c=>c[0]==x.id)]=col;else arr.splice(Math.min(x.i,arr.length),0,col);
+  setCols(x.g,arr);S.sheet=null;S.xc=null;render();toast('ac_saved');return 1}
+ case'ac_cdel':{const x=S.xc;setCols(x.g,colsOf(x.g).filter(c=>c[0]!=x.id));
+  if(isT(x.g))Object.keys(G().m).forEach(k=>{const o=G().m[k];if(o.cv)Object.keys(o.cv).forEach(q=>{const z=q.split('|');if(z[0]==x.g.slice(2)&&z[2]==x.id)delete o.cv[q]})});
+  sv();S.sheet=null;S.xc=null;render();toast('sp_deleted');return 1}
+ case'ac_ri':{const T=ctT(S.at),o=W(m),id=ux();(o.rw[T.id]=o.rw[T.id]||[]).splice(+d.i,0,{id,l:''});sv();render();setTimeout(()=>{const e=document.querySelector('.acx[data-r="'+id+'"]');if(e)e.focus()},0);return 1}
+ case'ac_rd':{const T=ctT(S.at),o=W(m);o.rw[T.id]=(o.rw[T.id]||[]).filter(r=>r.id!=d.i);Object.keys(o.cv).forEach(q=>{if(q.indexOf(T.id+'|'+d.i+'|')==0)delete o.cv[q]});sv();render();return 1}}return 0}
+document.addEventListener('input',ev=>{const el=ev.target,x=S.xc,k=S.xt;
+ if(el.classList&&el.classList.contains('acx')&&el.dataset.r&&isT(S.at)){const r=rwL(S.am,ctT(S.at).id).find(y=>y.id==el.dataset.r);if(r){r.l=el.value;sv()}return}
+ if(el.id=='acn'&&x&&x.auto&&(x.g=='ch'||isT(x.g))){const q=guessDir(el.value);if(q&&q!=x.s){x.s=q;syncTy()}}
  else if(el.id=='atn'&&k&&k.auto){const q=guessK(el.value);if(q!=k.k){k.k=q;syncK()}}});
 render();
 })();
@@ -1388,27 +1596,54 @@ header .sm{font-size:13px}
 .tw{border-radius:12px}
 .tb th{font-size:12.5px;color:var(--mu);font-weight:700}
 .toast{border-radius:12px}
+html[lang=ar] svg.flip{transform:scaleX(-1)}
+.sheet:focus{outline:0}
 </style>
+<style id="gold">
+/* warm identity: gold · yellow · orange · red */
+:root{--bg:#fbf7f0;--card:#fff;--tx:#2b1b10;--mu:#7b6a58;--bd:#ecdfcd;--in:#f7f0e4;--pr:#c2410c;--pr2:#b45309;--er:#dc2626;--sh:0 1px 2px rgba(120,70,20,.06),0 6px 18px rgba(120,70,20,.05)}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#161009;--card:#21170f;--tx:#f7ede0;--mu:#bba68c;--bd:#3b2b1c;--in:#2c2016;--pr:#fb923c;--pr2:#fbbf24;--er:#f87171;--sh:none}}
+:root[data-theme=dark]{--bg:#161009;--card:#21170f;--tx:#f7ede0;--mu:#bba68c;--bd:#3b2b1c;--in:#2c2016;--pr:#fb923c;--pr2:#fbbf24;--er:#f87171;--sh:none}
+header .logo,.logo{background:linear-gradient(135deg,#fbbf24 0%,#ea580c 55%,#dc2626 100%);color:#fff}
+.btn.p{background:linear-gradient(135deg,#d9480f,#c0262d);color:#fff}
+.av{background:linear-gradient(135deg,#d9480f,#c0262d);color:#fff}
+.chk.on{background:#c2410c;border-color:#c2410c}
+.pl::before,.pr::before{background:#c2410c}
+header::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:3px;background:linear-gradient(90deg,#fbbf24,#ea580c,#dc2626)}
+.tabs .chip.on{box-shadow:0 1px 3px rgba(120,70,20,.18)}
+</style>
+<script>
+(function(){function go(){var src=[].map.call(document.querySelectorAll('script[data-app]'),function(s){return s.textContent}).join('\n;\n'),s=document.createElement('script');s.textContent=src;document.body.appendChild(s)}
+ (window.__idbReady||Promise.resolve()).then(go,go)})();
+</script>
 <script type="module">
 import {initializeApp,deleteApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import {getAuth,GoogleAuthProvider,signInWithPopup,signOut,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-import {getFirestore,doc,getDoc,getDocs,collection,writeBatch} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import {getFirestore,doc,runTransaction,onSnapshot} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 const cfg={apiKey:"AIzaSyC3MMC-7dGU3ztshP0mYUWrV_c1Zm8njoc",authDomain:"youyou-f869f.firebaseapp.com",projectId:"youyou-f869f",storageBucket:"youyou-f869f.firebasestorage.app",messagingSenderId:"185167516974",appId:"1:185167516974:web:6d44fc5c98e63b554696bf"};
 // every signed-in account has its own app: separate Auth session, separate Firestore connection
-const apps={};
+const apps={},CID=Math.random().toString(36).slice(2)+Date.now().toString(36);
+// split without cutting a surrogate pair in half
+const cut=(t,n)=>{const p=[];let i=0;while(i<t.length){let j=Math.min(i+n,t.length);if(j<t.length){const c=t.charCodeAt(j);if(c>=0xDC00&&c<=0xDFFF)j--}p.push(t.slice(i,j));i=j}return p};
 function get(slot){if(apps[slot])return apps[slot];const app=slot=='[DEFAULT]'?initializeApp(cfg):initializeApp(cfg,slot);return apps[slot]={app,auth:getAuth(app),db:getFirestore(app)}}
 window.FB={
  user:slot=>new Promise(res=>{const a=get(slot),un=onAuthStateChanged(a.auth,u=>{un();res(u)},()=>res(null))}),
  async add(){const slot='a'+Date.now().toString(36),a=get(slot),p=new GoogleAuthProvider();p.setCustomParameters({prompt:'select_account'});
   try{const c=await signInWithPopup(a.auth,p);return{slot,user:c.user}}catch(e){await FB.drop(slot,false);throw e}},
  async drop(slot,out){const a=apps[slot];if(!a)return;try{if(out)await signOut(a.auth)}catch(e){}try{await deleteApp(a.app)}catch(e){}delete apps[slot]},
- async load(slot,uid){const db=get(slot).db,m=await getDoc(doc(db,'users',uid));if(!m.exists())return null;const d=m.data(),cs=await getDocs(collection(db,'users',uid,'chunks')),parts=[];
-  cs.forEach(c=>{parts[+c.id]=c.data().d});return{ts:d.ts,json:parts.slice(0,d.n).join('')}},
- async save(slot,uid,ts,json){const db=get(slot).db,CH=400000,parts=[];for(let i=0;i<json.length;i+=CH)parts.push(json.slice(i,i+CH));
-  const old=await getDocs(collection(db,'users',uid,'chunks')),b=writeBatch(db);
-  parts.forEach((d,i)=>b.set(doc(db,'users',uid,'chunks',String(i)),{d}));
-  old.forEach(c=>{if(+c.id>=parts.length)b.delete(c.ref)});
-  b.set(doc(db,'users',uid),{ts,n:parts.length});await b.commit()}};
+ // read-merge-write in one transaction: a concurrent write from another device makes it retry, so nothing is overwritten
+ async sync(slot,uid,fn){const db=get(slot).db;
+  return runTransaction(db,async tx=>{const mref=doc(db,'users',uid),m=await tx.get(mref);let json=null,rts=0,n=0;
+   if(m.exists()){const d=m.data();n=+d.n||0;rts=+d.ts||0;const cs=await Promise.all(Array.from({length:n},(_,i)=>tx.get(doc(db,'users',uid,'chunks',String(i)))));json=cs.map(c=>c.exists()?c.data().d:'').join('')}
+   const r=fn(json,rts);
+   if(r&&r.write){const parts=cut(r.json,250000);
+    parts.forEach((d,i)=>tx.set(doc(db,'users',uid,'chunks',String(i)),{d}));
+    for(let i=parts.length;i<n;i++)tx.delete(doc(db,'users',uid,'chunks',String(i)));
+    tx.set(mref,{ts:Date.now(),n:parts.length,by:CID})}
+   return r})},
+ // live updates: another device wrote → the app merges again
+ watch(slot,uid,cb){const db=get(slot).db;let first=true;
+  return onSnapshot(doc(db,'users',uid),s=>{if(first){first=false;return}if(s.metadata.hasPendingWrites)return;const d=s.data();if(d&&d.by!==CID)cb()},()=>{})}};
 window.dispatchEvent(new Event('fbready'));
 </script>
 </body>
