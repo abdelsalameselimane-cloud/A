@@ -165,6 +165,10 @@ fr:{name:"Calculateur REQ",drop:"ou glissez vos fichiers ici",csv_lang:"Langue d
 ar:{name:"حاسبة REQ",drop:"أو اسحب الملفات وأفلتها هنا",csv_lang:"لغة الملاحظات في Excel",lang_en:"English",lang_fr:"Français",open_excel:"عرض كجدول",err_excel:"تعذّر فتح الملف في Excel",err_excel_desc:"ثبّت تطبيق Excel، أو استخدم التصدير ثم افتح الملف من ملفاتك.",tagline:"اجمع أوراق النقد من سجل جهاز الصرف.",language:"اللغة",back:"رجوع",import_title:"استيراد مستندات",import_desc:"اختر ملفًا نصيًا واحدًا أو أكثر يحتوي سجلات REQ.",choose_file:"اختيار ملفات",last_desc:"{n} عملية · المجموع {t}",reading:"جارٍ قراءة الملفات…",reading_desc:"يستغرق هذا بضع ثوانٍ فقط.",err_open:"تعذّر فتح هذا الملف",err_open_desc:"تأكد أن الملف ما زال موجودًا ثم اخترْه مرة أخرى.",err_none:"لم نجد أي REQ",err_none_desc:"لا يحتوي هذا الملف على أسطر REQ. اختر ملف السجل الصحيح وحاول مرة أخرى.",try_again:"حاول مرة أخرى",results:"النتائج",grand:"المجموع العام",grand_desc:"يشمل العمليات الصالحة فقط.",detected:"عدد REQ",valid:"صالحة",verify:"للتحقق",no_dispense:"بدون صرف",verify_banner:"{n} تحتاج تحققًا",verify_banner_desc:"تبقى خارج المجموع حتى تصحّحها.",all_ok:"كل شيء متطابق",all_ok_desc:"لا توجد عملية تحتاج تحققًا.",search:"ابحث برقم العملية أو الوقت",f_all:"الكل",f_verify:"للتحقق",empty_filter:"لا توجد نتائج مطابقة لبحثك.",clear_filters:"مسح التصفية",export_csv:"تصدير إلى Excel (CSV)",exporting:"جارٍ الحفظ…",saved:"تم حفظ الملف",updated:"تم تحديث العملية",err_save:"تعذّر حفظ الملف",err_save_desc:"اختر مكانًا آخر وحاول مرة أخرى.",copy_total:"نسخ المجموع",edit:"تعديل",edit_title:"تعديل الأرقام",edit_desc:"اكتب أعداد الأوراق الأربعة لهذه العملية.",note_n:"الفئة {n}",save:"حفظ",cancel:"إلغاء",err_edit:"أدخل أربعة أعداد صحيحة.",original:"النص الأصلي",st_VALID:"صالحة",st_VERIFY:"للتحقق",st_NO_DISPENSE:"بدون صرف",n_SUM:"المجموع يختلف عن NOTES PRESENTED. تحقق من الأرقام.",n_BAD:"كان المتوقع أربعة أرقام لكن وُجد: {a}",n_DECLINED:"رفض الجهاز هذا الطلب (الرمز {a}). لم تُصرف أي أوراق.",n_NOCASH:"لم يُطلب أي مبلغ.",n_EDITED:"قمت بتعديل هذه العملية.",n_NOLINE:"طُلب مبلغ لكن لم نجد سطر الأرقام الأربعة.",n_FROMNP:"لا يوجد سطر الأرقام الأربعة، فأُخذت الأوراق من NOTES PRESENTED.",n_NONCASH:"نوع العملية {a}: لم تُقدَّم أي أوراق ولم يُصرف شيء."}};
 Object.assign(D.ar,{sv_title:"الخدمات"});Object.assign(D.en,{sv_title:"Services"});Object.assign(D.fr,{sv_title:"Services"});
 const LANGS=[["ar","العربية"],["en","English"],["fr","Français"]];
+Object.assign(D.ar,{hm_today:"اليوم",hm_open:"فتح",hm_new:"+ حركة طوابع",hm_docs:"المستندات",hm_lastdoc:"مجموع آخر مستند",hm_req:"سجلات REQ",hm_req_sub:"استيراد سجلات الموزع وحساب المبالغ",hm_month:"هذا الشهر"});
+Object.assign(D.en,{hm_today:"Today",hm_open:"Open",hm_new:"+ Stamp movement",hm_docs:"Documents",hm_lastdoc:"Last document total",hm_req:"REQ logs",hm_req_sub:"Import ATM journals and compute totals",hm_month:"This month"});
+Object.assign(D.fr,{hm_today:"Aujourd'hui",hm_open:"Ouvrir",hm_new:"+ Mouvement timbres",hm_docs:"Documents",hm_lastdoc:"Total du dernier document",hm_req:"Journaux REQ",hm_req_sub:"Importer les journaux du DAB et calculer les totaux",hm_month:"Ce mois"});
+
 Object.assign(D.en,{signin:"Sign in",account:"Account",signout:"Sign out",acct_desc:"Your documents sync across every device where you sign in with this account. Signing out clears them from this browser (they stay in your account).",synced:"Synced with your account",sync_err:"Couldn't sync. Check your connection.",login_err:"Sign-in failed. Try again."});
 Object.assign(D.fr,{signin:"Connexion",account:"Compte",signout:"Se déconnecter",acct_desc:"Vos documents se synchronisent sur chaque appareil connecté à ce compte. La déconnexion les efface de ce navigateur (ils restent dans votre compte).",synced:"Synchronisé avec votre compte",sync_err:"Synchronisation impossible. Vérifiez votre connexion.",login_err:"Échec de la connexion. Réessayez."});
 Object.assign(D.ar,{signin:"تسجيل الدخول",account:"الحساب",signout:"تسجيل الخروج",acct_desc:"تتزامن مستنداتك على كل جهاز تدخل منه بهذا الحساب. وتسجيل الخروج يمسحها من هذا المتصفح (وتبقى محفوظة في حسابك).",synced:"تمت المزامنة مع حسابك",sync_err:"تعذّرت المزامنة. تحقق من اتصالك.",login_err:"فشل تسجيل الدخول. حاول مرة أخرى."});
@@ -434,14 +438,32 @@ function selBar(){if(!S.sel)return'';const n=S.ids.size,v=vis();
  return '<div class="bar t" role="toolbar"><b>'+esc(t('sel_n',{n}))+'</b>'+btn('selall',v.length&&v.every(d=>S.ids.has(d.id))?t('desel'):t('sel_all'),{dis:!v.length})+btn('move',t('move'),{icon:'Move',dis:!n})+btn('bdel',t('del'),{d:1,icon:'Trash',dis:!n})+'</div>'}
 function fcard(f){const n=S.docs.filter(d=>fid(d)===f.id).length,id=esc(f.id),c=col(f.color);
  return '<article class="card ent fc" style="--c:'+c+'" data-a="openf" data-id="'+id+'" tabindex="0" role="button"><div class="row"><div class="tile">'+ic('Folder')+'</div><div class="grow"><div class="dn">'+esc(f.name)+'</div><div class="mu sm t">'+esc(t('f_count',{n}))+'</div></div><button class="ib" data-a="editf" data-id="'+id+'" title="'+esc(t('edit'))+'" aria-label="'+esc(t('edit'))+'">'+ic('Edit')+'</button></div></article>'}
-function home(){if(S.fol&&!S.folders.some(f=>f.id===S.fol))S.fol=null;const has=true;let h='<div class="home hm'+(S.sel?' selm':'')+'">';
+function hmK(l,v,c){return '<div class="kp"><span class="mu xs t">'+esc(l)+'</span><b class="ltr"'+(c?' style="color:'+c+'"':'')+'>'+v+'</b></div>'}
+const hmM=n=>num(Math.round(n))+' <span class="xs mu">'+esc(t('f_cur'))+'</span>';
+const hmB=(label,a,p,icn)=>'<button class="btn'+(p?' p':'')+'" data-a="'+a.a+'"'+(a.s?' data-s="'+a.s+'"':'')+(a.t?' data-t="'+a.t+'"':'')+'>'+(icn?ic(icn):'')+'<span class="t">'+esc(label)+'</span></button>';
+function hmTile(c,icn,title,sub,badge,kpis,acts,s){return '<article class="tl" style="--c:'+c+'" data-a="hm_go" data-s="'+s+'" tabindex="0" role="button" aria-label="'+esc(title)+'"><div class="tl-h"><div class="tile">'+ic(icn)+'</div><div class="grow t"><h2>'+esc(title)+'</h2><div class="mu sm">'+esc(sub)+'</div></div>'+(badge||'')+'</div><div class="tl-k">'+kpis.join('')+'</div><div class="tl-a">'+acts.join('')+'</div></article>'}
+const hmBadge=(l,c)=>'<span class="badge t" style="--c:'+c+'">'+esc(l)+'</span>';
+function tFin(){if(!window.finSum)return'';let s={set:0};try{s=finSum()}catch(e){}
+ const k=s.set?[hmK(t('f_theo'),hmM(s.theo),s.theo<0?'var(--er)':''),hmK(t('f_recv'),'+ '+hmM(s.inn),'var(--ok)'),hmK(t('f_given'),'− '+hmM(s.out),'var(--er)')].concat(s.un?['<div class="tl-w t">'+ic('Alert')+'<span>'+esc(t('f_unclosed',{n:s.un}))+'</span></div>']:[]):['<div class="mu sm t" style="grid-column:1/-1">'+esc(t('f_su_desc'))+'</div>'];
+ return hmTile('var(--ok)','Wallet',t('f_title'),t('f_sub'),s.set?hmBadge(t(s.closed?'f_st_closed':'f_st_open'),s.closed?'var(--ok)':'var(--pr)'):'',k,[hmB(t('hm_open'),{a:'hm_go',s:'fin'},1,'Wallet'),hmB(t('f_tab_hist'),{a:'hm_go',s:'fin',t:'hist'},0,'Table')],'fin')}
+function tStm(){if(!window.stmSum)return'';let s={cnt:0,amt:0,clv:0};try{s=stmSum()}catch(e){}
+ return hmTile('var(--pr2)','File',t('sp_title'),t('sp_sub'),hmBadge(t('hm_today'),'var(--pr)'),[hmK(t('sp_cnt'),num(s.cnt),'var(--ok)'),hmK(t('sp_sold'),hmM(s.amt)),hmK(t('sp_stock'),hmM(s.clv))],[hmB(t('hm_open'),{a:'hm_go',s:'stm'},1,'File'),hmB(t('hm_new'),{a:'hm_new'},0),hmB(t('sp_rep'),{a:'hm_rep'},0,'Print')],'stm')}
+function tAcc(){if(!window.accSum)return'';let s=null;try{s=accSum()}catch(e){}
+ const k=s?[hmK(t('ac_rec'),hmM(s.rec),'var(--ok)'),hmK(t('ac_dep'),hmM(s.dep),'var(--er)'),hmK(t('ac_ch'),hmM(s.ch))]:[];
+ return hmTile('#d97706','Table',t('ac_title'),t('ac_sub'),hmBadge(t('hm_month'),'var(--pr)'),k,[hmB(t('hm_open'),{a:'hm_go',s:'acc'},1,'Table'),hmB(t('ac_ch'),{a:'hm_go',s:'acc',t:'ch'},0),hmB(t('ac_gab'),{a:'hm_go',s:'acc',t:'gab'},0)],'acc')}
+function tReq(){const n=S.docs.length,last=[...S.docs].sort((a,b)=>b.ts-a.ts)[0],ls=last?summarize(last.entries):null,vf=S.docs.reduce((a,d)=>a+summarize(d.entries).verify,0);
+ return '<section class="tl nc" style="--c:var(--pr)"><div class="tl-h"><div class="tile">'+ic('Upload')+'</div><div class="grow t"><h2>'+esc(t('hm_req'))+'</h2><div class="mu sm">'+esc(t('hm_req_sub'))+'</div></div></div><div class="tl-k">'+hmK(t('hm_docs'),num(n))+hmK(t('hm_lastdoc'),ls?num(ls.grand):'—')+hmK(t('verify'),num(vf),vf?'var(--er)':'')+'</div>'+
+ '<div class="drop t" id="drop" style="margin-top:0">'+esc(t('drop'))+btn('pick',t('choose_file'),{p:1,icon:'Upload',dis:S.busy,load:S.busy})+'</div></section>'}
+function home(){if(S.fol&&!S.folders.some(f=>f.id===S.fol))S.fol=null;let h='<div class="home hm2'+(S.sel?' selm':'')+'">';
  if(S.busy)h+=banner('RUN',t('reading'),t('reading_desc'));
  else if(S.homeErr)h+=banner('ERR',t('err_'+S.homeErr),t('err_'+S.homeErr+'_desc'),btn('pick',t('try_again')));
  else if(S.homeInfo)h+=banner('OK',t('imported',{n:S.homeInfo.ok}),S.homeInfo.skipped.length?t('skipped',{names:S.homeInfo.skipped.join(', ')}):'');
- h+=storeBan();h+='<div class="card imp"><div class="row"><div class="tile">'+ic('Upload')+'</div><div class="grow t"><h2>'+esc(t('import_title'))+'</h2><div class="mu sm">'+esc(t('import_desc'))+'</div></div></div>'+
- '<div class="drop t" id="drop">'+esc(t('drop'))+btn('pick',t('choose_file'),{p:1,icon:'Upload',dis:S.busy,load:S.busy})+'</div></div>';
- h+='<div class="svw"><div class="sec t">'+esc(t('sv_title'))+'</div><div class="svc">'+(typeof finCard=='function'?finCard():'')+(window.stmCard?stmCard():'')+(window.accCard?accCard():'')+'</div></div>'+toolsCard();if(has)h+='<section class="card docs">'+secHead()+
+ h+=storeBan();
+ h+='<div class="hd2 t"><b>'+esc(new Date().toLocaleDateString(S.lang=='ar'?'ar-u-nu-latn':S.lang,{weekday:'long',day:'numeric',month:'long',year:'numeric'}))+'</b></div>';
+ h+='<div class="tiles">'+tFin()+tStm()+tAcc()+tReq()+'</div>';
+ h+='<section class="card docs">'+secHead()+
   '<label class="field" style="margin-top:14px">'+ic('Search')+'<input id="dq" type="search" value="'+esc(S.dq)+'" placeholder="'+esc(t('docs_search'))+'" aria-label="'+esc(t('docs_search'))+'"></label><div class="list" id="dlist" style="margin-top:14px"></div></section>';
+ h+=toolsCard();
  return h+'</div>'+selBar()}
 function docCard(d){const s=summarize(d.entries),dt=new Date(d.ts).toLocaleString(S.lang=='ar'?'ar-u-nu-latn':S.lang,{dateStyle:'medium',timeStyle:'short'}),id=esc(d.id),on=S.ids.has(d.id),fo=S.folders.find(f=>f.id===fid(d)),tc=fo?col(fo.color):'var(--pr)';
  return '<article class="card ent dc'+(on?' sel':'')+'" style="--c:'+(s.verify?'var(--er)':'var(--pr)')+'" data-a="'+(S.sel?'tog':'open')+'" data-id="'+id+'" tabindex="0" role="button"'+(S.sel?' aria-pressed="'+on+'"':'')+'><div class="row">'+(S.sel?'<span class="chk'+(on?' on':'')+'">'+(on?ic('Check'):'')+'</span>':'')+'<div class="tile" style="--c:'+tc+'">'+ic('File')+'</div><div class="grow"><div class="dn">'+esc(d.name)+'</div><div class="mu sm t">'+esc(t('last_desc',{n:s.detected,t:num(s.grand)}))+'</div><div class="mu xs">'+esc(dt)+'</div>'+(fo&&S.dq.trim()?'<div class="xs t" style="color:'+col(fo.color)+';font-weight:700">● '+esc(fo.name)+'</div>':'')+'</div>'+
@@ -1051,6 +1073,7 @@ const vb=v=>{const k=Object.keys(v||{}).filter(x=>x!='o'&&+v[x]).sort((a,b)=>b-a
 function dispensed(day){const seen=new Set();let tot=0;S.docs.forEach(d=>d.entries.forEach(x=>{if(x.date!==day||x.status!='VALID')return;const k=[x.ref,x.date,x.time,x.req].join('|');if(seen.has(k))return;seen.add(k);tot+=x.req}));return tot}
 const unclosed=d=>dayDates().filter(k=>k<d&&!(F().days[k]&&F().days[k].closed)&&(!F().set.start||k>=F().set.start)&&F().txs.some(x=>x.date==k));
 const verb=(p,dir)=>t('f_v_'+(p?p.type:'other')+'_'+dir);
+window.finSum=()=>{const f=F(),d=today();if(!f.set.start)return{set:0};const s=stat(d);return{set:1,theo:s.theo,inn:s.inn,out:s.out,closed:s.closed,un:unclosed(d).length}};
 
 // ── denomination inputs (shared by movements, closing and opening balance) ──
 function denBlock(v,hint){return '<div class="stack" style="gap:8px">'+dens().map(k=>'<div class="row"><b class="ltr" style="min-width:64px">'+num(k)+'</b><div class="field grow"><input class="fcn" data-v="'+k+'" inputmode="numeric" maxlength="6" placeholder="0" aria-label="'+k+'" value="'+(v[k]||'')+'"></div><span class="mu xs t" style="min-width:90px;text-align:end">'+(hint?esc(t('f_expected'))+': <b class="ltr">'+num(hint[k]||0)+'</b>':'<span class="ltr" id="fcs'+k+'">'+(v[k]?num(v[k]*k):'')+'</span>')+'</span></div>').join('')+
@@ -1317,11 +1340,55 @@ window.stmPage=()=>{S.sp=S.sp||'day';S.sd=S.sd||today();S.sm=S.sm||today().slice
 function dayV(){const g=G(),d=S.sd,T=g.tx.filter(x=>x.date==d).sort((a,b)=>a.ts-b.ts),st=stk(d,1),sa=Object.keys(st).reduce((a,k)=>a+k.split(':')[1]*st[k],0),s=k=>T.filter(x=>x.k==k).reduce((a,x)=>a+amt(x),0),pv_=S.lang=='ar'?'ChevR':'ChevL',nx=S.lang=='ar'?'ChevL':'ChevR',
  es=g.emp.filter(e=>!e.a||T.some(x=>x.pid==e.id)).map(e=>{const a=T.filter(x=>x.pid==e.id&&x.k=='take').reduce((q,x)=>q+amt(x),0),b=T.filter(x=>x.pid==e.id&&x.k=='ret').reduce((q,x)=>q+amt(x),0);return[e,a,b,a-b]});
  let h='<div class="card"><div class="row"><button class="ib" data-a="sp_prev"'+(d<=g.start?' disabled':'')+' aria-label="-1">'+ic(pv_)+'</button><div class="grow"><div class="field"><input type="date" id="spdt" value="'+d+'" min="'+g.start+'"></div></div><button class="ib" data-a="sp_next" aria-label="+1">'+ic(nx)+'</button></div>'+(d!==today()?'<div style="margin-top:10px"><button class="chip" data-a="sp_today">'+esc(t('f_today'))+'</button></div>':'')+'</div>';
- h+='<div class="card"><div class="fk">'+kp('sp_sold',dz(s('take')-s('ret')),'var(--ok)')+kp('sp_stock',dz(sa))+kp('sp_recv','+ '+dz(s('recv')))+kp('sp_rev','− '+dz(s('rev')),'var(--er)')+'</div><div class="g2" style="margin-top:14px">'+nb('take',1)+nb('ret')+'</div><div class="g2" style="margin-top:10px">'+nb('recv')+nb('rev')+'</div></div>';
+ h+='<div class="card"><div class="fk">'+kp('sp_sold',dz(s('take')-s('ret')),'var(--ok)')+kp('sp_cnt','<span class="ltr">'+num(repTot(d).cnt)+'</span>','var(--ok)')+kp('sp_opn',dz(repTot(d).opv))+kp('sp_stock',dz(sa))+kp('sp_recv','+ '+dz(s('recv')))+kp('sp_rev','− '+dz(s('rev')),'var(--er)')+'</div><div class="g2" style="margin-top:14px">'+nb('take',1)+nb('ret')+'</div><div class="g2" style="margin-top:10px">'+nb('recv')+nb('rev')+'</div><div class="stack" style="gap:10px;margin-top:14px">'+btn('sp_rep',t('sp_rep'),{p:1,icon:'Print'})+btn('sp_repx',t('sp_repx'),{icon:'Download'})+'</div></div>';
  h+='<div class="card">'+ttl('sp_emp')+(es.length?tbl([t('sp_emp1'),t('sp_took'),t('sp_ret'),t('sp_sold')],es.map(([e,a,b,c])=>[esc(e.n),num(a),num(b),'<b style="color:'+(c<0?'var(--er)':'var(--ok)')+'">'+num(c)+'</b>'+(c<0?'<div class="xs" style="color:var(--er)">'+esc(t('sp_neg'))+'</div>':'')])):'<div class="mu sm t" style="margin-top:10px">'+esc(t('sp_noemp'))+'</div>')+'</div>';
  h+='<div class="card">'+ttl('sp_mvs')+'<div class="stack" style="gap:10px;margin-top:12px">'+(T.length?T.map(x=>{const inn=SG[x.k]>0,q=Object.keys(x.q).sort((a,b)=>a-b).map(k=>num(+k)+'×'+num(x.q[k])).join(' · ');
   return '<div class="card ent" style="padding:12px;--c:'+(inn?'var(--ok)':'var(--er)')+'"><div class="row" style="align-items:flex-start"><div class="grow t" style="min-width:0"><div class="dn">'+esc(t('sp_k_'+x.k)+(x.pid?' · '+nmE(x.pid):''))+'</div><div class="mu sm">'+esc(t('sp_f_'+x.fam))+'</div><div class="mu sm ltr" style="text-align:start;overflow-wrap:anywhere">'+esc(q)+'</div>'+(x.note?'<div class="mu sm" style="overflow-wrap:anywhere">'+esc(x.note)+'</div>':'')+'</div><b style="white-space:nowrap">'+dz(amt(x))+'</b><button class="ib" data-a="sp_edit" data-id="'+esc(x.id)+'" aria-label="'+esc(t('f_edit'))+'">'+ic('Edit')+'</button><button class="ib" data-a="sp_del" data-id="'+esc(x.id)+'" aria-label="'+esc(t('f_del'))+'">'+ic('Trash')+'</button></div></div>'}).join(''):'<div class="mu t">'+esc(t('sp_notx'))+'</div>')+'</div></div>';
  return h}
+
+Object.assign(D.ar,{sp_rep:"تقرير نهاية اليوم",sp_repx:"تصدير تقرير اليوم Excel",sp_rep_t:"تقرير نهاية اليوم — الطوابع",sp_cnt:"عدد الطوابع المباعة",sp_opn:"المخزون أول اليوم",sp_by_fam:"ملخص حسب النوع",sp_by_den:"تفصيل حسب الفئة",sp_tr:"حركات اليوم"});
+Object.assign(D.en,{sp_rep:"End-of-day report",sp_repx:"Export day report (Excel)",sp_rep_t:"End-of-day report — Stamps",sp_cnt:"Stamps sold",sp_opn:"Stock at day start",sp_by_fam:"Summary by type",sp_by_den:"Breakdown by denomination",sp_tr:"Day movements"});
+Object.assign(D.fr,{sp_rep:"Rapport de fin de journée",sp_repx:"Exporter le rapport (Excel)",sp_rep_t:"Rapport de fin de journée — Timbres",sp_cnt:"Timbres vendus",sp_opn:"Stock début de journée",sp_by_fam:"Synthèse par type",sp_by_den:"Détail par valeur",sp_tr:"Mouvements du jour"});
+// ── end-of-day report: counts and values per type / denomination ──
+const lc=()=>S.lang=='ar'?'ar-u-nu-latn':S.lang,qn=x=>Object.keys(x.q).reduce((a,k)=>a+x.q[k],0);
+const kvq=(r,f)=>{let c=0,v=0;for(const k in r){const a=k.split(':');if(a[0]==f&&r[k]){c+=r[k];v+=r[k]*a[1]}}return{c,v}};
+function rep(d){const g=G(),T=g.tx.filter(x=>x.date==d).sort((a,b)=>a.ts-b.ts),o0=stk(d,0),c0=stk(d,1),Q={};
+ FAM.forEach(([f])=>{Q[f]={}});
+ T.forEach(x=>{if(!Q[x.fam])return;for(const k in x.q){const n=x.q[k],o=Q[x.fam][k]||(Q[x.fam][k]={s:0,rc:0,rv:0});if(x.k=='take')o.s+=n;else if(x.k=='ret')o.s-=n;else if(x.k=='recv')o.rc+=n;else o.rv+=n}});
+ const F={};FAM.forEach(([f])=>{let cnt=0,sv=0,rc=0,rv=0;for(const k in Q[f]){const o=Q[f][k];cnt+=o.s;sv+=o.s*k;rc+=o.rc*k;rv+=o.rv*k}F[f]={cnt,sv,rc,rv,op:kvq(o0,f),cl:kvq(c0,f)}});
+ return{T,o0,c0,Q,F}}
+function repTot(d){const r=rep(d),z={cnt:0,amt:0,rc:0,rv:0,opv:0,clv:0};FAM.forEach(([f])=>{const x=r.F[f];z.cnt+=x.cnt;z.amt+=x.sv;z.rc+=x.rc;z.rv+=x.rv;z.opv+=x.op.v;z.clv+=x.cl.v});return z}
+window.stmSum=()=>{const z=repTot(today());return{cnt:z.cnt,amt:z.amt,clv:z.clv}};
+function repRows(r,d){const o=[];FAM.forEach(([f])=>ds(f).forEach(k=>{const q=r.Q[f][k]||{s:0,rc:0,rv:0},a=r.o0[f+':'+k]||0,z=r.c0[f+':'+k]||0;if(a||z||q.s||q.rc||q.rv)o.push({f,k,a,rc:q.rc,s:q.s,rv:q.rv,z,v:q.s*k})}));return o}
+function printRep(d){const g=G(),r=rep(d),tt=repTot(d),pr=document.getElementById('prt'),dir=dr(),cur=t('f_cur'),dzt=n=>num(Math.round(n))+' '+cur,
+ fn=f=>t('sp_f_'+f).replace(/ \(.*\)/,''),office=((jget('fin',null)||{}).set||{}).office||'',
+ wd=new Date(d+'T12:00:00').toLocaleDateString(lc(),{weekday:'long'}),
+ th=a=>'<thead><tr>'+a.map(k=>'<th>'+esc(t(k))+'</th>').join('')+'</tr></thead>',
+ td=(a,l)=>a.map((c,i)=>'<td'+(i==0&&l?' style="text-align:start"':'')+'>'+c+'</td>').join(''),
+ h2=k=>'<h2 style="margin:16px 0 6px;font-size:15px">'+esc(t(k))+'</h2>',tb=(h,b,f)=>'<div class="tw sm0"><table class="tb">'+th(h)+'<tbody>'+b+'</tbody>'+(f?'<tfoot>'+f+'</tfoot>':'')+'</table></div>';
+ pr.dir=dir;
+ const kv=[[t('sp_opn'),dzt(tt.opv)],[t('sp_recv'),dzt(tt.rc)],[t('sp_sold'),dzt(tt.amt)],[t('sp_cnt'),num(tt.cnt)],[t('sp_rev'),dzt(tt.rv)],[t('sp_stock'),dzt(tt.clv)]],
+ fam=FAM.map(([f])=>{const x=r.F[f];return '<tr>'+td([esc(fn(f)),num(x.cnt),num(x.sv),num(x.rc),num(x.rv),num(x.cl.v)],1)+'</tr>'}).join(''),
+ den=repRows(r,d).map(x=>'<tr>'+td([esc(fn(x.f)),num(+x.k),num(x.a),num(x.rc),num(x.s),num(x.rv),num(x.z),num(x.v)],1)+'</tr>').join(''),
+ es=g.emp.filter(e=>r.T.some(x=>x.pid==e.id)).map(e=>{const a=r.T.filter(x=>x.pid==e.id&&x.k=='take'),b=r.T.filter(x=>x.pid==e.id&&x.k=='ret'),va=a.reduce((s,x)=>s+amt(x),0),vb=b.reduce((s,x)=>s+amt(x),0),c=a.reduce((s,x)=>s+qn(x),0)-b.reduce((s,x)=>s+qn(x),0);return '<tr>'+td([esc(e.n),num(va),num(vb),num(c),num(va-vb)],1)+'</tr>'}).join(''),
+ mv=r.T.map(x=>{const q=Object.keys(x.q).sort((a,b)=>a-b).map(k=>num(+k)+'×'+num(x.q[k])).join(' · ');return '<tr><td style="text-align:start">'+esc(t('sp_k_'+x.k)+(x.pid?' · '+nmE(x.pid):'')+' · '+fn(x.fam))+' <span dir="ltr">['+esc(q)+']</span>'+(x.note?' — '+esc(x.note):'')+'</td><td>'+(SG[x.k]>0?'+':'−')+' '+num(amt(x))+'</td></tr>'}).join('');
+ pr.innerHTML='<h1>'+esc(office||t('sp_title'))+'</h1><div class="pm">'+esc(t('sp_rep_t'))+' — '+esc(wd)+' '+esc(fmtDate(d))+'</div>'+
+ '<div class="tw sm0" style="margin-top:12px"><table class="tb"><tbody>'+kv.map(([k,v])=>'<tr><td style="text-align:start">'+esc(k)+'</td><td>'+esc(v)+'</td></tr>').join('')+'</tbody></table></div>'+
+ h2('sp_by_fam')+tb(['sp_famn','sp_cnt','sp_sold','sp_recv','sp_rev','sp_stock'],fam,'<tr>'+td([esc(t('sp_total')),num(tt.cnt),num(tt.amt),num(tt.rc),num(tt.rv),num(tt.clv)],1)+'</tr>')+
+ h2('sp_by_den')+(den?tb(['sp_famn','sp_cat','sp_opn','sp_recv','sp_cnt','sp_rev','sp_stock','sp_mt'],den):'<div class="pm">'+esc(t('sp_notx'))+'</div>')+
+ h2('sp_emp')+(es?tb(['sp_emp1','sp_took','sp_ret','sp_cnt','sp_sold'],es):'<div class="pm">'+esc(t('sp_notx'))+'</div>')+
+ h2('sp_tr')+(mv?'<div class="tw sm0"><table class="tb"><tbody>'+mv+'</tbody></table></div>':'<div class="pm">'+esc(t('sp_notx'))+'</div>')+
+ '<div style="display:flex;justify-content:space-between;margin-top:50px"><div>'+esc(t('f_pr_sign'))+'<br><br>________________</div><div class="pm">'+esc(t('f_pr_gen'))+' '+esc(new Date().toLocaleString(lc()))+'</div></div>';
+ setTimeout(()=>doPrint(pr.innerHTML,(office||t('sp_title'))+' '+d,dir),80)}
+async function repX(d){const g=G(),r=rep(d),tt=repTot(d),fn=f=>t('sp_f_'+f).replace(/ \(.*\)/,''),hd=a=>a.map(v=>({v,s:1})),bd=a=>a.map(v=>({v,s:0})),cu=' ('+t('f_cur')+')';
+ const rows=[hd([t('sp_famn'),t('sp_cat'),t('sp_opn'),t('sp_recv'),t('sp_cnt'),t('sp_rev'),t('sp_stock'),t('sp_sold')+cu])];
+ repRows(r,d).forEach(x=>rows.push(bd([fn(x.f),+x.k,x.a,x.rc,x.s,x.rv,x.z,x.v])));
+ rows.push(hd([t('sp_total'),'','',tt.rc?'':'',tt.cnt,'','',tt.amt]));
+ const em=[hd([t('sp_emp1'),t('sp_took')+cu,t('sp_ret')+cu,t('sp_cnt'),t('sp_sold')+cu])];
+ g.emp.filter(e=>r.T.some(x=>x.pid==e.id)).forEach(e=>{const a=r.T.filter(x=>x.pid==e.id&&x.k=='take'),b=r.T.filter(x=>x.pid==e.id&&x.k=='ret'),va=a.reduce((s,x)=>s+amt(x),0),vb=b.reduce((s,x)=>s+amt(x),0);em.push(bd([e.n,va,vb,a.reduce((s,x)=>s+qn(x),0)-b.reduce((s,x)=>s+qn(x),0),va-vb]))});
+ const mv=[hd([t('sp_mvs'),t('sp_emp1'),t('sp_famn'),t('sp_det'),t('sp_mt')])];
+ r.T.forEach(x=>mv.push(bd([t('sp_k_'+x.k),nmE(x.pid),fn(x.fam),Object.keys(x.q).sort((a,b)=>a-b).map(k=>k+'×'+x.q[k]).join(' · '),(SG[x.k]>0?1:-1)*amt(x)])));
+ const ok=await deliver(xlsxBook([{name:'Rapport',rows,w:[24,10,14,12,14,14,14,16]},{name:'Agents',rows:em,w:[22,16,16,14,16]},{name:'Mouvements',rows:mv,w:[24,18,24,40,14]}]),'timbres-jour-'+d+'.xlsx');toast(ok?'saved':'err_save')}
 // ── month situation (same layout as the Excel "sit vente": previous / received / total / sold / reversement / remaining) ──
 function monV(){const m=S.sm,{p,R}=mon(m),rw=(f,d)=>{const i=f+':'+d,o=R[i]||{rc:0,sd:0,rv:0},a=p[i]||0;return[a,o.rc,a+o.rc,o.sd,o.rv,a+o.rc-o.sd-o.rv]},
  H=['sp_cat','sp_prev','sp_recv','sp_total','sp_sold','sp_rev','sp_rest'].map(k=>t(k)),
@@ -1367,7 +1434,7 @@ function openSheet(){const x=S.so;return OV(ttl('sp_open_t')+'<div class="mu sm 
 function rdO(){const x=S.so;document.querySelectorAll('#layer .spo').forEach(i=>{const n=Math.round(+i.value||0),k=x.fam+':'+i.dataset.d;if(n>0)x.o[k]=n;else delete x.o[k]})}
 Object.assign(SH3,{sp_tx:txSheet,sp_em:empSheet,sp_op:openSheet,sp_dl:()=>OV(ttl('sp_dl_t')+'<div class="g2">'+btn('close',t('f_cancel'))+btn('sp_delok',t('f_del'),{d:1,icon:'Trash'})+'</div>')});
 // ── actions ──
-window.actP=function(a,el){if(a.slice(0,3)!='sp_')return 0;const d=el.dataset,g=G();switch(a){
+window.actP=function(a,el){if(a.slice(0,3)!='sp_'&&a.slice(0,3)!='hm_')return 0;const d=el.dataset,g=G();switch(a){
  case'sp_go':S.sp='day';S.sd=today();go(3);return 1;
  case'sp_tab':S.sp=d.v;render();return 1;
  case'sp_prev':S.sd=addD(S.sd,-1);render();return 1;case'sp_next':S.sd=addD(S.sd,1);render();return 1;case'sp_today':S.sd=today();render();return 1;
@@ -1388,7 +1455,11 @@ window.actP=function(a,el){if(a.slice(0,3)!='sp_')return 0;const d=el.dataset,g=
  case'sp_ofam':rdO();S.so.fam=d.v;render();return 1;
  case'sp_osave':rdO();g.open=S.so.o;sv();S.sheet=null;S.so=null;render();toast('sp_saved');return 1;
  case'sp_setsave':setSave();return 1;
- case'sp_xl':xl();return 1}return 0};
+ case'sp_rep':printRep(S.sd);return 1;case'sp_repx':repX(S.sd);return 1;
+  case'hm_go':{const w=d.s;if(w=='fin'){S.fp=d.t||'day';S.fd=today();go(2)}else if(w=='stm'){S.sp=d.t||'day';S.sd=today();go(3)}else if(w=='acc'){S.at=d.t||'rec';S.as=(S.at=='rec'||S.at=='dep')?'A':'';S.am=today().slice(0,7);go(4)}return 1}
+  case'hm_new':{S.sp='day';S.sd=today();go(3);const e=g.emp.filter(y=>!y.a)[0];S.sx={id:null,k:'take',pid:e?e.id:'',fam:'tp',q:{},note:'',date:S.sd};op('sp_tx',pv);return 1}
+  case'hm_rep':printRep(today());return 1;
+  case'sp_xl':xl();return 1}return 0};
 document.addEventListener('input',ev=>{const el=ev.target,c=el.classList;if(c.contains('spq')||c.contains('spo')){el.value=el.value.replace(/\D/g,'').slice(0,7);if(c.contains('spq'))pv()}else if(el.id=='spd')pv()});
 document.addEventListener('change',ev=>{const el=ev.target;if(el.id=='spdt'&&el.value){S.sd=el.value<G().start?G().start:el.value;render()}else if(el.id=='spm'&&el.value){S.sm=el.value;render()}});
 document.addEventListener('keydown',ev=>{if(ev.key!='Enter'||S.sheet!='sp_tx'||!ev.target.classList.contains('spq'))return;ev.preventDefault();const l=[...document.querySelectorAll('#layer .spq')],i=l.indexOf(ev.target);if(i<l.length-1)l[i+1].focus();else txSave()});
@@ -1467,6 +1538,7 @@ function gV(m){const r=R(m),rows=gRows(m),n=dim(m),sc=c=>{let q=0;for(let d=1;d<
  return h+tr(lb(t('ac_mt'))+GI.map(c=>cell('s|'+c,sc(c),1)).join('')+'<td></td>'+cell('re|T',rows[n-1].r,1),'ft')+'</tbody>'}
 function view(){MAP={};const m=S.am,b=S.at;return isT(b)&&ctT(b)?tV(b.slice(2),m):b=='ch'?chV(m):b=='gab'?gV(m):S.as=='R'?recV(b,m):ledV(b,S.as,m)}
 const chip=(a,v,l,on)=>'<button class="chip'+(on?' on':'')+'" data-a="'+a+'" data-v="'+v+'">'+esc(l)+'</button>';
+window.accSum=()=>{G();const m=curM(),n=dim(m),d=Math.min(new Date().getDate(),n);let rec=0,dep=0;for(const s of RC.rec)SCH.rec[s].forEach(c=>{rec+=tot(m,'rec',s,c[0],1,n)});for(const s of RC.dep)SCH.dep[s].forEach(c=>{dep+=tot(m,'dep',s,c[0],1,n)});return{m,rec,dep,ch:chRows(m)[d-1].r,gab:gRows(m)[d-1].r}};
 window.accCard=()=>'<section class="card"><div class="row"><div class="tile" style="--c:var(--ok)">'+ic('Table')+'</div><div class="grow t"><h2>'+esc(t('ac_title'))+'</h2><div class="mu sm">'+esc(t('ac_card'))+'</div></div></div><div style="margin-top:14px">'+btn('ac_go',t('ac_go'),{p:1,icon:'Table'})+'</div></section>';
 window.accPage=()=>{S.at=S.at||'rec';if(isT(S.at)&&!ctT(S.at))S.at='rec';S.as=S.as||'A';S.am=S.am||curM();const b=S.at,led=b=='rec'||b=='dep';
  return '<div class="home" style="max-width:1160px"><div class="chips tabs">'+tabsH(b)+'</div><div class="card"><div class="g2"><label><span class="mu xs t">'+esc(t('sp_month'))+'</span><div class="field"><input type="month" id="acm" value="'+S.am+'"></div></label><div style="align-self:end" class="stack">'+btn('ac_xl',t('ac_xl'),{icon:'Download'})+(b=='gab'?btn('ac_req',t('ac_req'),{p:1,icon:'Download'}):'')+(isT(b)?btn('ac_et',t('ac_et'),{icon:'Edit'}):'')+'</div></div>'+
@@ -1623,6 +1695,30 @@ header .sm{font-size:13px}
 .toast{border-radius:12px}
 html[lang=ar] svg.flip{transform:scaleX(-1)}
 .sheet:focus{outline:0}
+</style>
+<style id="v6">
+/* ── v6: dashboard home ── */
+.hm2{max-width:1180px;display:grid;gap:16px;grid-template-columns:minmax(0,1fr)}
+.hm2>*{min-width:0}
+.hd2{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}.hd2 b{font-size:18px}
+.tiles{display:grid;gap:14px;grid-template-columns:minmax(0,1fr)}
+@media (min-width:720px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.tl{position:relative;display:flex;flex-direction:column;gap:14px;background:var(--card);border:1px solid var(--bd);border-top:4px solid var(--c,var(--pr));border-radius:var(--rd,14px);padding:16px;box-shadow:var(--sh);cursor:pointer;transition:box-shadow .15s,transform .1s}
+.tl.nc{cursor:default}
+.tl:not(.nc):hover{box-shadow:0 4px 18px rgba(15,27,51,.12)}
+.tl:not(.nc):active{transform:scale(.995)}
+.tl:focus-visible{outline:2px solid var(--pr);outline-offset:2px}
+.tl-h{display:flex;align-items:center;gap:12px}
+.tl h2{margin:0;font-size:17px;line-height:1.35}
+.tl-k{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.tl-k .kp{padding:10px}
+.tl-k .kp b{font-size:15.5px;line-height:1.35}
+.tl-k .kp .xs{font-size:11.5px;line-height:1.3}
+.tl-w{grid-column:1/-1;display:flex;gap:8px;align-items:center;color:var(--er);font-size:13px;font-weight:600}
+.tl-a{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:8px;margin-top:auto}
+.tl-a .btn{min-height:44px;font-size:14px;padding:0 10px}
+.tl .drop{margin-top:0}
+@media (max-width:480px){.tl-a .btn:nth-child(3):last-child{grid-column:1/-1}.tl-k .kp:first-child{grid-column:1/-1}.tl-k{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 <script>
 (function(){function go(){var src=[].map.call(document.querySelectorAll('script[data-app]'),function(s){return s.textContent}).join('\n;\n'),s=document.createElement('script');s.textContent=src;document.body.appendChild(s)}
