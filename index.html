@@ -157,7 +157,6 @@ window.__idbReady=new Promise(function(res){
  }catch(e){fin()}
 });
 </script>
-<script src="access.js?v=1"></script>
 <script type="text/plain" data-app>
 // ── i18n ──
 const D={
@@ -1110,7 +1109,7 @@ function dayView(){const f=F(),d=S.fd,s=stat(d),act=f.parties.filter(p=>!p.arch)
  const rows=f.parties.filter(p=>!p.arch||held(p.id,d)||s.T.some(x=>x.pid==p.id));
  if(rows.length){const dsp=dispensed(d),hasAtm=rows.some(p=>p.type=='atm');
   h+='<div class="card">'+hdr('User','f_pos')+'<div class="tw sm0 fz" style="margin-top:12px;direction:'+dirS()+'"><table class="tb"><thead><tr>'+['f_col_party','f_col_given','f_col_recv','f_col_net'].map(k=>'<th>'+esc(t(k))+'</th>').join('')+'</tr></thead><tbody>'+
-  rows.map(p=>{const g=s.T.filter(x=>x.pid==p.id&&x.dir=='out').reduce((a,x)=>a+x.amt,0),r=s.T.filter(x=>x.pid==p.id&&x.dir=='in').reduce((a,x)=>a+x.amt,0),hd=held(p.id,d),over=(!window.Acc||Acc.can('cash_cap_alert'))&&p.cap&&hd>p.cap;
+  rows.map(p=>{const g=s.T.filter(x=>x.pid==p.id&&x.dir=='out').reduce((a,x)=>a+x.amt,0),r=s.T.filter(x=>x.pid==p.id&&x.dir=='in').reduce((a,x)=>a+x.amt,0),hd=held(p.id,d),over=p.cap&&hd>p.cap;
    return '<tr><td style="text-align:start"><span class="dot" style="--c:'+col(p.color)+'"></span> '+esc(p.name)+(over?' <span class="badge" style="--c:var(--er)">'+esc(t('f_over'))+'</span>':'')+'</td><td>'+(g?num(g):'')+'</td><td>'+(r?num(r):'')+'</td><td style="font-weight:700;color:'+col2(hd)+'">'+num(hd)+'</td></tr>'}).join('')+'</tbody></table></div><div class="mu xs t" style="margin-top:8px">'+esc(t('f_pos_hint'))+'</div>'+
   (hasAtm||dsp?'<div class="row t" style="margin-top:10px"><span class="grow mu sm">'+esc(t('f_atm_log'))+'</span><b>'+dz(dsp)+'</b></div>':'')+'</div>'}
  h+='<div class="card">'+hdr('File','f_txs')+'<div class="stack" style="gap:10px;margin-top:12px">'+(s.T.length?[...s.T].sort((a,b)=>a.ts-b.ts).map(x=>{const p=P_(x.pid),inn=x.dir=='in';
@@ -1783,120 +1782,6 @@ html[lang=ar] svg.flip{transform:scaleX(-1)}
 .tl .drop{margin-top:0}
 @media (max-width:480px){.tl-a .btn:nth-child(3):last-child{grid-column:1/-1}.tl-k .kp:first-child{grid-column:1/-1}.tl-k{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
-<script type="text/plain" data-app>
-// ════════ Subscriptions: access gate (needs access.js) ════════
-try{(function(){
- if(!window.AccessSDK)return;
- // ---- إعدادات الاتصال (مفتاح الموقع عام بطبيعته؛ الحماية في الخادم) ----
- const CFG={endpoint:'https://grqomcfysrksrvseujnf.supabase.co/functions/v1/check-access',
-  apiKey:'sk_510f20c2_gPUW2LbYDnes5EkHMSVPfeKKPLIv-vX--J3lqi9cYX0',
-  plansUrl:'https://reqcal.github.io/admin/plans.html?site=ae5309d0-20b9-4700-b85a-9b62a5c844d0'};
- // وضع التطوير (محلياً فقط): كل شيء مفتوح ولا اتصال بالخادم
- const dev=/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname)||location.protocol==='file:';
- const A=AccessSDK.create({dev,endpoint:CFG.endpoint,apiKey:CFG.apiKey,plansUrl:CFG.plansUrl,
-  getIdentity:async()=>{const u=S.user;if(!u)return null;let token=null;try{token=window.FB&&FB.token?await FB.token(u.slot):null}catch(e){}return{uid:u.uid,token}}});
- window.Acc=A;
- // ---- النصوص ----
- Object.assign(D.ar,{acc_lock_title:'ميزة للمشتركين',acc_lock_desc:'هذه الميزة غير مضمّنة في خطتك الحالية. اشترك أو رقِّ خطتك لتفعيلها.',acc_limit_title:'وصلت إلى الحد',acc_limit_desc:'خطتك الحالية تسمح بحد أقصى {n}. اشترك أو رقِّ خطتك لزيادة الحد.',acc_sub:'الاشتراك والباقات',acc_close:'إغلاق',acc_plan_line:'الباقة: {p} · حتى {d}',acc_free_line:'بدون اشتراك',acc_sync_locked:'المزامنة السحابية متاحة للمشتركين'});
- Object.assign(D.en,{acc_lock_title:'Subscribers only',acc_lock_desc:"This feature isn't included in your current plan. Subscribe or upgrade to unlock it.",acc_limit_title:'Limit reached',acc_limit_desc:'Your current plan allows up to {n}. Subscribe or upgrade to raise the limit.',acc_sub:'Subscribe / Plans',acc_close:'Close',acc_plan_line:'Plan: {p} · until {d}',acc_free_line:'No subscription',acc_sync_locked:'Cloud sync is for subscribers'});
- Object.assign(D.fr,{acc_lock_title:'Réservé aux abonnés',acc_lock_desc:"Cette fonctionnalité n'est pas incluse dans votre offre actuelle. Abonnez-vous ou passez à l'offre supérieure.",acc_limit_title:'Limite atteinte',acc_limit_desc:"Votre offre actuelle autorise jusqu'à {n}. Abonnez-vous ou passez à l'offre supérieure.",acc_sub:'Abonnement / Offres',acc_close:'Fermer',acc_plan_line:"Offre : {p} · jusqu'au {d}",acc_free_line:'Sans abonnement',acc_sync_locked:'La synchronisation cloud est réservée aux abonnés'});
- // ---- خريطة الإجراءات (data-a) ← مفاتيح الميزات ----
- const TOGGLE={pick:'req_import',
-  newf:'req_folders',editf:'req_folders',fsave:'req_folders',delf:'req_folders',confirmfdel:'req_folders',move:'req_folders',mv:'req_folders',openf:'req_folders',upf:'req_folders',
-  flt:'req_search_filter',sortby:'req_search_filter',sortdir:'req_search_filter',
-  edit:'req_edit_numbers',save:'req_edit_numbers',
-  export:'req_export_csv',csvx:'req_export_csv',csv:'req_export_csv',
-  excel:'req_table_view',
-  days:'req_daily_report',dclr:'req_daily_report',printd:'req_daily_report',fstats:'req_daily_report',fsx:'req_daily_report',
-  dups:'req_duplicates',mmf:'req_suspicious',den:'req_denominations',densave:'req_denominations',
-  cfg:'req_analysis_settings',cfgd:'req_analysis_settings',cfgsave:'req_analysis_settings',
-  trash:'req_trash',restore:'req_trash',emptytrash:'req_trash',undo:'req_trash',
-  fin:'cash_module',fclose:'cash_day_close',fclosesave:'cash_day_close',freopen:'cash_history',freopenok:'cash_history',faudit:'cash_audit_log',
-  sp_go:'stamps_module',hm_new:'stamps_module',hm_rep:'stamps_module',sp_rep:'stamps_module',sp_repx:'stamps_module',sp_xl:'stamps_export',
-  ac_go:'acc_module',ac_imp:'acc_import',ac_impgo:'acc_import'};
- const MOD={fin:'cash_module',stm:'stamps_module',acc:'acc_module'},SCREEN_MOD={2:'cash_module',3:'stamps_module',4:'acc_module'};
- function need(a,d){
-  if(TOGGLE[a])return[TOGGLE[a]];
-  if(a=='hm_go'){const r=[MOD[d.s]].filter(Boolean);if(d.s=='fin'&&d.t=='hist')r.push('cash_history');if(d.s=='acc'&&(d.t=='ch'||d.t=='gab'))r.push('acc_ch60_atm');return r}
-  if(a=='ftab'&&d.v=='hist')return['cash_history'];
-  if(a=='sp_tab'&&d.v=='mon')return['stamps_month_position'];
-  if(a=='ac_tab'&&(d.v=='ch'||d.v=='gab'))return['acc_ch60_atm'];
-  return null}
- // ---- نافذة القفل / الحد (مستقلة عن render لكي لا تُمحى) ----
- let layer=null;
- const closeSheet=()=>{if(layer)layer.innerHTML=''};
- function openSheet(kind,key,n){
-  if(!layer){layer=document.createElement('div');layer.id='acc-layer';document.body.appendChild(layer)}
-  if(layer.firstChild)return;
-  const f=A.feature(key),label=f&&f.label&&S.lang=='ar'?f.label:'',i=A.info(),ref=kind=='limit';
-  layer.innerHTML='<div class="ov"><div class="sheet" role="dialog" aria-modal="true"><div class="row" style="gap:10px">'+ic('Lock')+'<h2 class="t grow" style="margin:0">'+esc(t(ref?'acc_limit_title':'acc_lock_title'))+'</h2></div>'
-   +(label?'<div class="t"><b>'+esc(label)+'</b></div>':'')+'<div class="mu sm t">'+esc(ref?t('acc_limit_desc',{n:n}):t('acc_lock_desc'))+'</div>'
-   +'<div class="g2"><button class="btn" data-acc="x"><span class="t">'+esc(t('acc_close'))+'</span></button><button class="btn p" data-acc="sub"><span class="t">'+esc(t('acc_sub'))+'</span></button></div></div></div>'}
- const showLock=k=>openSheet('lock',k),showLimit=(k,n)=>openSheet('limit',k,n);
- function openPlans(){const u=S.user,url=A.subscribeUrl({email:u&&u.email,name:u&&u.name});if(url)window.open(url,'_blank','noopener')}
- document.addEventListener('click',ev=>{const el=ev.target.closest&&ev.target.closest('[data-acc],#acc-layer .ov');if(!el)return;
-  if(el.dataset.acc=='sub'){openPlans();return}
-  if(el.dataset.acc=='x'||(el.classList.contains('ov')&&ev.target===el))closeSheet()},true);
- document.addEventListener('keydown',ev=>{if(ev.key=='Escape')closeSheet()},true);
- // ---- فحص الحدود ----
- // عدد العناصر النشطة من التخزين المحلي (دوال F/G داخل وحداتها ولا تُرى من هنا)
- function cnt(store,list,flag){try{const j=JSON.parse(sget(store)||'null');return((j&&j[list])||[]).filter(x=>!x[flag]).length}catch(e){return 0}}
- function limitBlock(key,current){if(!A.can(key)){showLock(key);return true}const lim=A.limit(key);if(lim!=null&&current>=lim){showLimit(key,lim);return true}return false}
- function gate(a,el){
-  const d=el.dataset||{},keys=need(a,d);
-  if(keys){for(const k of keys)if(!A.can(k)){showLock(k);return true}}
-  try{
-   if(a=='fpnew'||a=='fnewp'||(a=='fpsave'&&S.fp2&&!S.fp2.id)){if(limitBlock('cash_parties',cnt('fin','parties','arch',1)))return true}
-   if(a=='sp_newemp'||a=='sp_enew'||(a=='sp_esave'&&S.se&&!S.se.id)){if(limitBlock('stamps_employees',cnt('stm','emp','a',0)))return true}
-   if((a=='addacct'||a=='login')&&S.accts.length>0){
-    if(!A.can('multi_accounts')){showLock('multi_accounts');return true}
-    const lim=A.limit('multi_accounts');if(lim!=null&&S.accts.length>=lim){showLimit('multi_accounts',lim);return true}}
-  }catch(e){}
-  return false}
- const wrap=(name,mk)=>{const o=window[name];if(typeof o=='function')window[name]=mk(o)};
- wrap('act2',o=>function(a,el){return gate(a,el)?1:o(a,el)});
- wrap('go',o=>function(n){const k=SCREEN_MOD[n];if(k&&!A.can(k)){showLock(k);return}return o.apply(this,arguments)});
- wrap('readFiles',o=>async function(files){
-  files=[...files];if(!files.length)return;
-  if(!A.can('req_import')){showLock('req_import');return}
-  if(!A.can('req_documents')){showLock('req_documents');return}
-  const lim=A.limit('req_documents');let over=false;
-  if(lim!=null){const room=Math.max(0,lim-S.docs.length);if(!room){showLimit('req_documents',lim);return}if(files.length>room){files=files.slice(0,room);over=true}}
-  const r=await o(files);if(over)showLimit('req_documents',lim);return r});
- // ---- بطاقات التحليل داخل صفحة النتائج ----
- const lockCard=(title,key)=>'<div class="card"><div class="row" style="gap:10px">'+ic('Lock')+'<div class="grow t"><b>'+esc(title)+'</b><div class="mu sm">'+esc(t('acc_lock_title'))+'</div></div><button class="chip on" data-acc="sub">'+esc(t('acc_sub'))+'</button></div></div>';
- wrap('devCard',o=>function(){const h=o.apply(this,arguments);return h&&!A.can('req_cassettes')?lockCard(t('dev_title')):h});
- wrap('cassHtml',o=>function(){return A.can('req_cassettes')?o.apply(this,arguments):'<div class="row" style="gap:10px">'+ic('Lock')+'<span class="mu sm t grow">'+esc(t('acc_lock_title'))+'</span><button class="chip on" data-acc="sub">'+esc(t('acc_sub'))+'</button></div>'});
- wrap('declCard',o=>function(){const h=o.apply(this,arguments);return h&&!A.can('req_decline_reasons')?lockCard(t('decl_title')):h});
- wrap('mmBanners',o=>function(){return A.can('req_suspicious')?o.apply(this,arguments):''});
- // ---- بلاطات الوحدات في الشاشة الرئيسية ----
- [['tFin','cash_module'],['tStm','stamps_module'],['tAcc','acc_module']].forEach(([n,k])=>wrap(n,o=>function(){const h=o.apply(this,arguments);
-  return h&&!A.can(k)?h.replace('</article>','<div class="tl-w t">'+ic('Lock')+'<span>'+esc(t('acc_lock_title'))+'</span></div></article>'):h}));
- // ---- البحث (حقل إدخال لا زر) ----
- document.addEventListener('input',ev=>{const el=ev.target;if(!el||(el.id!='q'&&el.id!='dq')||A.can('req_search_filter'))return;
-  ev.stopImmediatePropagation();el.value='';if(el.id=='q')S.q='';else S.dq='';showLock('req_search_filter')},true);
- // ---- المزامنة السحابية والحسابات ----
- let syncNote=false;
- wrap('activate',o=>async function(){const r=await o.apply(this,arguments);A.ensure();return r});
- wrap('runSync',o=>async function(){await A.ensure();
-  if(!A.can('cloud_sync')){S.syncErr=false;S.ready=true;if(!syncNote){syncNote=true;toast('acc_sync_locked')}return}
-  return o.apply(this,arguments)});
- wrap('acctSheet',o=>function(){let h=o.apply(this,arguments);const i=A.info();
-  if(i.status=='dev'||i.status=='unknown'||i.status=='pending')return h;
-  const dt=i.endsAt?new Date(i.endsAt).toLocaleDateString(S.lang=='ar'?'ar-u-nu-latn':S.lang):'';
-  const line='<div class="row" style="gap:10px"><div class="grow mu sm t">'+esc(i.subscribed?t('acc_plan_line',{p:i.plan||'',d:dt}):t('acc_free_line'))+'</div>'+(i.subscribed?'':'<button class="chip on" data-acc="sub">'+esc(t('acc_sub'))+'</button>')+'</div>';
-  return h.replace(/<button class="btn " data-a="addacct"/,line+'$&')});
- // ---- عند وصول نتيجة جديدة ----
- let sig='';
- A.onChange(()=>{
-  try{const k=SCREEN_MOD[S.screen];if(k&&!A.can(k)){go(0)}}catch(e){}
-  try{if(S.user&&A.can('cloud_sync'))syncActive()}catch(e){}
-  const cur=JSON.stringify(window.__accSig());
-  if(cur!==sig){sig=cur;if(S.sheet||isTyping())S.defer=true;else render()}});
- window.__accSig=()=>{const a=[];['req_import','req_documents','req_folders','req_search_filter','req_edit_numbers','req_export_csv','req_table_view','req_daily_report','req_duplicates','req_suspicious','req_denominations','req_cassettes','req_decline_reasons','req_analysis_settings','req_trash','cash_module','cash_parties','cash_day_close','cash_history','cash_audit_log','cash_cap_alert','stamps_module','stamps_employees','stamps_month_position','stamps_export','acc_module','acc_import','acc_ch60_atm','cloud_sync','multi_accounts'].forEach(k=>a.push([k,A.can(k),A.limit(k)]));a.push(A.info().subscribed);return a};
- A.refresh();
-})()}catch(e){console.error('access gate',e)}
-</script>
 <script>
 (function(){function go(){var src=[].map.call(document.querySelectorAll('script[data-app]'),function(s){return s.textContent}).join('\n;\n'),s=document.createElement('script');s.textContent=src;document.body.appendChild(s)}
  (window.__idbReady||Promise.resolve()).then(go,go)})();
@@ -1912,7 +1797,6 @@ const apps={},CID=Math.random().toString(36).slice(2)+Date.now().toString(36);
 const cut=(t,n)=>{const p=[];let i=0;while(i<t.length){let j=Math.min(i+n,t.length);if(j<t.length){const c=t.charCodeAt(j);if(c>=0xDC00&&c<=0xDFFF)j--}p.push(t.slice(i,j));i=j}return p};
 function get(slot){if(apps[slot])return apps[slot];const app=slot=='[DEFAULT]'?initializeApp(cfg):initializeApp(cfg,slot);return apps[slot]={app,auth:getAuth(app),db:getFirestore(app)}}
 window.FB={
- token:async slot=>{const a=apps[slot],u=a&&a.auth.currentUser;return u?await u.getIdToken():null},
  user:slot=>new Promise(res=>{const a=get(slot),un=onAuthStateChanged(a.auth,u=>{un();res(u)},()=>res(null))}),
  async add(){const slot='a'+Date.now().toString(36),a=get(slot),p=new GoogleAuthProvider();p.setCustomParameters({prompt:'select_account'});
   try{const c=await signInWithPopup(a.auth,p);return{slot,user:c.user}}catch(e){await FB.drop(slot,false);throw e}},
